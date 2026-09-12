@@ -37,7 +37,28 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 主持人 SNS：桌機塞在右上，手機放不下（標題跟右邊按鈕已經 0px 間隙）就移到 bar 下方
+  const snsLinks = hostSns && (
+    <>
+      <a href={hostSns.x} target="_blank" rel="noopener noreferrer" title="逢田珠里依 X" aria-label="逢田珠里依 X" className={SNS_CLASS}>
+        <XIcon size={16} />
+      </a>
+      <a href={hostSns.instagram} target="_blank" rel="noopener noreferrer" title="逢田珠里依 Instagram" aria-label="逢田珠里依 Instagram" className={SNS_CLASS}>
+        <InstagramIcon size={16} />
+      </a>
+      {hostSns.tiktok && (
+        <a href={hostSns.tiktok} target="_blank" rel="noopener noreferrer" title="逢田珠里依 TikTok" aria-label="逢田珠里依 TikTok" className={SNS_CLASS}>
+          <TikTokIcon size={16} />
+        </a>
+      )}
+      <a href={hostSns.showroom} target="_blank" rel="noopener noreferrer" title="逢田珠里依 SHOWROOM" aria-label="逢田珠里依 SHOWROOM" className={SNS_CLASS}>
+        <Radio size={16} />
+      </a>
+    </>
+  );
+
   return (
+    <>
     <nav className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-6">
         <div className="relative max-w-4xl mx-auto h-16 flex items-center justify-between">
@@ -55,24 +76,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
           </p>
         )}
         <div className="flex gap-1.5 sm:gap-2 items-center font-medium text-sm">
-          {hostSns && (
-            <div className="hidden md:flex items-center gap-1 mr-1">
-              <a href={hostSns.x} target="_blank" rel="noopener noreferrer" title="逢田珠里依 X" aria-label="逢田珠里依 X" className={SNS_CLASS}>
-                <XIcon size={16} />
-              </a>
-              <a href={hostSns.instagram} target="_blank" rel="noopener noreferrer" title="逢田珠里依 Instagram" aria-label="逢田珠里依 Instagram" className={SNS_CLASS}>
-                <InstagramIcon size={16} />
-              </a>
-              {hostSns.tiktok && (
-                <a href={hostSns.tiktok} target="_blank" rel="noopener noreferrer" title="逢田珠里依 TikTok" aria-label="逢田珠里依 TikTok" className={SNS_CLASS}>
-                  <TikTokIcon size={16} />
-                </a>
-              )}
-              <a href={hostSns.showroom} target="_blank" rel="noopener noreferrer" title="逢田珠里依 SHOWROOM" aria-label="逢田珠里依 SHOWROOM" className={SNS_CLASS}>
-                <Radio size={16} />
-              </a>
-            </div>
-          )}
+          {snsLinks && <div className="hidden md:flex items-center gap-1 mr-1">{snsLinks}</div>}
           <Link
             href="/members"
             className={`group h-10 inline-flex items-center justify-center px-3 rounded-full font-bold transition-all shadow-sm hover:shadow-md hover:shadow-brand-yellow/10 ${
@@ -157,5 +161,11 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
         </div>
       </div>
     </nav>
+    {snsLinks && (
+      <div className="md:hidden flex justify-center gap-2 py-2 border-b border-zinc-200 dark:border-zinc-800">
+        {snsLinks}
+      </div>
+    )}
+    </>
   );
 }
