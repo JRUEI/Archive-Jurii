@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>はるまとぺーじ Wiki 專案總覽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+  :root {
+    --ground: #FAF9FC;
+    --surface: #FFFFFF;
+    --surface-2: #F3F1F7;
+    --ink: #1A1523;
+    --ink-2: #453D57;
+    --muted: #6C6580;
+    --line: #E6E2EE;
+    --line-strong: #CFC8DD;
+    --violet: #7E22CE;
+    --violet-soft: #F2E9FC;
+    --green: #047857;
+    --green-soft: #E1F4EC;
+    --gold: #96701A;
+    --gold-soft: #F7EFD9;
+    --red: #C0392B;
+    --red-soft: #FBEAE7;
+    --shadow: 0 1px 2px rgba(26, 21, 35, .05), 0 8px 24px -16px rgba(26, 21, 35, .25);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0B0910;
+      --surface: #14101D;
+      --surface-2: #1B1626;
+      --ink: #F3F0F8;
+      --ink-2: #CFC7DE;
+      --muted: #948CA8;
+      --line: #251E33;
+      --line-strong: #3A3050;
+      --violet: #C084FC;
+      --violet-soft: #241735;
+      --green: #34D399;
+      --green-soft: #10281F;
+      --gold: #E8C97A;
+      --gold-soft: #2A2110;
+      --red: #F87171;
+      --red-soft: #2E1414;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0B0910;
+    --surface: #14101D;
+    --surface-2: #1B1626;
+    --ink: #F3F0F8;
+    --ink-2: #CFC7DE;
+    --muted: #948CA8;
+    --line: #251E33;
+    --line-strong: #3A3050;
+    --violet: #C084FC;
+    --violet-soft: #241735;
+    --green: #34D399;
+    --green-soft: #10281F;
+    --gold: #E8C97A;
+    --gold-soft: #2A2110;
+    --red: #F87171;
+    --red-soft: #2E1414;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ---------- masthead ---------- */
+  .masthead { padding: 72px 0 40px; border-bottom: 1px solid var(--line); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--violet); margin: 0 0 20px;
+  }
+  h1 {
+    font-family: "Noto Serif TC", "Songti TC", serif;
+    font-weight: 700;
+    font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.25; letter-spacing: -.01em;
+    margin: 0 0 18px; text-wrap: balance;
+  }
+  h1 .jp { color: var(--violet); }
+  .deck {
+    font-size: clamp(1rem, 2.2vw, 1.15rem); color: var(--ink-2);
+    max-width: 62ch; margin: 0;
+  }
+  .deck strong { color: var(--ink); font-weight: 500; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px; margin-top: 40px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  }
+  .stat { background: var(--surface); padding: 18px 20px; }
+  .stat dt {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 6px;
+  }
+  .stat dd {
+    margin: 0; font-family: "Noto Serif TC", serif; font-weight: 700;
+    font-size: 1.5rem; line-height: 1.2; font-variant-numeric: tabular-nums;
+  }
+  .stat dd small { font-size: .8rem; font-weight: 400; color: var(--muted); margin-left: 4px; font-family: "Noto Sans TC", sans-serif; }
+
+  /* ---------- sections ---------- */
+  section { padding-top: 56px; }
+  .cue {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px; letter-spacing: .1em;
+    color: var(--violet); margin: 0 0 10px;
+  }
+  .cue::before { content: "["; opacity: .55; margin-right: 3px; }
+  .cue::after { content: "]"; opacity: .55; margin-left: 3px; }
+  h2 {
+    font-family: "Noto Serif TC", serif; font-weight: 700;
+    font-size: clamp(1.35rem, 3.2vw, 1.75rem); line-height: 1.35;
+    margin: 0 0 8px; text-wrap: balance;
+  }
+  .lede { color: var(--ink-2); max-width: 66ch; margin: 0 0 24px; }
+  p { margin: 0 0 16px; }
+  a { color: var(--violet); }
+
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .875em;
+  }
+  code {
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 5px; padding: .1em .38em; color: var(--ink-2);
+    word-break: break-word;
+  }
+
+  /* ---------- pipeline ---------- */
+  .pipeline {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px; margin: 0 0 12px; padding: 0; list-style: none;
+  }
+  .step {
+    position: relative; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 18px 18px 16px; box-shadow: var(--shadow);
+  }
+  .step-n {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .1em;
+    color: var(--violet); display: block; margin-bottom: 8px;
+  }
+  .step h3 { margin: 0 0 6px; font-size: .98rem; font-weight: 700; font-family: "Noto Sans TC", sans-serif; }
+  .step p { margin: 0; font-size: .86rem; color: var(--muted); line-height: 1.65; }
+  .step::after {
+    content: "\2192"; position: absolute; right: -14px; top: 50%; transform: translate(50%, -50%);
+    color: var(--line-strong); font-size: 14px; z-index: 1;
+  }
+  .step:last-child::after { content: none; }
+  @media (max-width: 640px) {
+    .step::after { content: none; }
+  }
+
+  /* ---------- mode cards ---------- */
+  .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .mode {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px; box-shadow: var(--shadow);
+  }
+  .mode .tag {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    letter-spacing: .06em; padding: 3px 8px; border-radius: 999px;
+    background: var(--violet-soft); color: var(--violet); margin-bottom: 12px;
+  }
+  .mode h3 { margin: 0 0 8px; font-size: 1.02rem; font-family: "Noto Serif TC", serif; font-weight: 700; }
+  .mode p { margin: 0; font-size: .88rem; color: var(--muted); line-height: 1.7; }
+
+  /* ---------- feature list ---------- */
+  .features {
+    list-style: none; margin: 0; padding: 0; display: grid; gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  }
+  .features li { background: var(--surface); padding: 16px 20px; display: grid; grid-template-columns: 190px 1fr; gap: 4px 24px; }
+  .features b { font-weight: 700; font-size: .92rem; }
+  .features span { color: var(--muted); font-size: .9rem; }
+  @media (max-width: 620px) { .features li { grid-template-columns: 1fr; } }
+
+  /* ---------- tables ---------- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; min-width: 560px; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); font-weight: 500;
+    background: var(--surface-2); white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  td.mono, th.mono { font-family: "IBM Plex Mono", monospace; font-size: .82rem; white-space: nowrap; }
+  .ep-title { font-weight: 500; }
+
+  .pill {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .pill-guest { background: var(--gold-soft); color: var(--gold); }
+  .pill-solo { background: var(--surface-2); color: var(--muted); }
+  .pill-ok { background: var(--green-soft); color: var(--green); }
+  .pill-warn { background: var(--gold-soft); color: var(--gold); }
+  .pill-err { background: var(--red-soft); color: var(--red); }
+
+  /* ---------- rules ---------- */
+  .rules { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .rule {
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--violet);
+    border-radius: 8px; padding: 16px 18px;
+  }
+  .rule h3 { margin: 0 0 6px; font-size: .95rem; font-weight: 700; }
+  .rule p { margin: 0; font-size: .88rem; color: var(--muted); line-height: 1.7; }
+
+  /* ---------- status ---------- */
+  .banner {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--red-soft); border: 1px solid var(--red);
+    border-radius: 10px; padding: 16px 18px; margin-bottom: 22px;
+  }
+  .banner .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); margin-top: 9px; flex: none; }
+  .banner h3 { margin: 0 0 4px; font-size: .98rem; color: var(--red); font-weight: 700; }
+  .banner p { margin: 0; font-size: .9rem; color: var(--ink-2); }
+  .banner-ok { background: var(--green-soft); border-color: var(--green); }
+  .banner-ok .dot { background: var(--green); }
+  .banner-ok h3 { color: var(--green); }
+
+  .issues {
+    list-style: none; margin: 0; padding: 0; display: grid; gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  }
+  .issues li { background: var(--surface); padding: 14px 18px; display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+  .issues .what { flex: 1 1 320px; font-size: .9rem; }
+  .issues .where { font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--muted); min-width: 120px; }
+
+  .note { margin-top: 20px; color: var(--muted); font-size: .9rem; }
+
+  footer {
+    margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--line);
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">非公式 · 繁體中文 · 靜態網站</p>
+    <h1>福嶋晴菜<span class="jp">「はるまとぺーじ」</span>內容整理 Wiki</h1>
+    <p class="deck">
+      這個專案把一檔日文廣播節目的每一回，整理成<strong>三層深度的繁體中文紀錄</strong>——精簡總結、無損還原、完整逐字稿——
+      再由 Next.js 在建置時把 Markdown 編成純靜態頁面。內容全部放在 <code>content/episodes/*.md</code>，
+      程式碼只負責解析與呈現，不接資料庫、沒有後端。
+    </p>
+
+    <dl class="stats">
+      <div class="stat"><dt>收錄回數</dt><dd>10 <small>回</small></dd></div>
+      <div class="stat"><dt>逐字稿列數</dt><dd>7,741 <small>列</small></dd></div>
+      <div class="stat"><dt>還原段落</dt><dd>51 <small>張卡</small></dd></div>
+      <div class="stat"><dt>來賓回</dt><dd>5 <small>／10</small></dd></div>
+      <div class="stat"><dt>期間</dt><dd style="font-size:1.05rem">2026-04-11<br><small style="margin:0">→ 2026-08-22</small></dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <p class="cue">內容管線</p>
+    <h2>從節目音檔到靜態頁面</h2>
+    <p class="lede">整條流程刻意設計成「人工把關、工具只做檢查」——沒有任何一支腳本會自動改寫既有內容。</p>
+    <ol class="pipeline">
+      <li class="step">
+        <span class="step-n">01</span>
+        <h3>來源字幕</h3>
+        <p>從官方 YouTube 影片取得日文字幕，存為 <code>content/ep0X.ja.vtt</code>，原始檔永遠保留。</p>
+      </li>
+      <li class="step">
+        <span class="step-n">02</span>
+        <h3>翻譯與校正</h3>
+        <p>Whisper + LLM 產出雙語內容，再用詞語庫校正人名與專有名詞。</p>
+      </li>
+      <li class="step">
+        <span class="step-n">03</span>
+        <h3>三段式 Markdown</h3>
+        <p>寫入 <code>content/episodes/epXX.md</code>：frontmatter 加上三個固定章節。</p>
+      </li>
+      <li class="step">
+        <span class="step-n">04</span>
+        <h3>建置成靜態站</h3>
+        <p><code>gray-matter</code> 解析後全頁預渲染，<code>dynamicParams = false</code>，執行期不再讀檔。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="cue">資料結構</p>
+    <h2>一份 Markdown，三種閱讀深度</h2>
+    <p class="lede">
+      每個集數檔案的三個章節，直接對應網站上的三個閱讀模式。<code>src/lib/markdown.ts</code> 用正則切分章節，
+      把 <code>### [標籤] 標題</code> 轉成卡片、把 <code>[00:00:00] [說話者] 內容</code> 轉成逐字稿列。
+    </p>
+    <div class="modes">
+      <div class="mode">
+        <span class="tag">【精簡總結】</span>
+        <h3>五行讀完一集</h3>
+        <p>條列式重點。列表頁只取第一條當摘要，適合快速回顧「這集講了什麼」。</p>
+      </div>
+      <div class="mode">
+        <span class="tag">【無損還原】</span>
+        <h3>分段落的完整內容</h3>
+        <p>依單元切成帶標籤的卡片（開場／來信／單元／結語），保留引言區塊。這也是圖卡輸出的來源。</p>
+      </div>
+      <div class="mode">
+        <span class="tag">【完整逐字稿】</span>
+        <h3>帶時間碼的全文</h3>
+        <p>每列附時間與說話者，可對照原影片。目前全站共 7,741 列。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="cue">前端功能</p>
+    <h2>網站實際做得到的事</h2>
+    <ul class="features">
+      <li><b>三種閱讀模式切換</b><span>總結／無損還原／逐字稿，在 <code>EpisodeViewer.tsx</code> 以 state 切換。</span></li>
+      <li><b>IG 限動式卡片模式</b><span>把無損還原內容排成 1080×1920 直式卡片，framer-motion 驅動，支援 40px 觸控滑動翻頁。</span></li>
+      <li><b>整集圖卡打包下載</b><span>html-to-image 逐張轉 PNG、JSZip 打包成 <code>{集名}-Cards.zip</code>，全在瀏覽器端完成。</span></li>
+      <li><b>深色模式</b><span>next-themes 控制，品牌紫／綠在明暗兩套各有一組色值。</span></li>
+      <li><b>專注模式</b><span>Header 設定面板可切換，狀態存在 localStorage（<code>client-state.ts</code> 用 useSyncExternalStore）。</span></li>
+      <li><b>首頁版型切換</b><span>列表／卡片兩種排列，同樣持久化在瀏覽器端。</span></li>
+      <li><b>輕量首頁資料</b><span>首頁只送出標題、日期、來賓與一行摘要；完整逐字稿不會進 client bundle。</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="cue">集數清單</p>
+    <h2>目前收錄的十回</h2>
+    <p class="lede">卡片數＝【無損還原】的段落數；逐字稿列數為實際解析到的時間碼列。</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="mono">EP</th>
+            <th class="mono">配信日</th>
+            <th>標題</th>
+            <th>形式</th>
+            <th class="mono">卡片</th>
+            <th class="mono">逐字稿</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">01</td><td class="mono">2026-04-11</td><td class="ep-title">與大家一起創造全新的第一頁！</td><td><span class="pill pill-solo">個人回</span></td><td class="num">5</td><td class="num">699</td></tr>
+          <tr><td class="mono">02</td><td class="mono">2026-04-25</td><td class="ep-title">節目迎來首位嘉賓！舞台劇回憶與ウミガメのスープ</td><td><span class="pill pill-guest">今泉りおな</span></td><td class="num">5</td><td class="num">733</td></tr>
+          <tr><td class="mono">03</td><td class="mono">2026-05-09</td><td class="ep-title">感冒後的沙啞嗓音與 USJ 遠足回憶</td><td><span class="pill pill-solo">個人回</span></td><td class="num">6</td><td class="num">41</td></tr>
+          <tr><td class="mono">04</td><td class="mono">2026-05-23</td><td class="ep-title">生日活動回顧與原創解謎挑戰</td><td><span class="pill pill-guest">真野美月</span></td><td class="num">6</td><td class="num">1,066</td></tr>
+          <tr><td class="mono">05</td><td class="mono">2026-06-13</td><td class="ep-title">決定粉絲專屬稱呼「しおり」</td><td><span class="pill pill-solo">個人回</span></td><td class="num">4</td><td class="num">899</td></tr>
+          <tr><td class="mono">06</td><td class="mono">2026-06-27</td><td class="ep-title">問候語「こんまとぺ」誕生與我們的色彩哲學</td><td><span class="pill pill-guest">藤本侑里</span></td><td class="num">6</td><td class="num">910</td></tr>
+          <tr><td class="mono">07</td><td class="mono">2026-07-11</td><td class="ep-title">一人廣播的拉麵之日與青春裁判！</td><td><span class="pill pill-solo">個人回</span></td><td class="num">4</td><td class="num">124</td></tr>
+          <tr><td class="mono">08</td><td class="mono">2026-07-25</td><td class="ep-title">夏日素麵與謎題破解！</td><td><span class="pill pill-guest">根本優奈</span></td><td class="num">4</td><td class="num">1,456</td></tr>
+          <tr><td class="mono">09</td><td class="mono">2026-08-08</td><td class="ep-title">夏日防暑與購物心得！朗讀劇幕後花絮分享</td><td><span class="pill pill-solo">個人回</span></td><td class="num">6</td><td class="num">832</td></tr>
+          <tr><td class="mono">10</td><td class="mono">2026-08-22</td><td class="ep-title">嘉賓佐藤榛夏登場！回顧深厚友誼與生日驚喜</td><td><span class="pill pill-guest">佐藤榛夏</span></td><td class="num">5</td><td class="num">1,084</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="cue">技術棧</p>
+    <h2>用到什麼、放在哪裡</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th class="mono">路徑 / 套件</th><th>角色</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">next 16.2.12 · react 19.2.4</td><td>App Router，全站 SSG</td></tr>
+          <tr><td class="mono">tailwindcss v4 · typescript 5</td><td>樣式與型別；色彩變數集中在 <code>globals.css</code></td></tr>
+          <tr><td class="mono">framer-motion · next-themes</td><td>卡片動畫、深色模式</td></tr>
+          <tr><td class="mono">gray-matter · react-markdown</td><td>frontmatter 解析與內文渲染</td></tr>
+          <tr><td class="mono">html-to-image · jszip · file-saver</td><td>圖卡輸出（動態 import，不進主 bundle）</td></tr>
+          <tr><td class="mono">src/lib/markdown.ts</td><td>唯一的內容解析器，標記 <code>server-only</code></td></tr>
+          <tr><td class="mono">src/components/EpisodeViewer.tsx</td><td>閱讀模式切換的中樞</td></tr>
+          <tr><td class="mono">src/components/CardMode.tsx</td><td>656 行，圖卡排版與匯出</td></tr>
+          <tr><td class="mono">content/glossary.json</td><td>37 條全域替換規則 + ep02 專屬覆寫（<strong style="color:var(--red)">目前檔案已毀損</strong>）</td></tr>
+          <tr><td class="mono">docs/demos/*.html</td><td>30 份 UI 提案與前後比對 demo，已排除在部署外</td></tr>
+          <tr><td class="mono">scripts/legacy/</td><td>8 支高風險的舊字幕腳本，封存不刪</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="cue">工具鏈</p>
+    <h2>指令與安全網</h2>
+    <p class="lede">所有內容工具都是唯讀或 dry-run：只回報問題，不會替你改字幕或改 Markdown。</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th class="mono">指令</th><th>做什麼</th><th>會寫檔嗎</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">npm run dev</td><td>本機開發伺服器</td><td><span class="pill pill-solo">—</span></td></tr>
+          <tr><td class="mono">npm run validate:content</td><td>檢查 frontmatter、章節、時間碼、說話者與詞語庫</td><td><span class="pill pill-ok">唯讀</span></td></tr>
+          <tr><td class="mono">npm run subtitles:check</td><td>比對來源／候選 ASS：列數、時間碼、每行字數（超過 25 字失敗）</td><td><span class="pill pill-ok">唯讀</span></td></tr>
+          <tr><td class="mono">npm run glossary:dry-run</td><td>只列出詞語庫「可能會替換」的位置</td><td><span class="pill pill-ok">唯讀</span></td></tr>
+          <tr><td class="mono">npm run verify</td><td>lint → typecheck → build，部署前的完整驗證</td><td><span class="pill pill-solo">—</span></td></tr>
+          <tr><td class="mono">prebuild</td><td>build 前自動跑內容驗證（Vercel 也會執行）</td><td><span class="pill pill-ok">唯讀</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="cue">維護守則</p>
+    <h2>寫給 AI 代理的邊界</h2>
+    <p class="lede"><code>AGENTS.md</code> 針對高自主性模型定了四條硬規則，維護這個專案時必須遵守。</p>
+    <div class="rules">
+      <div class="rule">
+        <h3>找不到就停下來</h3>
+        <p>檔案或元件不存在時，禁止捏造替代內容；直接回報「找不到」，語氣保持中立客觀。</p>
+      </div>
+      <div class="rule">
+        <h3>終端機指令要人批准</h3>
+        <p>install／build／commit 一律只能提案。大規模重構要先送審查再動手。</p>
+      </div>
+      <div class="rule">
+        <h3>內容與色系鎖定</h3>
+        <p>既有集數 Markdown 覆寫前必須先讀再問。品牌紫／綠只能改 <code>globals.css</code> 的變數，元件內不得硬寫色碼。</p>
+      </div>
+      <div class="rule">
+        <h3>展示一律用 HTML</h3>
+        <p>規劃、比對、概念說明都要做成獨立的 demo HTML，不產出 Markdown 企劃書——這頁本身就是照這條規則做的。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="cue">部署</p>
+    <h2>Vercel 設定</h2>
+    <ul class="features">
+      <li><b>Node.js 24.x</b><span>由 <code>package.json</code> 的 <code>engines</code> 鎖定，使用預設 <code>npm run build</code>，不需要 <code>vercel.json</code>。</span></li>
+      <li><b>安全標頭</b><span><code>next.config.ts</code> 全站掛上 CSP（<code>frame-ancestors 'none'</code>）、Permissions-Policy、Referrer-Policy、nosniff、X-Frame-Options，並移除 <code>X-Powered-By</code>。</span></li>
+      <li><b>.vercelignore</b><span>排除 demo HTML、報告、暫存字幕與封存腳本，公開站只留正式 Next.js 產物。</span></li>
+      <li><b>錯誤頁</b><span><code>error.tsx</code> 不外洩 stack；未知集數走 <code>not-found</code>。</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="cue">目前狀態</p>
+    <h2>已知問題（2026-09-04 10:15 複測）</h2>
+
+    <div class="banner banner-ok">
+      <span class="dot"></span>
+      <div>
+        <h3>ep09 / ep10 已修好</h3>
+        <p>frontmatter 換成 <code>episode</code> 與 <code>youtube</code>、補上正式標題，
+        <code>## 【無損還原】</code> 也補齊了（第 9 回 6 張卡、第 10 回 5 張）。上一輪的 4 個 error 全部消失。</p>
+      </div>
+    </div>
+
+    <div class="banner">
+      <span class="dot"></span>
+      <div>
+        <h3>但 build 仍然被擋下——換成詞語庫壞了</h3>
+        <p><code>content/glossary.json</code> 被以錯誤編碼重新存檔（UTF-8 BOM ＋ CP950 來回轉換），
+        JSON 已無法解析。<code>npm run validate:content</code> 現在是 1 error / 11 warning，exit code 仍為 1，
+        <code>prebuild</code> 照樣會讓 <code>npm run build</code> 失敗。</p>
+      </div>
+    </div>
+
+    <ul class="issues">
+      <li><span class="pill pill-err">error</span><span class="where">glossary.json</span><span class="what">
+        編碼毀損：檔頭多了 UTF-8 BOM，內文出現 200 個私用區字元與 404 個 <code>?</code>，連引號都被吃掉。
+        原因是曾用 Big5／CP950 的編碼寫回檔案，假名沒有對應碼位而被替換成 <code>?</code>——這部分是<strong>永久遺失</strong>。
+        檔案還是 untracked，git 裡沒有可還原的版本。
+      </span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">scratch/fix_glossary.js</span><span class="what">
+        這支腳本會直接改寫 <code>content/episodes/*.md</code>，與專案「工具只做 dry-run」的原則相衝突。
+        09:43 已執行過一次，ep01–ep06 的檔案時間都被更新。（所幸這些 Markdown 目前檢查下來編碼乾淨。）
+      </span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">ep08</span><span class="what">516 列逐字稿完全重複，另有 3 次時間倒退。</span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">ep05</span><span class="what">說話者被污染成「福嶋晴菜春奈」，找不到精確的主持人標籤。</span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">ep10 / ep06</span><span class="what">110 列與 3 列沒有說話者標籤，網站目前不會顯示這些列。</span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">ep03 / ep07</span><span class="what">逐字稿只有 41 與 124 列，明顯短於其他回，內容應是尚未補齊。</span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">ep01 / 08 / 09</span><span class="what">共 29 列只有說話者或音效標籤，沒有實際內容。</span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">ep04</span><span class="what">可疑的說話者標籤「工作人員？」，與其他集數的格式不一致。</span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">ep09 / ep10</span><span class="what">frontmatter 仍留著多餘的 <code>id:</code>，內文也多了一層 <code>#</code> 標題，其他八集都沒有。不影響建置，但格式不一致。</span></li>
+      <li><span class="pill pill-warn">warning</span><span class="where">git</span><span class="what">除了初始 commit 之外全未提交：<code>content/</code>、<code>src/components/</code>、<code>src/lib/</code>、<code>scripts/</code> 都還是 untracked——這正是詞語庫救不回來的原因。</span></li>
+    </ul>
+
+    <p class="note">
+      詞語庫的 <code>global</code> 37 條規則可以從今天稍早的完整讀取內容原樣還原；
+      <code>episodes."2"</code> 的 13 條因為假名被換成 <code>?</code>，只剩漢字與 <code>(haraitai)</code> 這類 ASCII 片段，
+      需要對照 <code>content/ep02.ja.vtt</code> 人工重建。依照 <code>HANDOFF.md</code> 的原則，這些都不該盲目自動修復。
+    </p>
+  </section>
+
+  <footer>
+    <span>harumatope-wiki · Next.js 16 · 靜態站</span>
+    <span>資料實測於 2026-09-04 10:15</span>
+  </footer>
+
+</div>
+</html>

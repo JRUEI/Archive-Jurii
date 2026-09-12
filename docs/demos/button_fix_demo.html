@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按鈕破圖修復 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#8B5CF6' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 為了讓破圖更明顯，稍微放大外觀 */
+        .demo-container { transform-origin: top left; transform: scale(1.2); margin-bottom: 60px; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white p-8 font-sans">
+    <div class="max-w-4xl mx-auto space-y-12">
+        
+        <!-- 錯誤示範區 -->
+        <div class="demo-container">
+            <h2 class="text-xl font-bold text-red-400 mb-2">
+                原始狀況 (破圖外溢)
+            </h2>
+            <p class="text-sm text-zinc-400 mb-4 max-w-lg">
+                這還原了您截圖中的狀況。外層因左右 padding 不同受到擠壓，導致黑底框高度變小。<br>
+                加上按鈕切換時，因為「被選取時突然多出 border」，導致高度撐破了黑底框。<br>
+                <span class="text-red-300">您可以點擊按鈕看看，被點擊的按鈕邊界會凸出黑框外！</span>
+            </p>
+            
+            <div class="flex-[1.5] bg-zinc-900 border border-zinc-800 rounded-2xl p-3 flex items-center shadow-sm w-fit">
+                <div class="flex bg-zinc-950 p-1.5 rounded-xl" id="broken-container">
+                    <!-- 預設左邊選取 -->
+                    <button onclick="toggleBroken(true)" id="broken-btn-1" class="px-5 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-sm border border-transparent border-zinc-700/50">精簡總結</button>
+                    <button onclick="toggleBroken(false)" id="broken-btn-2" class="px-5 py-2 rounded-lg font-bold text-sm text-zinc-400 hover:text-zinc-200">完整無損</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 建議修正區 -->
+        <div class="demo-container">
+            <h2 class="text-xl font-bold text-emerald-400 mb-2">
+                完美修復版本 (不破圖)
+            </h2>
+            <p class="text-sm text-zinc-400 mb-4 max-w-lg">
+                1. 外層使用統一的 <code>p-4</code> 確保不會因為排版被壓扁。<br>
+                2. 所有按鈕都加入了 <code>border border-transparent</code> 作為基底。<br>
+                <span class="text-emerald-300">無論您怎麼點擊切換，按鈕高度永遠一致，完美包覆在黑框內，絕對不破圖！</span>
+            </p>
+            
+            <div class="flex-[1.5] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center shadow-sm w-fit">
+                <div class="flex bg-zinc-950 p-1.5 rounded-xl" id="fixed-container">
+                    <!-- 預設左邊選取 -->
+                    <button onclick="toggleFixed(true)" id="fixed-btn-1" class="px-5 py-2 rounded-lg font-bold text-sm border bg-zinc-800 text-white shadow-sm border-transparent border-zinc-700/50">精簡總結</button>
+                    <button onclick="toggleFixed(false)" id="fixed-btn-2" class="px-5 py-2 rounded-lg font-bold text-sm border border-transparent text-zinc-400 hover:text-zinc-200">完整無損</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 切換 Broken 狀態的 CSS (沒有預留邊框)
+        const brokenBtnActive = "px-5 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-sm border border-transparent border-zinc-700/50";
+        const brokenBtnInactive = "px-5 py-2 rounded-lg font-bold text-sm text-zinc-400 hover:text-zinc-200";
+
+        function toggleBroken(isLeft) {
+            document.getElementById('broken-btn-1').className = isLeft ? brokenBtnActive : brokenBtnInactive;
+            document.getElementById('broken-btn-2').className = !isLeft ? brokenBtnActive : brokenBtnInactive;
+        }
+
+        // 切換 Fixed 狀態的 CSS (都有預留 border border-transparent)
+        const fixedBtnActive = "px-5 py-2 rounded-lg font-bold text-sm border bg-zinc-800 text-white shadow-sm border-transparent border-zinc-700/50";
+        const fixedBtnInactive = "px-5 py-2 rounded-lg font-bold text-sm border border-transparent text-zinc-400 hover:text-zinc-200";
+
+        function toggleFixed(isLeft) {
+            document.getElementById('fixed-btn-1').className = isLeft ? fixedBtnActive : fixedBtnInactive;
+            document.getElementById('fixed-btn-2').className = !isLeft ? fixedBtnActive : fixedBtnInactive;
+        }
+    </script>
+</body>
+</html>

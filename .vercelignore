@@ -1,0 +1,8 @@
+.agents/
+content/*.vtt
+docs/
+reports/
+scratch/
+scripts/legacy/
+temp_subs/
+HANDOFF.md

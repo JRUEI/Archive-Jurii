@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基於原有架構 (EpisodeViewer) 升級 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#34d399' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+        .glass { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="max-w-4xl mx-auto py-10 px-4">
+        
+        <!-- Header (原有架構的美化版) -->
+        <header class="mb-10 flex flex-col items-center w-full relative">
+            <!-- 裝飾背光 -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[200px] bg-brand-green/10 blur-[100px] rounded-full pointer-events-none z-0"></div>
+            
+            <div class="flex flex-wrap justify-center gap-3 mb-5 relative z-10">
+                <span class="px-6 py-2 bg-brand-green/10 border border-brand-green/30 text-brand-green rounded-full text-sm font-bold tracking-widest shadow-[0_0_15px_rgba(52,211,153,0.2)]">
+                    第 8 回
+                </span>
+                <span class="px-6 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-full text-sm font-bold tracking-widest shadow-sm">
+                    來賓：根本優奈
+                </span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-black mb-6 text-center leading-tight tracking-tight relative z-10">
+                嘉賓根本優奈登場！夏日素麵與謎題破解！
+            </h1>
+            
+            <div class="w-full max-w-2xl flex items-center justify-center gap-4 relative z-10">
+                <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent to-brand-green/50"></div>
+                <p class="text-brand-green/80 text-sm font-bold whitespace-nowrap tracking-widest font-mono">
+                    2026-07-25 配信
+                </p>
+                <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent to-brand-green/50"></div>
+            </div>
+        </header>
+
+        <!-- Toolbar Area (原有架構的 UI 升級) -->
+        <div class="w-full flex flex-col lg:flex-row gap-4 mb-10 sticky top-4 z-40">
+            <!-- YouTube Link -->
+            <div class="flex-1 glass border border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="bg-red-500/10 text-red-400 p-2.5 rounded-full flex-shrink-0 border border-red-500/20">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93-.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-100 whitespace-nowrap">官方 YouTube 收聽</h3>
+                </div>
+                <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors text-sm whitespace-nowrap shadow-md">
+                    前往
+                </button>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="flex-[1.7] glass border border-zinc-800 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-lg">
+                <!-- Content Toggle (模擬已切換到 "完整無損") -->
+                <div class="flex w-full sm:w-auto bg-[#0a0a0f] border border-zinc-800 p-1.5 rounded-xl shrink-0 shadow-inner">
+                    <button class="flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold transition-all text-sm text-zinc-500 hover:text-zinc-300">
+                        精簡總結
+                    </button>
+                    <!-- Active State -->
+                    <button class="flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold transition-all text-sm bg-zinc-800 text-white shadow-md border border-zinc-700/50">
+                        完整無損
+                    </button>
+                </div>
+
+                <!-- Mode Toggle (模擬已切換到 "文字模式") -->
+                <div class="flex w-full sm:w-auto bg-[#0a0a0f] border border-zinc-800 p-1.5 rounded-xl shrink-0 shadow-inner">
+                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-all text-sm text-zinc-500 hover:text-zinc-300">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                        <span class="whitespace-nowrap">圖卡模式</span>
+                    </button>
+                    <!-- Active State -->
+                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-all text-sm bg-brand-purple/20 text-brand-purple shadow-md border border-brand-purple/30">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        <span class="whitespace-nowrap">文字模式</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area (文字模式 - 無損還原內容) -->
+        <div class="w-full">
+            <div class="space-y-8">
+                
+                <!-- 區塊 1 -->
+                <div class="bg-[#12121a] border border-zinc-800/80 rounded-3xl p-6 md:p-8 hover:border-brand-purple/30 transition-colors duration-300">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="bg-brand-purple/20 text-brand-purple px-3 py-1 rounded-full text-xs font-bold tracking-widest">嘉賓登場</span>
+                        <h3 class="text-xl font-bold text-zinc-100">根本優奈初次作為嘉賓！</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-zinc-800/30 rounded-xl p-5 border border-zinc-800/50">
+                            <strong class="text-brand-purple block mb-2 text-lg">初次作客</strong>
+                            <p class="text-zinc-400 leading-relaxed">節目一開始就迎來了這集的嘉賓「根本優奈」！根本表示這不僅是她第一次來這檔節目，更是她工作生涯中「第一次作為嘉賓」出席，讓她非常期待。</p>
+                        </div>
+                        <div class="bg-zinc-800/30 rounded-xl p-5 border border-zinc-800/50">
+                            <strong class="text-brand-purple block mb-2 text-lg">可靠的姐姐</strong>
+                            <p class="text-zinc-400 leading-relaxed">當聽眾問到兩人的關係時，福嶋形容根本就像是「可靠的姐姐（姉貴）」。雖然福嶋總是很想把根本當成小寶寶寵愛，但根本那種開朗、愛喝酒、又會帶領大家的性格，反而更像個大姐。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 區塊 2 -->
+                <div class="bg-[#12121a] border border-zinc-800/80 rounded-3xl p-6 md:p-8 hover:border-brand-purple/30 transition-colors duration-300">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="bg-brand-purple/20 text-brand-purple px-3 py-1 rounded-full text-xs font-bold tracking-widest">近況分享</span>
+                        <h3 class="text-xl font-bold text-zinc-100">夏日的素麵與不同吃法</h3>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="bg-zinc-800/30 rounded-xl p-5 border border-zinc-800/50 flex gap-4 flex-col md:flex-row">
+                            <strong class="text-brand-purple shrink-0 md:w-24 mt-1 text-lg">素麵話題</strong>
+                            <p class="text-zinc-400 leading-relaxed">根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。</p>
+                        </div>
+                        <div class="bg-zinc-800/30 rounded-xl p-5 border border-zinc-800/50 flex gap-4 flex-col md:flex-row">
+                            <strong class="text-brand-purple shrink-0 md:w-24 mt-1 text-lg">兩種沾醬</strong>
+                            <p class="text-zinc-400 leading-relaxed">而福嶋則分享了自己家裡獨特的吃法：她會同時準備「冷」跟「熱」（通常有豬肉和蔥）兩種沾醬，交替著吃才不會膩。這讓根本笑說簡直像是瑪麗·安東妮（Marie Antoinette）般的奢華吃法。</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

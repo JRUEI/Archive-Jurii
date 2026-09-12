@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary & Correction System Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#4ade80' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+        .glass-panel { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(63, 63, 70, 0.5); }
+    </style>
+</head>
+<body class="min-h-screen p-6 sm:p-12 relative overflow-y-auto">
+    <!-- Background Decor -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-purple/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+    <div class="max-w-6xl mx-auto space-y-12 relative z-10">
+        
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-black mb-4">全網域詞語庫 & 逐字稿校正系統</h1>
+            <p class="text-zinc-400">模擬 1~8 回逐字稿的字典分類 (Global / Local) 與自動語意修正流程。</p>
+        </header>
+
+        <!-- Section 1: Glossary Management (Labeling) -->
+        <section class="glass-panel rounded-3xl p-8 shadow-2xl">
+            <div class="flex items-center justify-between mb-8 pb-4 border-b border-zinc-800">
+                <h2 class="text-2xl font-bold text-brand-purple flex items-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    詞語庫管理 (Glossary Manager)
+                </h2>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 bg-brand-purple/20 text-brand-purple rounded-full text-xs font-bold border border-brand-purple/30">Total: 42 Terms</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Global Terms -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-zinc-300 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+                        全域共用 (Global)
+                        <span class="text-xs font-normal text-zinc-500 ml-2">適用於 Ep 1 ~ Ep 8</span>
+                    </h3>
+                    <div class="space-y-3">
+                        <!-- Term Item -->
+                        <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center hover:border-blue-500/50 transition-colors">
+                            <div>
+                                <div class="font-bold text-white mb-1">福嶋晴菜</div>
+                                <div class="text-xs text-zinc-500">預警防呆：福島なの、福島</div>
+                            </div>
+                            <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">人物</span>
+                        </div>
+                        <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center hover:border-blue-500/50 transition-colors">
+                            <div>
+                                <div class="font-bold text-white mb-1">ダミーヘッドマイク <span class="text-xs text-zinc-400 ml-1">(假人頭麥克風)</span></div>
+                                <div class="text-xs text-zinc-500">預警防呆：ラーミー、ナミー</div>
+                            </div>
+                            <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">核心專有名詞</span>
+                        </div>
+                        <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center hover:border-blue-500/50 transition-colors">
+                            <div>
+                                <div class="font-bold text-white mb-1">『オートクチュールボイス』</div>
+                                <div class="text-xs text-zinc-500">預警防呆：オートチュールボイズ</div>
+                            </div>
+                            <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">常態單元 (需加雙引號)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Local Terms -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-zinc-300 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></span>
+                        單集專用 (Episode-Specific)
+                        <span class="text-xs font-normal text-zinc-500 ml-2">嚴格限制生效範圍</span>
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center hover:border-amber-500/50 transition-colors">
+                            <div>
+                                <div class="font-bold text-white mb-1">今泉りおな <span class="text-xs text-amber-500 ml-2 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded">限定: 第2回</span></div>
+                                <div class="text-xs text-zinc-500">預警防呆：今泉リオラ、岩泉リオナ</div>
+                            </div>
+                            <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">人物</span>
+                        </div>
+                        <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center hover:border-amber-500/50 transition-colors">
+                            <div>
+                                <div class="font-bold text-white mb-1">腹痛い / 払いたい <span class="text-xs text-amber-500 ml-2 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded">限定: 第2回</span></div>
+                                <div class="text-xs text-zinc-500">背景：海龜湯謎題核心諧音梗</div>
+                            </div>
+                            <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">劇情知識</span>
+                        </div>
+                        <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center hover:border-amber-500/50 transition-colors">
+                            <div>
+                                <div class="font-bold text-white mb-1">ちびっこ組 <span class="text-xs text-amber-500 ml-2 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded">限定: 第2回</span></div>
+                                <div class="text-xs text-zinc-500">背景：155cm以下的私人小團體</div>
+                            </div>
+                            <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">背景知識</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section 2: Automated Semantic Correction Pipeline -->
+        <section class="glass-panel rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-4 border-b border-zinc-800 relative z-10">
+                <h2 class="text-2xl font-bold text-brand-green flex items-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    全集逐字稿 自動校正處理引擎
+                </h2>
+                <div class="mt-4 md:mt-0 flex items-center gap-3">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-900 flex items-center justify-center text-xs text-zinc-500">Ep1</div>
+                        <div class="w-8 h-8 rounded-full bg-brand-green border-2 border-zinc-900 flex items-center justify-center text-xs text-zinc-950 font-bold shadow-[0_0_10px_rgba(74,222,128,0.5)] z-10">Ep2</div>
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-900 flex items-center justify-center text-xs text-zinc-500">Ep3</div>
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-900 flex items-center justify-center text-xs text-zinc-500">...</div>
+                    </div>
+                    <span class="text-sm font-mono text-brand-green animate-pulse">Processing...</span>
+                </div>
+            </div>
+
+            <!-- Pipeline Diff Demo -->
+            <div class="relative z-10 space-y-6">
+                <div class="text-sm text-zinc-400 mb-4">正在處理：<span class="text-white font-bold">第 2 回 (嘉賓：今泉りおな)</span> - 套用 Global + Ep2 Local 詞語庫</div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Original AI Transcript -->
+                    <div class="bg-red-500/5 border border-red-500/20 rounded-xl p-5">
+                        <div class="text-red-400 text-xs font-bold mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            原始初稿 (充滿聽寫與幻覺錯誤)
+                        </div>
+                        <div class="space-y-4 text-sm text-zinc-400">
+                            <p>[12:05] <span class="text-red-400 underline decoration-wavy">福島なの</span>：今天我們用 <span class="text-red-400 underline decoration-wavy">ラーミー</span> 來收音喔。說到舞台劇，我們 <span class="text-red-400 underline decoration-wavy">チビコ組</span> 的大家感情都超好的！</p>
+                            <p>[12:12] <span class="text-red-400 underline decoration-wavy">今泉リオラ</span>：對啊！妳當時還拼命練習 <span class="text-red-400 underline decoration-wavy">ポイ</span> 呢，真不愧是 <span class="text-red-400 underline decoration-wavy">ポイ</span>大師。後來在 <span class="text-red-400 underline decoration-wavy">オートチュールボイズ</span> 單元裡，還一直唸錯台詞，超好笑的。</p>
+                        </div>
+                    </div>
+
+                    <!-- AI Corrected Transcript -->
+                    <div class="bg-brand-green/5 border border-brand-green/30 rounded-xl p-5 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-brand-green/5 to-transparent pointer-events-none"></div>
+                        <div class="text-brand-green text-xs font-bold mb-3 flex items-center gap-2 relative z-10">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            套用詞庫後 (精準語意修復)
+                        </div>
+                        <div class="space-y-4 text-sm text-zinc-300 relative z-10">
+                            <p>[12:05] <span class="text-brand-green font-bold bg-brand-green/20 px-1 rounded">福嶋晴菜</span>：今天我們用 <span class="text-brand-green font-bold bg-brand-green/20 px-1 rounded">假人頭麥克風(ダミーヘッドマイク)</span> 來收音喔。說到舞台劇，我們 <span class="text-amber-400 font-bold bg-amber-400/20 px-1 rounded" title="Ep2限定">ちびっこ組</span> 的大家感情都超好的！</p>
+                            <p>[12:12] <span class="text-amber-400 font-bold bg-amber-400/20 px-1 rounded" title="Ep2限定">今泉りおな</span>：對啊！妳當時還拼命練習 <span class="text-amber-400 font-bold bg-amber-400/20 px-1 rounded" title="Ep2限定">ポイ (Poi)</span> 呢，真不愧是 <span class="text-amber-400 font-bold bg-amber-400/20 px-1 rounded" title="Ep2限定">ポイ大師</span>。後來在 <span class="text-brand-green font-bold bg-brand-green/20 px-1 rounded">『オートクチュールボイス』</span> 單元裡，還一直唸錯台詞，超好笑的。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>

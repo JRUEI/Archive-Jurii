@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spacing and Line Fix Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#4ade80' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-10">
+
+    <div class="max-w-4xl mx-auto flex flex-col gap-16">
+
+        <!-- BEFORE -->
+        <div>
+            <h2 class="text-2xl font-bold mb-4 text-brand-purple">Before (Bug Reproduction)</h2>
+            <div class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-xl max-w-none">
+                
+                <div class="space-y-16"> <!-- Notice space-y-16 makes a HUGE gap -->
+                    
+                    <!-- Inactive Block (Gray line pushes content) -->
+                    <div class="relative pl-8 transition-all duration-500 ease-out cursor-pointer opacity-40 scale-95">
+                        <div class="hidden sm:block absolute top-0 bottom-0 rounded-full transition-all duration-500 w-1 left-0 bg-zinc-800"></div>
+                        <div class="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <h3 class="text-2xl font-bold text-zinc-100 m-0 tracking-tight">
+                                [Inactive] 這裡有灰線，並且文字被往右推 (pl-8)
+                            </h3>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <p class="text-lg leading-relaxed text-zinc-300 my-4">這是因為 base 設置了 pl-8，而且灰線佔據了左側的位置。</p>
+                        </div>
+                    </div>
+
+                    <!-- Active Block -->
+                    <div class="relative pl-8 transition-all duration-500 ease-out cursor-pointer opacity-100 scale-100 bg-[#1c1924] shadow-[inset_0_0_0_1px_rgba(139,92,246,0.1)] rounded-3xl p-8 -mx-8">
+                        <div class="hidden sm:block absolute top-0 bottom-0 rounded-full transition-all duration-500 w-1.5 left-[-1px] bg-gradient-to-b from-brand-purple to-brand-green shadow-[0_0_12px_rgba(139,92,246,0.6)]"></div>
+                        <div class="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <h3 class="text-2xl font-bold text-zinc-100 m-0 tracking-tight">
+                                [Active] 觸發狀態
+                            </h3>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <p class="text-lg leading-relaxed text-zinc-300 my-4">段落距離 (space-y-16) 太遠了。</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- AFTER -->
+        <div>
+            <h2 class="text-2xl font-bold mb-4 text-brand-green">After (Fixed)</h2>
+            <div class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-xl max-w-none">
+                
+                <div class="space-y-8"> <!-- Changed from 16 to 8 -->
+                    
+                    <!-- Inactive Block (No line, no padding) -->
+                    <div class="relative transition-all duration-500 ease-out cursor-pointer opacity-40 scale-95">
+                        <div class="hidden sm:block absolute top-0 bottom-0 rounded-full transition-all duration-500 w-1.5 left-0 bg-gradient-to-b from-brand-purple to-brand-green shadow-[0_0_12px_rgba(139,92,246,0.6)] opacity-0"></div>
+                        <div class="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <h3 class="text-2xl font-bold text-zinc-100 m-0 tracking-tight">
+                                [Inactive] 灰線移除，也沒有多餘的 padding 了！
+                            </h3>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <p class="text-lg leading-relaxed text-zinc-300 my-4">文字切齊原始位置，沒有被往右推，也沒有奇怪的灰線干擾。</p>
+                        </div>
+                    </div>
+
+                    <!-- Active Block -->
+                    <div class="relative transition-all duration-500 ease-out cursor-pointer opacity-100 scale-100 bg-[#1c1924] shadow-[inset_0_0_0_1px_rgba(139,92,246,0.1)] rounded-3xl p-8 -mx-8">
+                        <div class="hidden sm:block absolute top-0 bottom-0 rounded-full transition-all duration-500 w-1.5 left-0 bg-gradient-to-b from-brand-purple to-brand-green shadow-[0_0_12px_rgba(139,92,246,0.6)] opacity-100"></div>
+                        <div class="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <h3 class="text-2xl font-bold text-zinc-100 m-0 tracking-tight">
+                                [Active] 觸發狀態
+                            </h3>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <p class="text-lg leading-relaxed text-zinc-300 my-4">段落距離 (space-y-8) 變得更加緊湊合理，閱讀起來更順暢。</p>
+                        </div>
+                    </div>
+
+                    <!-- Inactive Block -->
+                    <div class="relative transition-all duration-500 ease-out cursor-pointer opacity-40 scale-95">
+                        <div class="hidden sm:block absolute top-0 bottom-0 rounded-full transition-all duration-500 w-1.5 left-0 bg-gradient-to-b from-brand-purple to-brand-green shadow-[0_0_12px_rgba(139,92,246,0.6)] opacity-0"></div>
+                        <div class="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <h3 class="text-2xl font-bold text-zinc-100 m-0 tracking-tight">
+                                [Inactive] 第三個區塊
+                            </h3>
+                        </div>
+                        <div class="mt-6 space-y-4">
+                            <p class="text-lg leading-relaxed text-zinc-300 my-4">段落之間的間距從 4rem (64px) 縮小為 2rem (32px)。</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

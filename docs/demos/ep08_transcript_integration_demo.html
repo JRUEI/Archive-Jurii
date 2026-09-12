@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現有面板新增逐字稿 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#34d399' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="max-w-4xl mx-auto py-10 px-4">
+        
+        <!-- Header (還原目前專案的設計) -->
+        <header class="mb-6 flex flex-col items-center w-full">
+            <div class="flex flex-wrap justify-center gap-3 mb-5">
+                <span class="px-6 py-2 bg-brand-purple/10 dark:bg-zinc-800 text-brand-purple rounded-full text-lg font-bold tracking-wider">
+                    第 8 回
+                </span>
+                <span class="px-6 py-2 rounded-full text-lg font-bold tracking-wider shadow-sm bg-amber-500/20 text-amber-300">
+                    來賓：根本優奈
+                </span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center leading-tight">嘉賓根本優奈登場！夏日素麵與謎題破解！</h1>
+            
+            <div class="w-full max-w-2xl flex items-center justify-center gap-4">
+                <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent to-brand-purple/50"></div>
+                <p class="text-zinc-500 dark:text-zinc-400 text-sm font-medium whitespace-nowrap tracking-wider">
+                    2026-07-25 配信
+                </p>
+                <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent to-brand-purple/50"></div>
+            </div>
+        </header>
+
+        <!-- Toolbar Area (現有面板) -->
+        <div class="w-full flex flex-col lg:flex-row gap-4 mb-6">
+            <!-- YouTube Link -->
+            <div class="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:px-5 flex items-center justify-between shadow-sm transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </div>
+                    <h3 class="font-bold text-base text-zinc-900 dark:text-zinc-100 whitespace-nowrap">官方 YouTube 收聽</h3>
+                </div>
+                <button class="px-4 py-2 bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 font-bold rounded-xl transition-colors text-sm whitespace-nowrap ml-2 flex-shrink-0 border border-red-200 dark:border-red-500/30">
+                    前往
+                </button>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="flex-[1.7] relative z-10 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:px-5 flex flex-col sm:flex-row justify-between items-center gap-2 lg:gap-3 shadow-sm">
+                
+                <!-- 【核心解答】內容切換新增「逐字稿」選項 -->
+                <div class="flex w-full sm:w-auto bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl shrink-0">
+                    <!-- 選項 1 -->
+                    <button class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border border-transparent text-zinc-600 dark:text-zinc-400">
+                        精簡總結
+                    </button>
+                    <!-- 選項 2 -->
+                    <button class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border border-transparent text-zinc-600 dark:text-zinc-400">
+                        完整無損
+                    </button>
+                    <!-- 選項 3 (模擬目前被選中) -->
+                    <button class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border bg-brand-purple/20 text-brand-purple shadow-sm border-brand-purple/30">
+                        逐字稿
+                    </button>
+                </div>
+
+                <!-- 模式切換 (如果在逐字稿模式下，可以選擇隱藏，或保留但鎖定為文字模式) -->
+                <div class="flex w-full sm:w-auto bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl shrink-0 opacity-50 pointer-events-none" title="逐字稿固定為文字閱讀模式">
+                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border border-transparent text-zinc-600 dark:text-zinc-500">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                        <span class="whitespace-nowrap">圖卡模式</span>
+                    </button>
+                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border bg-zinc-800 text-white shadow-sm border-zinc-700/50">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        <span class="whitespace-nowrap">文字模式</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 音訊播放器 (如果有點擊逐字稿，顯示在內容區頂部輔助) -->
+        <div class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:px-6 mb-6 flex items-center gap-4 shadow-sm">
+            <button class="w-10 h-10 shrink-0 bg-brand-purple text-zinc-950 rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 ml-0.5"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <div class="flex-1">
+                <div class="flex justify-between text-xs text-brand-purple font-mono mb-1.5 font-bold tracking-wider">
+                    <span>PLAYING NOW</span>
+                    <span>01:42 / 45:10</span>
+                </div>
+                <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden relative cursor-pointer">
+                    <div class="absolute left-0 top-0 bottom-0 w-[5%] bg-brand-purple"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area (逐字稿渲染) -->
+        <div class="w-full">
+            <div class="bg-zinc-900/50 rounded-2xl p-4 sm:p-8">
+                
+                <!-- 對話列表 -->
+                <div class="flex flex-col gap-2">
+                    
+                    <!-- 句子 1 -->
+                    <div class="group flex gap-4 md:gap-6 p-4 rounded-xl hover:bg-zinc-800/60 transition-colors duration-200">
+                        <div class="w-12 shrink-0 pt-0.5">
+                            <span class="text-xs font-mono text-zinc-500 cursor-pointer hover:text-brand-purple hover:underline">01:23</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 rounded-full bg-brand-purple"></span>
+                                <span class="font-bold text-brand-purple text-sm">福嶋晴菜</span>
+                            </div>
+                            <p class="text-zinc-300 group-hover:text-white transition-colors text-base md:text-lg leading-relaxed">哈囉大家好！歡迎回到本週的廣播節目。今天我們非常榮幸邀請到了一位特別來賓，她就是在錄音室總是充滿活力的前輩——今泉りおな！</p>
+                        </div>
+                    </div>
+
+                    <!-- 句子 2 -->
+                    <div class="group flex gap-4 md:gap-6 p-4 rounded-xl hover:bg-zinc-800/60 transition-colors duration-200">
+                        <div class="w-12 shrink-0 pt-0.5">
+                            <span class="text-xs font-mono text-zinc-500 cursor-pointer hover:text-brand-green hover:underline">01:35</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                <span class="font-bold text-amber-400 text-sm">今泉りおな</span>
+                            </div>
+                            <p class="text-zinc-300 group-hover:text-white transition-colors text-base md:text-lg leading-relaxed">大家好～我是今泉りおな！晴菜醬，剛剛那個介紹也太誇張了吧，什麼叫做總是充滿活力啦！(笑)</p>
+                        </div>
+                    </div>
+
+                    <!-- 句子 3 (模擬正在播放) -->
+                    <div class="group flex gap-4 md:gap-6 p-4 rounded-xl bg-zinc-800/80 border border-zinc-700/50 transition-colors duration-200 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-purple"></div>
+                        <div class="w-12 shrink-0 pt-0.5">
+                            <span class="text-xs font-mono text-brand-purple font-bold">01:42</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 rounded-full bg-brand-purple"></span>
+                                <span class="font-bold text-brand-purple text-sm">福嶋晴菜</span>
+                            </div>
+                            <p class="text-white text-base md:text-lg leading-relaxed">可是這是事實啊！每次前輩一進錄音室，整個氣氛都會變得超級歡樂。對了，聽說前輩最近迷上了某個新的 ASMR 麥克風？</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

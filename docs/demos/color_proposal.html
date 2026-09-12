@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正確版：網格卡片排版 + 原版綠色標題配色</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#34d399' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4">
+
+    <div class="max-w-4xl mx-auto">
+        <div class="w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 shadow-xl">
+            <h2 class="text-2xl font-bold text-brand-purple mb-10 pb-4 border-b border-zinc-800">節目文字全紀錄</h2>
+            
+            <div class="relative pl-6 md:pl-8 transition-all duration-500 ease-out bg-[#1c1924] shadow-[inset_0_0_0_1px_rgba(139,92,246,0.1)] rounded-3xl p-6 md:p-8 -mx-6 md:-mx-8">
+                <!-- Timeline Line -->
+                <div class="absolute top-0 bottom-0 rounded-full w-1.5 left-[-1px] bg-gradient-to-b from-brand-purple to-brand-green shadow-[0_0_12px_rgba(139,92,246,0.6)]"></div>
+                
+                <div class="flex flex-col">
+                    <!-- Header -->
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="text-[#d8b4fe] border border-[#a855f7] bg-transparent px-4 py-1.5 rounded-full text-sm font-bold tracking-widest shadow-[0_0_8px_rgba(168,85,247,0.3)]">
+                            近況分享
+                        </span>
+                        <h3 class="text-2xl font-bold text-zinc-100 tracking-tight m-0">
+                            夏日的素麵與不同吃法
+                        </h3>
+                    </div>
+
+                    <!-- Content List (Cards) -->
+                    <div class="space-y-4">
+                        <div class="bg-[#1a1a20] border border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-4 md:gap-8 hover:bg-[#1f1f26] transition-colors">
+                            <strong class="text-brand-green text-lg md:w-32 shrink-0 mt-0.5 tracking-wider font-bold">
+                                素麵話題
+                           </strong>
+                           <p class="text-zinc-400 text-lg leading-relaxed m-0 flex-1">
+                               根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。
+                           </p>
+                        </div>
+
+                        <div class="bg-[#1a1a20] border border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-4 md:gap-8 hover:bg-[#1f1f26] transition-colors">
+                            <strong class="text-brand-green text-lg md:w-32 shrink-0 mt-0.5 tracking-wider font-bold">
+                                兩種沾醬
+                           </strong>
+                           <p class="text-zinc-400 text-lg leading-relaxed m-0 flex-1">
+                               而福嶋則分享了自己家裡獨特的吃法：她會同時準備「冷」跟「熱」（通常有豬肉和蔥）兩種沾醬，交替著吃才不會膩。這讓根本笑說簡直像是瑪麗·安東妮（Marie Antoinette）般的奢華吃法。
+                           </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

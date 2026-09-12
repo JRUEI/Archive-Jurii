@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>閱讀焦點追蹤 Demo</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --text-color: #e2e8f0;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.15), transparent 25%);
+            background-attachment: fixed;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem;
+            text-align: center;
+            background: rgba(15, 17, 26, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10rem 2rem 60vh 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+        .text-block {
+            padding: 2.5rem;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0.25;
+            transform: scale(0.92) translateY(20px);
+            filter: blur(4px);
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .text-block.active {
+            opacity: 1;
+            transform: scale(1.02) translateY(0);
+            filter: blur(0);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.2), 
+                        inset 0 0 0 1px rgba(255,255,255,0.05);
+        }
+        .text-block:hover:not(.active) {
+            opacity: 0.6;
+            filter: blur(1px);
+            transform: scale(0.95) translateY(10px);
+        }
+        .text-block h3 {
+            margin-top: 0;
+            color: var(--accent-cyan);
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .text-block h3::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 24px;
+            background: var(--accent-purple);
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            transform: scaleY(0);
+        }
+        .text-block.active h3::before {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+        .text-block p {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: rgba(226, 232, 240, 0.9);
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+        /* A subtle reading progress line */
+        .progress-line {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-cyan));
+            background-size: 200% 100%;
+            animation: gradientMove 3s linear infinite;
+            z-index: 101;
+            width: 0%;
+            transition: width 0.1s ease-out;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-line" id="progressLine"></div>
+    <div class="header">
+        <h1>閱讀焦點追蹤展示 (Focus Reading)</h1>
+        <p style="margin: 0.5rem 0 0 0; color: #94a3b8; font-size: 0.95rem;">請向下捲動，體驗「沉浸式自動對焦」效果</p>
+    </div>
+    
+    <div class="container" id="content-container">
+        <!-- 內容區塊將透過 JS 載入 -->
+    </div>
+
+    <script>
+        const contentData = [
+            { title: "嘉賓登場", text: "節目一開始就迎來了這集的嘉賓「根本優奈」！根本表示這不僅是她第一次來這檔節目，更是她工作生涯中「第一次作為嘉賓」出席，讓她非常期待。" },
+            { title: "可靠的姐姐", text: "當聽眾問到兩人的關係時，福嶋形容根本就像是「可靠的姐姐（姉貴）」。雖然福嶋總是很想把根本當成小寶寶寵愛，但根本那種開朗、愛喝酒、又會帶領大家的性格，反而更像個大姐。" },
+            { title: "素麵話題", text: "根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。" },
+            { title: "兩種沾醬", text: "而福嶋則分享了自己家裡獨特的吃法：她會同時準備「冷」跟「熱」（通常有豬肉和蔥）兩種沾醬，交替著吃才不會膩。這讓根本笑說簡直像是瑪麗·安東妮般的奢華吃法。" },
+            { title: "必備蟹肉棒", text: "福嶋還提到她吃冷素麵時一定會加「蟹肉棒」跟蔥，就像把中華涼麵的配料搬過來一樣，這點也讓根本大開眼界。" },
+            { title: "新宿街頭解謎", text: "回應聽眾來信，兩人分享了之前一起去新宿玩街頭解謎的經歷。身為解謎老手的福嶋，甚至教導根本要準備「附夾子的板夾」跟「多色擦擦筆」（紅色用來重解），讓根本大讚福嶋非常有安全感。" },
+            { title: "ASMR喜好", text: "有聽眾問到根本在事務所的興趣欄寫了ASMR。根本分享自己喜歡聽做菜時切菜的聲音，以及「小狗（豆柴）被清耳朵或按摩」的美容影片。" },
+            { title: "廣播播報技巧", text: "面對聽眾請教如何做好廣播與呼叫，兩人給出專業建議：可以想像自己是在對著「麥克風更深處」的人喊話，並且要「刻意把嘴巴張大」讓對方也能透過唇語讀懂，甚至可以加入一些炒熱氣氛的語調。" }
+        ];
+
+        const container = document.getElementById('content-container');
+        
+        contentData.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'text-block';
+            block.innerHTML = `<h3>${item.title}</h3><p>${item.text}</p>`;
+            
+            // 點擊可以手動滾動到畫面中間
+            block.addEventListener('click', () => {
+                block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            
+            container.appendChild(block);
+        });
+
+        // 觀察器設定：偵測哪個區塊在畫面的中間
+        const blocks = document.querySelectorAll('.text-block');
+        
+        const observerOptions = {
+            root: null,
+            // 當區塊進入畫面中央上下約 15% 範圍內時觸發
+            rootMargin: '-35% 0px -40% 0px', 
+            threshold: 0
+        };
+
+        let activeIndex = 0;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    blocks.forEach(b => b.classList.remove('active'));
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        blocks.forEach(block => observer.observe(block));
+
+        // 頁面捲動進度條
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressLine').style.width = scrolled + '%';
+        });
+        
+        // 初始確保第一個元素為 active
+        setTimeout(() => {
+            if(!document.querySelector('.text-block.active') && blocks.length > 0) {
+                blocks[0].classList.add('active');
+            }
+        }, 100);
+    </script>
+</body>
+</html>

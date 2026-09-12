@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity True Pipeline Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#4ade80', blue: '#60a5fa' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+        .glass-panel { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(63, 63, 70, 0.5); }
+        .arrow-down { width: 2px; height: 30px; background: linear-gradient(to bottom, #60a5fa, transparent); margin: 0 auto; }
+        .arrow-down.green { background: linear-gradient(to bottom, #4ade80, transparent); }
+        .arrow-down.purple { background: linear-gradient(to bottom, #c084fc, transparent); }
+    </style>
+</head>
+<body class="min-h-screen p-6 sm:p-12 relative overflow-y-auto">
+    <!-- Background Decor -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-blue/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+    <div class="max-w-5xl mx-auto space-y-8 relative z-10">
+        
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-5xl font-black mb-4">真實工作流：Python + Antigravity LLM</h1>
+            <p class="text-zinc-400">這才是當初成功產出「第 8 回」的真正架構，也是接下來處理 1~7 回的終極方案。</p>
+        </header>
+
+        <div class="space-y-2">
+            
+            <!-- Stage 1: YT-DLP -->
+            <section class="glass-panel rounded-3xl p-6 sm:p-8 shadow-lg relative border-zinc-700">
+                <div class="absolute -top-3 left-8 bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-bold px-3 py-1 rounded-full">Stage 1: 資料抓取 (Data Fetching)</div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-zinc-100">
+                    <span class="text-2xl">📥</span> yt-dlp & VTT 自動字幕
+                </h2>
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div class="flex-1 text-sm text-zinc-400">
+                        透過 <code>yt-dlp</code> 指令強制從 YouTube 下載日文自動字幕。此時的資料充滿了 <code>&lt;c&gt;</code> 標籤以及因為影片滾動造成的重複亂碼，完全不具備可讀性。
+                    </div>
+                    <div class="w-full md:w-1/2 bg-zinc-950 p-4 rounded-xl border border-zinc-800 font-mono text-xs text-zinc-500">
+                        00:00:14.480><c>あ</c><00:00:14.920><c>な</c><00:00:15.160>
+                    </div>
+                </div>
+            </section>
+
+            <div class="arrow-down"></div>
+
+            <!-- Stage 2: Python Script -->
+            <section class="glass-panel rounded-3xl p-6 sm:p-8 shadow-lg relative border-brand-blue/30">
+                <div class="absolute -top-3 left-8 bg-zinc-900 border border-brand-blue/50 text-brand-blue text-xs font-bold px-3 py-1 rounded-full">Stage 2: 資料清洗 (Python Pre-processing)</div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-brand-blue">
+                    <span class="text-2xl">🐍</span> Python 腳本清洗 (clean_vtt.py / extract.py)
+                </h2>
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div class="flex-1 text-sm text-zinc-400">
+                        啟動我在 <code>temp_subs/</code> 寫好的 Python 腳本。腳本會利用正則表達式剔除所有時間軸標籤，過濾掉疊加的重複句子，並將龐大的逐字稿切分成安全的區塊 (Chunks)，準備餵給語言模型。
+                    </div>
+                    <div class="w-full md:w-1/2 bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/20 font-mono text-xs text-zinc-300">
+                        [00:00:13] 詰み込んだ番組となっておりますので
+                        [00:00:16] リスナーの皆さんと一緒に
+                    </div>
+                </div>
+            </section>
+
+            <div class="arrow-down purple"></div>
+
+            <!-- Stage 3: LLM Engine -->
+            <section class="glass-panel rounded-3xl p-6 sm:p-8 shadow-lg relative border-brand-purple/30">
+                <div class="absolute -top-3 left-8 bg-zinc-900 border border-brand-purple/50 text-brand-purple text-xs font-bold px-3 py-1 rounded-full">Stage 3: 核心 AI 引擎 (Antigravity LLM)</div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-brand-purple">
+                    <span class="text-2xl">🧠</span> 語意重組、說話者辨識與翻譯
+                </h2>
+                <p class="text-sm text-zinc-400 mb-4">最吃效能的一步。由我 (AI 本體) 或是我生成的 Subagents 介入，分批讀取 Python 洗出來的純日文區塊，進行三大自然語言處理：</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-brand-purple/10 border border-brand-purple/20 p-4 rounded-xl text-center">
+                        <div class="font-bold text-white mb-1 text-sm">斷句與標點</div>
+                    </div>
+                    <div class="bg-brand-purple/10 border border-brand-purple/20 p-4 rounded-xl text-center">
+                        <div class="font-bold text-white mb-1 text-sm">說話者分離 (Diarization)</div>
+                    </div>
+                    <div class="bg-brand-purple/10 border border-brand-purple/20 p-4 rounded-xl text-center">
+                        <div class="font-bold text-white mb-1 text-sm">高品質繁中翻譯</div>
+                    </div>
+                </div>
+                <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 font-mono text-sm text-zinc-300 space-y-1">
+                    <div><span class="text-zinc-500">[00:00:13]</span> <span class="text-brand-purple font-bold">[福島なの]</span> 由於這是一個塞滿了各式各樣企劃的節目，</div>
+                </div>
+            </section>
+
+            <div class="arrow-down green"></div>
+
+            <!-- Stage 4: Glossary Injection -->
+            <section class="glass-panel rounded-3xl p-6 sm:p-8 shadow-lg relative border-brand-green/30">
+                <div class="absolute -top-3 left-8 bg-zinc-900 border border-brand-green/50 text-brand-green text-xs font-bold px-3 py-1 rounded-full">Stage 4: 詞庫校正 (Glossary Injection)</div>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-brand-green">
+                    <span class="text-2xl">✨</span> 自動語意修復與最終輸出
+                </h2>
+                <p class="text-sm text-zinc-400 mb-4">最後一道防線，套用 <code>glossary.json</code> 進行全域替換。強制將 AI 翻譯過程中音譯錯的人名或專有名詞，校正為絕對正確的資料，並存入 <code>ep0X.md</code> 成為完美逐字稿。</p>
+                <div class="bg-brand-green/5 p-4 rounded-xl border border-brand-green/20 text-sm text-zinc-300 space-y-1">
+                    <div><span class="text-zinc-500">[00:00:13]</span> <span class="text-brand-green font-bold bg-brand-green/20 px-1 rounded">福嶋晴菜</span>：由於這是一個塞滿了各式各樣企劃的節目，</div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</body>
+</html>

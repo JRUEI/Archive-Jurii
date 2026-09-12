@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ep08 完整無損排版升級 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#34d399' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <div class="max-w-4xl mx-auto py-10 px-4">
+        
+        <!-- Toolbar Area -->
+        <div class="w-full flex flex-col lg:flex-row gap-4 mb-10">
+            <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </div>
+                    <h3 class="font-bold text-sm text-zinc-100">官方 YouTube 收聽</h3>
+                </div>
+                <button class="px-4 py-2 bg-red-500/20 text-red-400 font-bold rounded-xl transition-colors text-sm whitespace-nowrap">前往</button>
+            </div>
+
+            <!-- Control Panel 整合逐字稿 -->
+            <div class="flex-[1.7] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex justify-between items-center gap-3 shadow-sm">
+                <div class="flex bg-zinc-950 p-1.5 rounded-xl shrink-0">
+                    <button class="px-4 py-2 rounded-lg font-bold text-sm text-zinc-500 hover:text-zinc-300">精簡總結</button>
+                    <!-- 完整無損 (Active) -->
+                    <button class="px-4 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-md border border-zinc-700/50">完整無損</button>
+                    <!-- 逐字稿選項 -->
+                    <button class="px-4 py-2 rounded-lg font-bold text-sm text-zinc-500 hover:text-zinc-300">逐字稿</button>
+                </div>
+                <div class="flex bg-zinc-950 p-1.5 rounded-xl shrink-0">
+                    <button class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm text-zinc-500 hover:text-zinc-300">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                        圖卡
+                    </button>
+                    <button class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm bg-brand-purple/20 text-brand-purple shadow-md border border-brand-purple/30">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        文字
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area: TextMode 重製 -->
+        <div class="w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 shadow-xl">
+            <h2 class="text-2xl font-bold text-brand-purple mb-10 pb-4 border-b border-zinc-800">節目文字全紀錄</h2>
+            
+            <div class="space-y-10">
+                
+                <!-- 區塊 1: 完美還原圖片設計 -->
+                <!-- 這裡保留 FocusMode 的特效：左側紫綠漸層線與背景高亮 -->
+                <div class="relative pl-6 md:pl-8 transition-all duration-500 ease-out bg-brand-purple/5 shadow-[inset_0_0_0_1px_rgba(139,92,246,0.1)] rounded-3xl p-6 md:p-8 -mx-6 md:-mx-8">
+                    
+                    <!-- Timeline Line (保留原有特效) -->
+                    <div class="absolute top-0 bottom-0 rounded-full w-1.5 left-[-1px] bg-gradient-to-b from-brand-purple to-brand-green shadow-[0_0_12px_rgba(139,92,246,0.6)]"></div>
+                    
+                    <!-- 卡片內部設計 -->
+                    <div class="flex flex-col">
+                        
+                        <!-- Header: 紫底 Tag + 白字大標題 -->
+                        <div class="flex items-center gap-4 mb-8">
+                            <span class="bg-brand-purple/20 text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-widest border border-brand-purple/20">
+                                近況分享
+                            </span>
+                            <h3 class="text-2xl font-bold text-zinc-100 tracking-tight m-0">
+                                夏日的素麵與不同吃法
+                            </h3>
+                        </div>
+
+                        <!-- Content List: 原本的 <ul><li> 轉換為網格卡片 -->
+                        <div class="space-y-4">
+                            <!-- 項目 1 -->
+                            <div class="bg-[#1a1a20] border border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-4 md:gap-8 hover:bg-[#1f1f26] transition-colors">
+                                <strong class="text-brand-purple text-lg md:w-32 shrink-0 mt-0.5 tracking-wider">
+                                    素麵話題
+                               </strong>
+                               <p class="text-zinc-400 text-lg leading-relaxed m-0">
+                                   根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。
+                               </p>
+                            </div>
+
+                            <!-- 項目 2 -->
+                            <div class="bg-[#1a1a20] border border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-4 md:gap-8 hover:bg-[#1f1f26] transition-colors">
+                                <strong class="text-brand-purple text-lg md:w-32 shrink-0 mt-0.5 tracking-wider">
+                                    兩種沾醬
+                               </strong>
+                               <p class="text-zinc-400 text-lg leading-relaxed m-0">
+                                   而福嶋則分享了自己家裡獨特的吃法：她會同時準備「冷」跟「熱」（通常有豬肉和蔥）兩種沾醬，交替著吃才不會膩。這讓根本笑說簡直像是瑪麗·安東妮（Marie Antoinette）般的奢華吃法。
+                               </p>
+                            </div>
+                            
+                            <!-- 項目 3 -->
+                            <div class="bg-[#1a1a20] border border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-4 md:gap-8 hover:bg-[#1f1f26] transition-colors">
+                                <strong class="text-brand-purple text-lg md:w-32 shrink-0 mt-0.5 tracking-wider">
+                                    必備蟹肉棒
+                               </strong>
+                               <p class="text-zinc-400 text-lg leading-relaxed m-0">
+                                   福嶋還提到她吃冷素麵時一定會加「蟹肉棒」跟蔥，就像把中華涼麵的配料搬過來一樣，這點也讓根本大開眼界。
+                               </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 區塊 2: 無 FocusMode 狀態 (模擬往下捲動) -->
+                <div class="relative pl-6 md:pl-8 transition-all duration-500 ease-out opacity-40 scale-95 p-6 md:p-8 -mx-6 md:-mx-8">
+                    <!-- Timeline Line (Inactive) -->
+                    <div class="absolute top-0 bottom-0 rounded-full w-1 left-0 bg-zinc-800"></div>
+                    
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="bg-zinc-800 text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-widest border border-transparent">
+                            解謎單元
+                        </span>
+                        <h3 class="text-2xl font-bold text-zinc-100 tracking-tight m-0">
+                            Mystery Harustory
+                        </h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-[#1a1a20] border border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-4 md:gap-8">
+                            <strong class="text-brand-purple text-lg md:w-32 shrink-0 mt-0.5 tracking-wider">理科實驗器材</strong>
+                            <p class="text-zinc-400 text-lg leading-relaxed m-0">聽眾「Doral」出了一題理科器材圖示題...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

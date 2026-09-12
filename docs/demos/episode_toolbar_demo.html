@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>間距與高度修復 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#8B5CF6' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-zinc-950 text-white p-4 sm:p-10 font-sans">
+    <div class="max-w-4xl mx-auto space-y-12">
+        
+        <!-- Before (原版問題) -->
+        <div>
+            <h2 class="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                修改前 (Before)：間距內縮不一、高度不對齊
+            </h2>
+            <div class="w-full flex flex-col gap-4">
+                <!-- YouTube Link (Before) -->
+                <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-sm relative">
+                    <!-- 標示線：顯示左側間距 -->
+                    <div class="absolute left-0 top-0 bottom-0 w-4 bg-red-500/20 border-r border-red-500/50"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </div>
+                        <h3 class="font-bold text-base text-zinc-100">官方 YouTube 收聽</h3>
+                    </div>
+                    <a href="#" class="px-5 py-2 bg-red-500/20 text-red-400 font-bold rounded-xl text-sm whitespace-nowrap ml-2 flex-shrink-0 border border-red-500/30">前往</a>
+                    <!-- 標示線：顯示右側間距 -->
+                    <div class="absolute right-0 top-0 bottom-0 w-4 bg-red-500/20 border-l border-red-500/50"></div>
+                </div>
+
+                <!-- Control Panel (Before) -->
+                <div class="flex-[1.5] bg-zinc-900 border border-zinc-800 rounded-2xl p-3 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm relative">
+                    <!-- 標示線：顯示左側間距 -->
+                    <div class="absolute left-0 top-0 bottom-0 w-3 bg-red-500/20 border-r border-red-500/50"></div>
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl">
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm text-zinc-400">精簡總結</button>
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-sm border border-zinc-700/50">完整無損</button>
+                    </div>
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl">
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm text-zinc-400">圖卡模式</button>
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm bg-brand-purple/20 text-brand-purple shadow-sm border border-brand-purple/20">文字模式</button>
+                    </div>
+                    <!-- 標示線：顯示右側間距 -->
+                    <div class="absolute right-0 top-0 bottom-0 w-3 bg-red-500/20 border-l border-red-500/50"></div>
+                </div>
+            </div>
+            <p class="mt-2 text-sm text-zinc-500">
+                👆 你可以清楚看到，上面的紅色內縮框是 p-4 (16px)，下面的紅色內縮框是 p-3 (12px)。<br>
+                在 lg (大螢幕) 以下時，這兩個區塊上下並排，導致左側、右側的邊界無法對齊，視覺上高度也不一致。
+            </p>
+        </div>
+
+        <div class="w-full h-px bg-zinc-800"></div>
+
+        <!-- After (修復後) -->
+        <div>
+            <h2 class="text-xl font-bold text-brand-purple mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                修改後 (After)：嚴格統一高度與間距
+            </h2>
+            
+            <div class="w-full flex flex-col gap-4">
+                <!-- YouTube Link (After) -->
+                <!-- 統一使用 p-4 sm:px-5 與 min-h-[76px] -->
+                <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:px-5 flex items-center justify-between shadow-sm min-h-[76px] relative">
+                    <div class="absolute left-0 top-0 bottom-0 w-4 sm:w-5 bg-brand-purple/20 border-r border-brand-purple/50"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </div>
+                        <h3 class="font-bold text-base text-zinc-100">官方 YouTube 收聽</h3>
+                    </div>
+                    <a href="#" class="px-5 py-2 bg-red-500/20 text-red-400 font-bold rounded-xl text-sm whitespace-nowrap ml-2 flex-shrink-0 border border-red-500/30">前往</a>
+                    <div class="absolute right-0 top-0 bottom-0 w-4 sm:w-5 bg-brand-purple/20 border-l border-brand-purple/50"></div>
+                </div>
+
+                <!-- Control Panel (After) -->
+                <!-- 統一使用 p-4 sm:px-5 與 min-h-[76px] -->
+                <div class="flex-[1.5] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:px-5 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm min-h-[76px] relative">
+                    <div class="absolute left-0 top-0 bottom-0 w-4 sm:w-5 bg-brand-purple/20 border-r border-brand-purple/50 hidden sm:block"></div>
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl">
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm text-zinc-400 hover:text-zinc-200">精簡總結</button>
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-sm border border-zinc-700/50">完整無損</button>
+                    </div>
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl">
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm text-zinc-400 hover:text-zinc-200">圖卡模式</button>
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm bg-brand-purple/20 text-brand-purple shadow-sm border border-brand-purple/20">文字模式</button>
+                    </div>
+                    <div class="absolute right-0 top-0 bottom-0 w-4 sm:w-5 bg-brand-purple/20 border-l border-brand-purple/50 hidden sm:block"></div>
+                </div>
+            </div>
+            
+            <!-- 大螢幕模擬 (lg:flex-row) -->
+            <div class="mt-8">
+                <h3 class="text-zinc-400 text-sm mb-3">大螢幕並排時 (模擬 lg:flex-row)：</h3>
+                <div class="w-full flex flex-col lg:flex-row gap-4">
+                    <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:px-5 flex items-center justify-between shadow-sm min-h-[76px]">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                                <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            </div>
+                            <h3 class="font-bold text-base text-zinc-100">官方 YouTube 收聽</h3>
+                        </div>
+                        <a href="#" class="px-5 py-2 bg-red-500/20 text-red-400 font-bold rounded-xl text-sm whitespace-nowrap ml-2 flex-shrink-0 border border-red-500/30">前往</a>
+                    </div>
+                    <div class="flex-[1.5] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:px-5 flex flex-col sm:flex-row lg:justify-between justify-center items-center gap-4 shadow-sm min-h-[76px]">
+                        <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl">
+                            <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm text-zinc-400 hover:text-zinc-200">精簡總結</button>
+                            <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-sm border border-zinc-700/50">完整無損</button>
+                        </div>
+                        <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl">
+                            <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm text-zinc-400 hover:text-zinc-200">圖卡模式</button>
+                            <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm bg-brand-purple/20 text-brand-purple shadow-sm border border-brand-purple/20">文字模式</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="mt-6 text-sm text-zinc-500">
+                ✨ 解決方案：<br>
+                1. 兩個區塊統一使用 <code class="bg-zinc-800 px-1 py-0.5 rounded text-zinc-300">p-4 sm:px-5</code>，這樣左右內縮完美對齊，並且在大螢幕時更有呼吸空間。<br>
+                2. 兩個區塊統一設置 <code class="bg-zinc-800 px-1 py-0.5 rounded text-zinc-300">min-h-[76px]</code>。因為按鈕加上 padding 後的高度差不多是 76px，這樣設定可以保證在桌面端並排時，以及在平板堆疊時，這兩個方塊的高矮、胖瘦完全一致！
+            </p>
+        </div>
+    </div>
+</body>
+</html>

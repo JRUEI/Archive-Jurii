@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>切換按鈕樣式差異分析報告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+        }
+        .report-section {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center text-slate-800">樣式差異分析與修復報告</h1>
+
+        <div class="report-section">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-4">1. 發現的樣式差異 (Issues Identified)</h2>
+            <ul class="list-disc pl-6 space-y-3 text-lg text-slate-600 mb-8">
+                <li><strong class="text-slate-900">字體粗細與對比度：</strong>圖一（設計稿）的字體較粗（<code>font-bold</code>），且未選取的文字顏色較深（<code>text-zinc-600</code>）；圖二（目前的網頁）的字體偏細（<code>font-medium</code>），未選取的文字太淡（<code>text-zinc-500</code>），導致對比度不足。</li>
+                <li><strong class="text-slate-900">立體感與陰影：</strong>圖一中，不管是白色的「完整無損」還是紫色的「文字模式」，選取時都帶有明顯的陰影（<code>shadow-sm</code>），看起來像浮動的實體按鈕；圖二的紫色按鈕則完全沒有陰影，顯得較為扁平。</li>
+                <li><strong class="text-slate-900">按鈕底色與間距：</strong>圖一按鈕外層的灰色容器顏色更為扎實（<code>bg-zinc-100</code>），且內部 Padding 較大；另外圖示的粗細與跟文字的間距（<code>gap-2</code>）在圖一中也更為勻稱。</li>
+                <li><strong class="text-slate-900">最外層容器的底色與陰影：</strong>如您所說，控制面板最外層的容器原本使用了 <code>bg-zinc-50</code> 且沒有陰影，這導致它與旁邊的「YouTube 收聽區塊」以及下方的「內文區塊」（兩者皆為 <code>bg-white</code> 且帶有陰影）視覺上不一致。修復後已統一改為 <code>bg-white</code> 並補上 <code>shadow-sm</code>。</li>
+            </ul>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- 圖二：目前的網頁 (現狀) -->
+            <div class="report-section flex flex-col items-center">
+                <div class="bg-red-100 text-red-700 px-4 py-1.5 rounded-full font-bold text-sm mb-8">
+                    圖二：目前的網頁 (Current)
+                </div>
+                
+                <!-- 模擬目前的結構 -->
+                <div class="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-3 flex flex-col gap-4 items-center">
+                    
+                    <div class="flex w-auto bg-zinc-200/50 p-1 rounded-xl">
+                        <button class="px-5 py-2 rounded-lg font-medium transition-all text-sm text-zinc-500">
+                            精簡總結
+                        </button>
+                        <button class="px-5 py-2 rounded-lg font-medium transition-all text-sm bg-white text-zinc-900 shadow-md">
+                            完整無損
+                        </button>
+                    </div>
+
+                    <div class="flex w-auto bg-zinc-200/50 p-1 rounded-xl">
+                        <button class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all text-sm text-zinc-500">
+                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                            圖卡模式
+                        </button>
+                        <button class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-medium transition-all text-sm bg-purple-500/20 text-purple-600">
+                            <i data-lucide="align-left" class="w-4 h-4"></i>
+                            文字模式
+                        </button>
+                    </div>
+
+                </div>
+                <div class="mt-6 text-sm text-slate-500 text-center">
+                    * 缺乏陰影、字體較細、灰色文字過淡
+                </div>
+            </div>
+
+            <!-- 圖一：修復後的設計 (目標) -->
+            <div class="report-section flex flex-col items-center ring-2 ring-emerald-500">
+                <div class="bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full font-bold text-sm mb-8">
+                    圖一：修復後的設計 (Target)
+                </div>
+                
+                <!-- 模擬修復後的結構 -->
+                <div class="w-full bg-white border border-zinc-200 rounded-2xl p-3 flex flex-col gap-4 items-center shadow-sm">
+                    
+                    <div class="flex w-auto bg-zinc-100 p-1.5 rounded-xl">
+                        <button class="px-5 py-2 rounded-lg font-bold transition-all text-sm text-zinc-600">
+                            精簡總結
+                        </button>
+                        <button class="px-5 py-2 rounded-lg font-bold transition-all text-sm bg-white text-zinc-900 shadow-sm">
+                            完整無損
+                        </button>
+                    </div>
+
+                    <div class="flex w-auto bg-zinc-100 p-1.5 rounded-xl">
+                        <button class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold transition-all text-sm text-zinc-600">
+                            <i data-lucide="layout-grid" class="w-[18px] h-[18px]" style="stroke-width: 2.5px;"></i>
+                            圖卡模式
+                        </button>
+                        <button class="flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold transition-all text-sm bg-[#ebdfff] text-purple-600 shadow-sm">
+                            <i data-lucide="align-left" class="w-[18px] h-[18px]" style="stroke-width: 2.5px;"></i>
+                            文字模式
+                        </button>
+                    </div>
+
+                </div>
+                <div class="mt-6 text-sm text-slate-500 text-center">
+                    * 加入陰影、加粗字體、圖示放大、容器背景更扎實
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>

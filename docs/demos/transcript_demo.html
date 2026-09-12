@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逐字稿與人物分辨設計 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#c084fc',
+                            green: '#34d399',
+                            orange: '#fb923c'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; }
+        
+        /* 隱藏捲軸但保留滾動功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-zinc-100 p-4 md:p-8 min-h-screen flex justify-center">
+
+    <div class="w-full max-w-4xl flex flex-col gap-8">
+        
+        <!-- 標題與說明 -->
+        <div class="text-center">
+            <h1 class="text-3xl font-black mb-3">逐字稿 (Transcript) 視覺設計</h1>
+            <p class="text-zinc-400 text-sm">
+                特色：多人物自動上色、時間軸快速跳轉、閱讀焦點模式（滑鼠 Hover 高亮當前對話）。
+            </p>
+        </div>
+
+        <!-- 播放器模擬 -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl sticky top-4 z-20 backdrop-blur-md bg-opacity-80">
+            <div class="flex items-center gap-6">
+                <!-- 播放按鈕 -->
+                <button class="w-14 h-14 shrink-0 bg-brand-purple text-zinc-950 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-[0_0_20px_rgba(192,132,252,0.3)]">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 ml-1"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <!-- 進度條 -->
+                <div class="flex-1">
+                    <div class="flex justify-between text-xs text-zinc-400 font-mono mb-2">
+                        <span>01:23</span>
+                        <span>45:10</span>
+                    </div>
+                    <div class="h-2 bg-zinc-800 rounded-full overflow-hidden relative cursor-pointer">
+                        <div class="absolute left-0 top-0 bottom-0 w-[5%] bg-brand-purple"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 逐字稿本體 -->
+        <div class="bg-zinc-900/50 border border-zinc-800/50 rounded-3xl p-6 md:p-10 shadow-lg">
+            
+            <!-- 參與者圖例 -->
+            <div class="flex flex-wrap gap-4 mb-10 pb-6 border-b border-zinc-800">
+                <div class="text-sm font-bold text-zinc-500 mr-2">本集參與者：</div>
+                <div class="flex items-center gap-2 bg-brand-purple/10 border border-brand-purple/20 px-3 py-1 rounded-full">
+                    <div class="w-2.5 h-2.5 rounded-full bg-brand-purple shadow-[0_0_8px_rgba(192,132,252,0.8)]"></div>
+                    <span class="text-brand-purple font-bold text-sm">福嶋晴菜 (主持人)</span>
+                </div>
+                <div class="flex items-center gap-2 bg-brand-green/10 border border-brand-green/20 px-3 py-1 rounded-full">
+                    <div class="w-2.5 h-2.5 rounded-full bg-brand-green shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                    <span class="text-brand-green font-bold text-sm">今泉りおな (來賓)</span>
+                </div>
+            </div>
+
+            <!-- 對話列表 -->
+            <div class="flex flex-col gap-6">
+                
+                <!-- 對話區塊 (主持人) -->
+                <div class="group flex gap-4 md:gap-6 p-4 -mx-4 rounded-2xl hover:bg-zinc-800/40 transition-colors duration-300">
+                    <!-- 時間標籤 -->
+                    <div class="w-12 md:w-16 shrink-0 pt-1">
+                        <span class="text-xs md:text-sm font-mono text-zinc-500 group-hover:text-brand-purple transition-colors cursor-pointer hover:underline">01:23</span>
+                    </div>
+                    <!-- 內容 -->
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="font-bold text-brand-purple text-sm md:text-base tracking-wide">福嶋晴菜</span>
+                        </div>
+                        <p class="text-zinc-300 group-hover:text-zinc-100 transition-colors text-base md:text-lg leading-relaxed">
+                            哈囉大家好！歡迎回到本週的廣播節目。今天我們非常榮幸邀請到了一位特別來賓，她就是在錄音室總是充滿活力的前輩——今泉りおな！
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 對話區塊 (來賓) -->
+                <div class="group flex gap-4 md:gap-6 p-4 -mx-4 rounded-2xl hover:bg-zinc-800/40 transition-colors duration-300">
+                    <div class="w-12 md:w-16 shrink-0 pt-1">
+                        <span class="text-xs md:text-sm font-mono text-zinc-500 group-hover:text-brand-green transition-colors cursor-pointer hover:underline">01:35</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="font-bold text-brand-green text-sm md:text-base tracking-wide">今泉りおな</span>
+                        </div>
+                        <p class="text-zinc-300 group-hover:text-zinc-100 transition-colors text-base md:text-lg leading-relaxed">
+                            大家好～我是今泉りおな！晴菜醬，剛剛那個介紹也太誇張了吧，什麼叫做總是充滿活力啦！(笑)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 對話區塊 (主持人) -->
+                <div class="group flex gap-4 md:gap-6 p-4 -mx-4 rounded-2xl hover:bg-zinc-800/40 transition-colors duration-300 bg-zinc-800/20"> 
+                    <!-- 特意加入一個預設高亮的樣式，模擬「當前播放到這句」 -->
+                    <div class="w-12 md:w-16 shrink-0 pt-1">
+                        <span class="text-xs md:text-sm font-mono text-brand-purple cursor-pointer">01:42</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="font-bold text-brand-purple text-sm md:text-base tracking-wide">福嶋晴菜</span>
+                        </div>
+                        <p class="text-zinc-100 text-base md:text-lg leading-relaxed">
+                            可是這是事實啊！每次前輩一進錄音室，整個氣氛都會變得超級歡樂。對了，聽說前輩最近迷上了某個新的 ASMR 麥克風？
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 對話區塊 (來賓) -->
+                <div class="group flex gap-4 md:gap-6 p-4 -mx-4 rounded-2xl hover:bg-zinc-800/40 transition-colors duration-300">
+                    <div class="w-12 md:w-16 shrink-0 pt-1">
+                        <span class="text-xs md:text-sm font-mono text-zinc-500 group-hover:text-brand-green transition-colors cursor-pointer hover:underline">01:50</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="font-bold text-brand-green text-sm md:text-base tracking-wide">今泉りおな</span>
+                        </div>
+                        <p class="text-zinc-300 group-hover:text-zinc-100 transition-colors text-base md:text-lg leading-relaxed">
+                            啊，被發現了！沒錯，我最近買了一個超貴的雙聲道麥克風。那個收音效果真的不得了，連我喝水吞嚥的聲音都收得一清二楚，害我現在錄音都不敢亂吞口水了。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 對話區塊 (同時發聲/笑聲) -->
+                <div class="group flex gap-4 md:gap-6 p-4 -mx-4 rounded-2xl hover:bg-zinc-800/40 transition-colors duration-300">
+                    <div class="w-12 md:w-16 shrink-0 pt-1">
+                        <span class="text-xs md:text-sm font-mono text-zinc-500 cursor-pointer hover:underline">02:05</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <!-- 雙色姓名標籤表示一起笑 -->
+                            <span class="font-bold text-brand-purple text-sm md:text-base tracking-wide">福嶋晴菜</span>
+                            <span class="text-zinc-600 text-xs">&</span>
+                            <span class="font-bold text-brand-green text-sm md:text-base tracking-wide">今泉りおな</span>
+                        </div>
+                        <p class="text-zinc-400 italic text-base md:text-lg leading-relaxed">
+                            (兩人瘋狂大笑)
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

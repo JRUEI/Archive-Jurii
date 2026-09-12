@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ep08 配色與排版精確還原 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#34d399' },
+                        surface: '#1c1924' /* 圖片中帶有微紫的深灰底色 */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+    </style>
+</head>
+<body class="min-h-screen py-20 flex justify-center items-center">
+
+    <!-- 模擬 TextMode 中的單一卡片區塊 -->
+    <div class="w-full max-w-4xl px-4">
+        
+        <div class="relative pl-6 md:pl-8 transition-all duration-500 ease-out bg-surface shadow-lg rounded-3xl p-6 md:p-8 -mx-6 md:-mx-8">
+            
+            <!-- Timeline Line (保留原有特效：紫綠漸層發光) -->
+            <div class="absolute top-0 bottom-0 rounded-full w-1.5 left-[-1px] bg-gradient-to-b from-brand-purple to-brand-green shadow-[0_0_12px_rgba(139,92,246,0.6)]"></div>
+            
+            <div class="flex flex-col">
+                
+                <!-- Header: 邊框紫字 Tag + 白字大標題 -->
+                <div class="flex items-center gap-4 mb-8">
+                    <!-- 圖片中的 Tag 看起來是沒有底色，只有邊框和漸層或純紫色字體 -->
+                    <span class="text-[#d8b4fe] border border-[#a855f7] bg-transparent px-4 py-1.5 rounded-full text-sm font-bold tracking-widest shadow-[0_0_8px_rgba(168,85,247,0.3)]">
+                        近況分享
+                    </span>
+                    <h3 class="text-2xl font-bold text-zinc-100 tracking-tight m-0">
+                        夏日的素麵與不同吃法
+                    </h3>
+                </div>
+
+                <!-- Content List: 還原圖片中的項目符號與文字配色 -->
+                <ul class="list-disc pl-5 space-y-6 marker:text-[#d8b4fe] marker:text-xl">
+                    <!-- 項目 1 -->
+                    <li class="text-zinc-300 text-lg leading-relaxed pl-2">
+                        <strong class="text-brand-green font-bold">素麵話題</strong>：根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。
+                    </li>
+
+                    <!-- 項目 2 -->
+                    <li class="text-zinc-300 text-lg leading-relaxed pl-2">
+                        <strong class="text-brand-green font-bold">兩種沾醬</strong>：而福嶋則分享了自己家裡獨特的吃法：她會同時準備「冷」跟「熱」（通常有豬肉和蔥）兩種沾醬，交替著吃才不會膩。這讓根本笑說簡直像是瑪麗·安東妮（Marie Antoinette）般的奢華吃法。
+                    </li>
+                    
+                    <!-- 項目 3 -->
+                    <li class="text-zinc-300 text-lg leading-relaxed pl-2">
+                        <strong class="text-brand-green font-bold">必備蟹肉棒</strong>：福嶋還提到她吃冷素麵時一定會加「蟹肉棒」跟蔥，就像把中華涼麵的配料搬過來一樣，這點也讓根本大開眼界。
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1487 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>網站現況與任務處理模型｜はるまとぺーじ Wiki</title>
+  <style>
+    :root {
+      --canvas: #f7f6f3;
+      --paper: #ffffff;
+      --ink: #232220;
+      --muted: #73716c;
+      --line: #e7e4de;
+      --line-strong: #d8d4cc;
+      --green-bg: #edf3ec;
+      --green-text: #346538;
+      --blue-bg: #e1f3fe;
+      --blue-text: #1f6c9f;
+      --yellow-bg: #fbf3db;
+      --yellow-text: #7a5700;
+      --red-bg: #fdebec;
+      --red-text: #9f2f2d;
+      --purple-bg: #f0ebf7;
+      --purple-text: #60427a;
+      --radius: 10px;
+      --sans: "SF Pro Display", "Geist Sans", "Helvetica Neue", "Noto Sans TC", sans-serif;
+      --serif: "Newsreader", "Noto Serif TC", "Songti TC", serif;
+      --mono: "Geist Mono", "SFMono-Regular", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--canvas);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M28 0H0V28' fill='none' stroke='%23dedbd4' stroke-opacity='.32' stroke-width='.6'/%3E%3C/svg%3E");
+      font-family: var(--sans);
+      line-height: 1.68;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration-color: #aaa59c;
+      text-underline-offset: 3px;
+    }
+
+    a:hover {
+      text-decoration-color: var(--ink);
+    }
+
+    code,
+    kbd {
+      font-family: var(--mono);
+      font-size: 0.9em;
+    }
+
+    code {
+      padding: 0.12rem 0.34rem;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #f9f8f6;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 92px 0 64px;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 930px;
+      margin-bottom: 24px;
+      font-family: var(--serif);
+      font-size: clamp(3rem, 7vw, 6.7rem);
+      font-weight: 600;
+      letter-spacing: -0.045em;
+      line-height: 0.98;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin-bottom: 42px;
+      color: #4d4b47;
+      font-size: clamp(1.05rem, 2vw, 1.32rem);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--line);
+    }
+
+    .stat {
+      min-height: 132px;
+      padding: 24px;
+      background: var(--paper);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 10px;
+      font-family: var(--serif);
+      font-size: 2.35rem;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .jump {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(247, 246, 243, 0.96);
+      backdrop-filter: blur(14px);
+    }
+
+    .jump-inner {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 0;
+      scrollbar-width: thin;
+    }
+
+    .jump a {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 5px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .jump a:hover {
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    main {
+      padding-bottom: 120px;
+    }
+
+    section {
+      padding: 92px 0 0;
+      scroll-margin-top: 62px;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 36px;
+      align-items: start;
+      margin-bottom: 34px;
+    }
+
+    .section-no {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4.4vw, 4rem);
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.06;
+    }
+
+    .section-intro {
+      max-width: 760px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    h3 {
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+      letter-spacing: -0.015em;
+    }
+
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      grid-column: span 4;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .card.wide {
+      grid-column: span 8;
+    }
+
+    .card.full {
+      grid-column: 1 / -1;
+    }
+
+    .card p:last-child,
+    .card ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 23px;
+      margin-bottom: 18px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.065em;
+      text-transform: uppercase;
+    }
+
+    .tag.confirmed {
+      color: var(--green-text);
+      background: var(--green-bg);
+    }
+
+    .tag.inferred {
+      color: var(--blue-text);
+      background: var(--blue-bg);
+    }
+
+    .tag.partial {
+      color: var(--yellow-text);
+      background: var(--yellow-bg);
+    }
+
+    .tag.risk {
+      color: var(--red-text);
+      background: var(--red-bg);
+    }
+
+    .tag.demo {
+      color: var(--purple-text);
+      background: var(--purple-bg);
+    }
+
+    .plain-list {
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+
+    .plain-list li + li {
+      margin-top: 8px;
+    }
+
+    .callout {
+      padding: 28px 30px;
+      border: 1px solid #e4d5d5;
+      border-left: 4px solid #b86562;
+      border-radius: var(--radius);
+      background: #fffafa;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: step;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 190px;
+      padding: 24px 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      counter-increment: step;
+    }
+
+    .flow-step::before {
+      content: counter(step, decimal-leading-zero);
+      display: block;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -10px;
+      z-index: 2;
+      width: 19px;
+      height: 24px;
+      color: #a29e96;
+      background: var(--canvas);
+      text-align: center;
+      transform: translateY(-50%);
+    }
+
+    .flow-step p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .system-map {
+      display: grid;
+      grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .system-node {
+      min-height: 176px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .system-node p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .system-arrow {
+      display: grid;
+      place-items: center;
+      color: #9e9a92;
+      font-family: var(--mono);
+    }
+
+    .matrix {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      font-size: 0.88rem;
+    }
+
+    .matrix th,
+    .matrix td {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .matrix th {
+      color: var(--muted);
+      background: #faf9f7;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .matrix tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .state {
+      white-space: nowrap;
+    }
+
+    .state::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: #7a7a76;
+      vertical-align: 1px;
+    }
+
+    .state.live::before {
+      background: #55805a;
+    }
+
+    .state.partial::before {
+      background: #b18a2e;
+    }
+
+    .state.demo::before {
+      background: #806694;
+    }
+
+    .state.missing::before {
+      background: #b85b57;
+    }
+
+    .evidence {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .evidence-item {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .evidence-item small {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.69rem;
+    }
+
+    .evidence-item p {
+      margin-bottom: 0;
+      font-size: 0.92rem;
+    }
+
+    .inventory-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .filter-button {
+      padding: 8px 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 5px;
+      color: var(--muted);
+      background: var(--paper);
+      font: 650 0.75rem var(--sans);
+      cursor: pointer;
+    }
+
+    .filter-button:hover,
+    .filter-button.is-active {
+      color: #fff;
+      border-color: #2c2b29;
+      background: #2c2b29;
+    }
+
+    .inventory-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .inventory {
+      width: 100%;
+      min-width: 860px;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    .inventory th,
+    .inventory td {
+      padding: 14px 15px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .inventory th {
+      position: sticky;
+      top: 0;
+      color: var(--muted);
+      background: #faf9f7;
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .inventory tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .inventory tr[hidden] {
+      display: none;
+    }
+
+    .file-link {
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      font-weight: 650;
+    }
+
+    .health {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .health-item {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .health-item strong {
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .health-item p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    details {
+      border-bottom: 1px solid var(--line);
+    }
+
+    summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 20px 0;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      color: var(--muted);
+      font: 400 1.2rem var(--mono);
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    .detail-body {
+      max-width: 860px;
+      padding: 0 0 24px;
+      color: var(--muted);
+    }
+
+    .method {
+      margin-top: 46px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1), transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .stat:nth-child(4),
+      .stat:nth-child(5) {
+        grid-column: span 1;
+      }
+
+      .flow {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .flow-step:nth-child(3)::after {
+        display: none;
+      }
+
+      .system-map {
+        grid-template-columns: 1fr;
+      }
+
+      .system-arrow {
+        min-height: 28px;
+        transform: rotate(90deg);
+      }
+
+      .health {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .hero {
+        padding: 62px 0 42px;
+      }
+
+      .stats,
+      .flow,
+      .health,
+      .evidence {
+        grid-template-columns: 1fr;
+      }
+
+      .stat:nth-child(4),
+      .stat:nth-child(5) {
+        grid-column: auto;
+      }
+
+      .section-head {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      section {
+        padding-top: 72px;
+      }
+
+      .card,
+      .card.wide {
+        grid-column: 1 / -1;
+      }
+
+      .flow-step:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -18px;
+        transform: translateX(50%) rotate(90deg);
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .jump,
+      .inventory-tools {
+        display: none;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+
+      section {
+        break-inside: avoid;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="page reveal">
+      <p class="eyebrow">System reading / 2026-07-28 / local workspace</p>
+      <h1>網站現況與任務處理模型</h1>
+      <p class="lead">
+        這份報告回答兩件事：正式網站目前如何從內容檔產生頁面，以及從 30 份 HTML 留下的軌跡來看，
+        系統如何理解、試作、修正並交付你指派的任務。
+      </p>
+
+      <div class="stats" aria-label="專案摘要數字">
+        <div class="stat">
+          <strong>30</strong>
+          <span>份獨立 HTML Demo／報告</span>
+        </div>
+        <div class="stat">
+          <strong>8</strong>
+          <span>集 Markdown 內容來源</span>
+        </div>
+        <div class="stat">
+          <strong>47</strong>
+          <span>筆實際詞庫替換規則</span>
+        </div>
+        <div class="stat">
+          <strong>685</strong>
+          <span>行逐字稿來源，其中 622 行可被目前 parser 讀取</span>
+        </div>
+        <div class="stat">
+          <strong>12</strong>
+          <span>個 production build 靜態頁面</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="jump" aria-label="報告章節">
+    <div class="page jump-inner">
+      <a href="#conclusion">核心結論</a>
+      <a href="#runtime">網站如何運作</a>
+      <a href="#task-model">任務如何被處理</a>
+      <a href="#content-pipeline">內容生產管線</a>
+      <a href="#capabilities">功能與狀態</a>
+      <a href="#gaps">落差與風險</a>
+      <a href="#inventory">HTML 索引</a>
+      <a href="#validation">驗證結果</a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <section id="conclusion" class="reveal">
+      <div class="section-head">
+        <div class="section-no">01 / Core reading</div>
+        <div>
+          <h2>它是一個內容驅動的靜態 Wiki，加上一套以 Demo 為核心的任務協作流程。</h2>
+          <p class="section-intro">
+            正式網站與資料夾裡的 HTML 有明確分工：Next.js 程式碼負責真正的網站；
+            30 份 HTML 多半是設計提案、問題重現、比較稿與工作報告，不是正式網站的 runtime 模組。
+          </p>
+        </div>
+      </div>
+
+      <div class="bento">
+        <article class="card wide">
+          <span class="tag confirmed">Code confirmed</span>
+          <h3>正式網站</h3>
+          <p>
+            `content/episodes/*.md` 是內容來源，`src/lib/markdown.ts` 在 build 時讀取並解析，
+            首頁和 8 個單集頁由 Next.js App Router 預先產生。沒有資料庫、登入、後台 CMS 或 API。
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="tag inferred">Artifact inferred</span>
+          <h3>任務協作</h3>
+          <p>
+            從檔名與內容可看出常見做法是先建立獨立 HTML Demo，呈現 Before／After 或多方案，
+            再把選定結果移植到 React 正式版。
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="tag partial">Semi automated</span>
+          <h3>內容生產</h3>
+          <p>
+            字幕下載、VTT 清洗、詞庫替換與網站建置可以用腳本處理；
+            說話者判斷、語意重組、翻譯與最終查核仍需人或 AI 工作階段介入。
+          </p>
+        </article>
+
+        <article class="card wide">
+          <span class="tag risk">Important boundary</span>
+          <h3>HTML 報告的敘述不等於目前程式的事實</h3>
+          <p>
+            例如 `opus_audit_report.html` 宣稱「20/20、已達生產級」，
+            但本次實際檢查仍有 27 個 lint errors；`demo_correction_pipeline.html` 顯示 42 terms，
+            實際 `glossary.json` 已有 47 筆。報告是當時快照，不是持續同步的狀態頁。
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="runtime" class="reveal">
+      <div class="section-head">
+        <div class="section-no">02 / Runtime</div>
+        <div>
+          <h2>網站從 Markdown 出發，在 build 階段完成大部分工作。</h2>
+          <p class="section-intro">
+            這種架構適合 Vercel：內容變更後重新 build，使用者收到的是預先產生的頁面；
+            瀏覽器端只負責顯示模式、偏好設定與圖卡匯出。
+          </p>
+        </div>
+      </div>
+
+      <div class="system-map" aria-label="正式網站資料流">
+        <article class="system-node">
+          <span class="tag confirmed">Source</span>
+          <h3>Markdown 內容</h3>
+          <p>Frontmatter、精簡總結、段落紀錄、完整逐字稿集中在 `content/episodes/ep01.md` 到 `ep08.md`。</p>
+        </article>
+        <div class="system-arrow" aria-hidden="true">→</div>
+        <article class="system-node">
+          <span class="tag confirmed">Parser</span>
+          <h3>檔案與正則解析</h3>
+          <p>`markdown.ts` 用 `fs`、`gray-matter` 與正則式轉成 EpisodeData、cards 和 transcript。</p>
+        </article>
+        <div class="system-arrow" aria-hidden="true">→</div>
+        <article class="system-node">
+          <span class="tag confirmed">Build</span>
+          <h3>Next.js 靜態產生</h3>
+          <p>`generateStaticParams()` 列出 8 集；首頁、404 與單集頁在 production build 產生。</p>
+        </article>
+        <div class="system-arrow" aria-hidden="true">→</div>
+        <article class="system-node">
+          <span class="tag confirmed">Browser</span>
+          <h3>互動與個人偏好</h3>
+          <p>React client components 處理主題、時間軸、緊湊模式、焦點特效、內容模式與下載。</p>
+        </article>
+      </div>
+
+      <div class="bento" style="margin-top:14px">
+        <article class="card">
+          <h3>首頁</h3>
+          <ul class="plain-list">
+            <li>依 episode number 由新到舊排序。</li>
+            <li>最新一集使用綠色強調。</li>
+            <li>時間軸、日期位置與摘要展開可切換。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>單集頁</h3>
+          <ul class="plain-list">
+            <li>顯示標題、日期、來賓與 YouTube 連結。</li>
+            <li>可切換精簡總結、段落紀錄、逐字稿。</li>
+            <li>非逐字稿模式可再切換圖卡或文字。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>圖卡輸出</h3>
+          <ul class="plain-list">
+            <li>`CardMode` 僅在瀏覽器端動態載入。</li>
+            <li>`html-to-image` 把卡片轉為 PNG。</li>
+            <li>`JSZip` 與 `file-saver` 產生 ZIP 下載。</li>
+          </ul>
+        </article>
+        <article class="card full">
+          <h3>使用者狀態保存</h3>
+          <p>
+            Theme、時間軸、日期位置、緊湊模式和閱讀焦點存在瀏覽器的 `localStorage`。
+            這些偏好只存在該瀏覽器，不會跨裝置同步，也沒有帳號資料。
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="task-model" class="reveal">
+      <div class="section-head">
+        <div class="section-no">03 / Task model</div>
+        <div>
+          <h2>你指派的任務，通常會走「理解、做 Demo、比較、實裝、再審查」的路線。</h2>
+          <p class="section-intro">
+            這是根據 HTML 檔案的命名、內容與修改時間推論出的協作模型。
+            專案裡目前沒有真正的 task queue、狀態機或審批資料庫。
+          </p>
+        </div>
+      </div>
+
+      <div class="flow">
+        <article class="flow-step">
+          <h3>理解要求</h3>
+          <p>找出要求屬於首頁、單集頁、控制列、時間軸、逐字稿或部署。</p>
+        </article>
+        <article class="flow-step">
+          <h3>隔離試作</h3>
+          <p>先在 `public/*.html` 做不影響正式版的單檔 Demo。</p>
+        </article>
+        <article class="flow-step">
+          <h3>呈現差異</h3>
+          <p>用 Before／After、A／B／C 或淺色／暗色比較具體差異。</p>
+        </article>
+        <article class="flow-step">
+          <h3>收斂方向</h3>
+          <p>依回饋改名、修溢出、調間距、配色或資訊階層。</p>
+        </article>
+        <article class="flow-step">
+          <h3>移植正式版</h3>
+          <p>把選定設計套到 `src/components`、CSS 或內容 schema。</p>
+        </article>
+        <article class="flow-step">
+          <h3>自審與建置</h3>
+          <p>另產 audit HTML，並以 TypeScript、lint、build 驗證。</p>
+        </article>
+      </div>
+
+      <div class="evidence" style="margin-top:14px">
+        <article class="evidence-item">
+          <small>Variant comparison</small>
+          <p>`date_layouts_demo.html`、`tag_demo.html`、`settings_ui_demo.html` 用多方案比較來協助決策。</p>
+        </article>
+        <article class="evidence-item">
+          <small>Bug reproduction</small>
+          <p>`demo_overflow.html`、`demo_spacing.html`、`timeline_fix_demo.html` 先解釋原因，再展示修正版。</p>
+        </article>
+        <article class="evidence-item">
+          <small>Progressive refinement</small>
+          <p>`ep08_redesign_demo.html` 到 `ep08_final_demo.html` 顯示單集頁經過多輪方向調整。</p>
+        </article>
+        <article class="evidence-item">
+          <small>Self review</small>
+          <p>`self_review_report.html` 與 `opus_audit_report.html` 把遺漏、修復與宣稱成果整理成可讀報告。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="content-pipeline" class="reveal">
+      <div class="section-head">
+        <div class="section-no">04 / Content pipeline</div>
+        <div>
+          <h2>逐字稿流程有腳本骨架，但語意工作仍是人工與 AI 協作。</h2>
+          <p class="section-intro">
+            `demo_true_pipeline.html` 描述的是理想工作流；實際 repo 中確實有下載、清洗與替換程式，
+            但沒有自動呼叫 LLM 的程式碼，也沒有端到端的一鍵工作命令。
+          </p>
+        </div>
+      </div>
+
+      <div class="flow">
+        <article class="flow-step">
+          <h3>YouTube 來源</h3>
+          <p>每集 Markdown frontmatter 保存 YouTube URL。</p>
+        </article>
+        <article class="flow-step">
+          <h3>下載 VTT</h3>
+          <p>`fetch_and_process.js` 可透過 `yt-dlp` 抓取第 1 至 7 集日文自動字幕。</p>
+        </article>
+        <article class="flow-step">
+          <h3>機械清洗</h3>
+          <p>Node／Python 腳本移除 VTT 標籤、時間格式與相鄰重複片段。</p>
+        </article>
+        <article class="flow-step">
+          <h3>語意處理</h3>
+          <p>斷句、說話者辨識與繁中翻譯由人或 AI 工作階段完成，repo 內沒有自動 LLM client。</p>
+        </article>
+        <article class="flow-step">
+          <h3>詞庫校正</h3>
+          <p>34 筆 global 與 13 筆 episode 2 規則做字串／正則替換。</p>
+        </article>
+        <article class="flow-step">
+          <h3>寫回 Markdown</h3>
+          <p>最終文字進入 `【完整逐字稿】`，再由網站 parser 讀取。</p>
+        </article>
+      </div>
+
+      <div class="bento" style="margin-top:14px">
+        <article class="card">
+          <span class="tag confirmed">Automated</span>
+          <h3>程式可以做</h3>
+          <ul class="plain-list">
+            <li>下載既有 YouTube 自動字幕。</li>
+            <li>移除 VTT 標記與部分重複。</li>
+            <li>套用詞庫替換規則。</li>
+            <li>把標準格式逐字稿渲染到網站。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="tag partial">Human or AI session</span>
+          <h3>仍需判斷</h3>
+          <ul class="plain-list">
+            <li>確認字幕是否真的聽寫正確。</li>
+            <li>辨識主持人與來賓。</li>
+            <li>繁中翻譯與語意重組。</li>
+            <li>新增 episode-specific 專有名詞。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="tag demo">Not implemented</span>
+          <h3>HTML 裡有，正式系統沒有</h3>
+          <ul class="plain-list">
+            <li>可操作的 Glossary Manager 後台。</li>
+            <li>逐集 correction dashboard。</li>
+            <li>自動 LLM／subagent 呼叫。</li>
+            <li>任務重試、版本與審批狀態。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="capabilities" class="reveal">
+      <div class="section-head">
+        <div class="section-no">05 / Capability state</div>
+        <div>
+          <h2>哪些已正式運作，哪些仍停留在 Demo。</h2>
+          <p class="section-intro">狀態以目前原始碼、內容檔和 build 結果為準，而不是以 HTML 報告內的宣稱為準。</p>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>領域</th>
+              <th>能力</th>
+              <th>目前狀態</th>
+              <th>根據</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>內容</td>
+              <td>8 集摘要與段落紀錄</td>
+              <td><span class="state live">已實裝</span></td>
+              <td>8 份 Markdown；39 個 summary bullets；40 個 cards。</td>
+            </tr>
+            <tr>
+              <td>內容</td>
+              <td>完整逐字稿</td>
+              <td><span class="state partial">部分正常</span></td>
+              <td>8 集都有 section，但第 4 集的 63 行格式不符合 parser。</td>
+            </tr>
+            <tr>
+              <td>首頁</td>
+              <td>時間軸、日期位置、緊湊模式</td>
+              <td><span class="state live">已實裝</span></td>
+              <td>`HomeEpisodeList`、`HomeLayoutProvider`、`Header`。</td>
+            </tr>
+            <tr>
+              <td>閱讀</td>
+              <td>精簡、段落、逐字稿切換</td>
+              <td><span class="state live">已實裝</span></td>
+              <td>`EpisodeViewer` 與 `TranscriptMode`。</td>
+            </tr>
+            <tr>
+              <td>閱讀</td>
+              <td>文字／圖卡模式與 ZIP 匯出</td>
+              <td><span class="state live">已實裝</span></td>
+              <td>`TextMode`、`CardMode`、`html-to-image`、`JSZip`。</td>
+            </tr>
+            <tr>
+              <td>偏好</td>
+              <td>主題與顯示設定保存</td>
+              <td><span class="state live">已實裝</span></td>
+              <td>瀏覽器 `localStorage`，沒有帳號同步。</td>
+            </tr>
+            <tr>
+              <td>內容處理</td>
+              <td>VTT 下載、清洗、詞庫替換</td>
+              <td><span class="state partial">半自動</span></td>
+              <td>有多支腳本，但未收斂成 package script 或單一安全 pipeline。</td>
+            </tr>
+            <tr>
+              <td>內容處理</td>
+              <td>自動說話者辨識與翻譯</td>
+              <td><span class="state missing">未程式化</span></td>
+              <td>HTML 描述此步驟，但 repo 沒有 LLM API client。</td>
+            </tr>
+            <tr>
+              <td>管理</td>
+              <td>詞庫管理畫面、任務狀態、審批</td>
+              <td><span class="state demo">Demo only</span></td>
+              <td>`demo_correction_pipeline.html` 是展示頁，未連接正式程式。</td>
+            </tr>
+            <tr>
+              <td>部署</td>
+              <td>Vercel production build</td>
+              <td><span class="state live">建置通過</span></td>
+              <td>Next.js 16.2.10 成功輸出 12 個靜態頁。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="gaps" class="reveal">
+      <div class="section-head">
+        <div class="section-no">06 / Gaps</div>
+        <div>
+          <h2>目前最需要注意的是「狀態不一致」和「半自動流程被描述成全自動」。</h2>
+          <p class="section-intro">這些不代表網站不能使用，但會讓未來任務接手、內容可信度與部署判斷變得困難。</p>
+        </div>
+      </div>
+
+      <div class="bento">
+        <article class="card wide">
+          <span class="tag risk">Data loss in UI</span>
+          <h3>第 4 集逐字稿實際存在，網站卻讀不到</h3>
+          <p>
+            Parser 只接受 <code>[時間] [說話者] 文字</code>；
+            第 4 集使用 <code>[時間] 說話者：文字</code>。結果是 63 行來源全部被忽略，
+            逐字稿頁會顯示「尚未提供」。
+          </p>
+        </article>
+        <article class="card">
+          <span class="tag risk">Public artifacts</span>
+          <h3>30 份 Demo 都在 public</h3>
+          <p>它們沒有被正式 UI 引用，但只要部署就可由網址直接存取，包括 audit 與部署指南。</p>
+        </article>
+        <article class="card">
+          <span class="tag risk">Synthetic content</span>
+          <h3>存在 mock transcript script</h3>
+          <p>`process_transcripts.js` 明確含有「假造的原始出錯聽寫」，不應被誤當正式內容來源。</p>
+        </article>
+        <article class="card">
+          <span class="tag partial">No task ledger</span>
+          <h3>任務狀態靠檔名推測</h3>
+          <p>`fix`、`final`、`proposal`、`demo` 沒有共同 task ID、核准欄位或「已實裝」連結。</p>
+        </article>
+        <article class="card">
+          <span class="tag partial">Validation gap</span>
+          <h3>Build 通過不等於 lint 通過</h3>
+          <p>TypeScript 和 production build 成功，但 ESLint 仍回報 27 errors 與 11 warnings。</p>
+        </article>
+        <article class="card">
+          <span class="tag partial">Stale narratives</span>
+          <h3>報告數字會過期</h3>
+          <p>Demo 顯示 42 terms，實際詞庫已有 47 筆；audit 的「生產級」也未反映新增程式與現況。</p>
+        </article>
+        <article class="card">
+          <span class="tag risk">Destructive scripts</span>
+          <h3>處理腳本直接覆寫 Markdown</h3>
+          <p>`fetch_and_process.js` 與相關腳本會原地寫回 episode 檔，沒有備份、dry-run 或 schema validation gate。</p>
+        </article>
+      </div>
+
+      <div class="callout" style="margin-top:14px">
+        <strong>一句話判斷</strong>
+        現在的系統很適合「由 AI 與你一起快速試作」，但還不是可以無人值守批次處理內容的 production pipeline。
+      </div>
+    </section>
+
+    <section id="inventory" class="reveal">
+      <div class="section-head">
+        <div class="section-no">07 / HTML inventory</div>
+        <div>
+          <h2>30 份 HTML 的角色與目前關係。</h2>
+          <p class="section-intro">
+            下列連結指向 `public` 中的原始檔。分類是本次分析結果；「Demo only」表示它不是正式 React runtime 的引用來源。
+          </p>
+        </div>
+      </div>
+
+      <div class="inventory-tools" role="group" aria-label="HTML 分類篩選">
+        <button class="filter-button is-active" type="button" data-filter="all">全部 30</button>
+        <button class="filter-button" type="button" data-filter="process">流程與報告 6</button>
+        <button class="filter-button" type="button" data-filter="home">首頁與設定 7</button>
+        <button class="filter-button" type="button" data-filter="fix">控制與修復 6</button>
+        <button class="filter-button" type="button" data-filter="episode">單集與逐字稿 11</button>
+      </div>
+
+      <div class="inventory-wrap">
+        <table class="inventory">
+          <thead>
+            <tr>
+              <th>檔案</th>
+              <th>分類</th>
+              <th>用途</th>
+              <th>目前關係</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-category="fix">
+              <td><a class="file-link" href="../public/button_demo.html">button_demo.html</a></td>
+              <td>控制與修復</td>
+              <td>切換按鈕樣式差異分析。</td>
+              <td>比較稿；正式控制已在 EpisodeViewer。</td>
+            </tr>
+            <tr data-category="fix">
+              <td><a class="file-link" href="../public/button_fix_demo.html">button_fix_demo.html</a></td>
+              <td>控制與修復</td>
+              <td>按鈕破圖外溢的 Before／After。</td>
+              <td>修復驗證 Demo。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/color_proposal.html">color_proposal.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>網格卡片與原版綠色標題配色提案。</td>
+              <td>視覺提案；非 runtime。</td>
+            </tr>
+            <tr data-category="home">
+              <td><a class="file-link" href="../public/date_layouts_demo.html">date_layouts_demo.html</a></td>
+              <td>首頁與設定</td>
+              <td>三種日期排版比較。</td>
+              <td>選案 Demo；目前正式版支援內／外日期。</td>
+            </tr>
+            <tr data-category="process">
+              <td><a class="file-link" href="../public/demo_correction_pipeline.html">demo_correction_pipeline.html</a></td>
+              <td>流程與報告</td>
+              <td>Glossary Manager 與逐集校正儀表板概念。</td>
+              <td>Demo only；正式系統沒有管理 UI。</td>
+            </tr>
+            <tr data-category="process">
+              <td><a class="file-link" href="../public/demo_glossary.html">demo_glossary.html</a></td>
+              <td>流程與報告</td>
+              <td>比較有無詞庫對聽寫與翻譯的影響。</td>
+              <td>概念說明；正式流程只有替換 JSON。</td>
+            </tr>
+            <tr data-category="fix">
+              <td><a class="file-link" href="../public/demo_overflow.html">demo_overflow.html</a></td>
+              <td>控制與修復</td>
+              <td>窄螢幕模式按鈕溢出重現與修復。</td>
+              <td>Bug reproduction。</td>
+            </tr>
+            <tr data-category="fix">
+              <td><a class="file-link" href="../public/demo_spacing.html">demo_spacing.html</a></td>
+              <td>控制與修復</td>
+              <td>段落灰線、padding 與焦點狀態比較。</td>
+              <td>Bug reproduction。</td>
+            </tr>
+            <tr data-category="process">
+              <td><a class="file-link" href="../public/demo_true_pipeline.html">demo_true_pipeline.html</a></td>
+              <td>流程與報告</td>
+              <td>VTT、Python、AI、Glossary 四階段理想管線。</td>
+              <td>半真實；AI 階段未程式化。</td>
+            </tr>
+            <tr data-category="process">
+              <td><a class="file-link" href="../public/deployment_guide.html">deployment_guide.html</a></td>
+              <td>流程與報告</td>
+              <td>手機預覽、Vercel 與 GitHub Pages 上線指南。</td>
+              <td>文件；未連接 Vercel automation。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/ep08_color_demo.html">ep08_color_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>第 8 集配色與排版精確還原。</td>
+              <td>視覺試作。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/ep08_final_demo.html">ep08_final_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>第 8 集完整無損排版升級的收斂稿。</td>
+              <td>標記 final，但不是正式元件來源。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/ep08_fix_demo.html">ep08_fix_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>單集 layout 修正。</td>
+              <td>修正 Demo。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/ep08_original_arch_demo.html">ep08_original_arch_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>在既有 EpisodeViewer 架構上加入內容。</td>
+              <td>接近正式架構的移植提案。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/ep08_redesign_demo.html">ep08_redesign_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>第 8 集較大幅度的單集頁重設計。</td>
+              <td>設計探索，未直接成為 runtime。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/ep08_transcript_integration_demo.html">ep08_transcript_integration_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>在既有面板新增逐字稿切換。</td>
+              <td>概念已進入 EpisodeViewer。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/episode_full_demo.html">episode_full_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>第 8 回完整單集頁淺色 Demo。</td>
+              <td>隔離展示，不改正式版。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/episode_full_demo_dark.html">episode_full_demo_dark.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>第 8 回完整單集頁暗色 Demo。</td>
+              <td>主題比較稿。</td>
+            </tr>
+            <tr data-category="fix">
+              <td><a class="file-link" href="../public/episode_toolbar_demo.html">episode_toolbar_demo.html</a></td>
+              <td>控制與修復</td>
+              <td>單集工具列高度與間距 Before／After。</td>
+              <td>正式 EpisodeViewer 的修復依據。</td>
+            </tr>
+            <tr data-category="home">
+              <td><a class="file-link" href="../public/focus_demo.html">focus_demo.html</a></td>
+              <td>首頁與設定</td>
+              <td>閱讀焦點追蹤的明顯效果版本。</td>
+              <td>互動原型；正式版在 TextMode。</td>
+            </tr>
+            <tr data-category="home">
+              <td><a class="file-link" href="../public/focus_demo2.html">focus_demo2.html</a></td>
+              <td>首頁與設定</td>
+              <td>保留原版樣式的焦點追蹤版本。</td>
+              <td>比較稿。</td>
+            </tr>
+            <tr data-category="process">
+              <td><a class="file-link" href="../public/opus_audit_report.html">opus_audit_report.html</a></td>
+              <td>流程與報告</td>
+              <td>20 項程式修復與模組對照報告。</td>
+              <td>歷史快照；生產級宣稱已非現況證明。</td>
+            </tr>
+            <tr data-category="process">
+              <td><a class="file-link" href="../public/self_review_report.html">self_review_report.html</a></td>
+              <td>流程與報告</td>
+              <td>導覽列、時間軸與最新集配色的自我審理。</td>
+              <td>歷史修復紀錄。</td>
+            </tr>
+            <tr data-category="home">
+              <td><a class="file-link" href="../public/settings_ui_demo.html">settings_ui_demo.html</a></td>
+              <td>首頁與設定</td>
+              <td>設定面板視覺統一與去冗餘。</td>
+              <td>設定選單設計稿。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/single_episode_demo.html">single_episode_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>單集頁完全體設計，含分享與導覽概念。</td>
+              <td>部分功能未進正式版。</td>
+            </tr>
+            <tr data-category="home">
+              <td><a class="file-link" href="../public/tag_demo.html">tag_demo.html</a></td>
+              <td>首頁與設定</td>
+              <td>最新集與一般集 tag 的 A／B／C 比較。</td>
+              <td>綠色 latest tag 已實裝。</td>
+            </tr>
+            <tr data-category="home">
+              <td><a class="file-link" href="../public/timeline_demo.html">timeline_demo.html</a></td>
+              <td>首頁與設定</td>
+              <td>首頁時間軸、暗色與多設定切換。</td>
+              <td>主要首頁互動原型。</td>
+            </tr>
+            <tr data-category="home">
+              <td><a class="file-link" href="../public/timeline_fix_demo.html">timeline_fix_demo.html</a></td>
+              <td>首頁與設定</td>
+              <td>時間軸節點與連接線的幾何原因分析。</td>
+              <td>正式 flex 時間軸的修復依據。</td>
+            </tr>
+            <tr data-category="fix">
+              <td><a class="file-link" href="../public/toolbar_fix_demo.html">toolbar_fix_demo.html</a></td>
+              <td>控制與修復</td>
+              <td>單集工具列間距與對齊終極測試。</td>
+              <td>最終比較稿。</td>
+            </tr>
+            <tr data-category="episode">
+              <td><a class="file-link" href="../public/transcript_demo.html">transcript_demo.html</a></td>
+              <td>單集與逐字稿</td>
+              <td>逐字稿時間、人物與對話排版設計。</td>
+              <td>核心概念已進 TranscriptMode。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="validation" class="reveal">
+      <div class="section-head">
+        <div class="section-no">08 / Validation</div>
+        <div>
+          <h2>本次檢查結果與可信度界線。</h2>
+          <p class="section-intro">報告同時保留「確認事實、合理推論、未能完成的驗證」，避免把 Demo 敘事當成正式現況。</p>
+        </div>
+      </div>
+
+      <div class="health">
+        <article class="health-item">
+          <strong>TypeScript</strong>
+          <p>通過。`npx tsc --noEmit` exit code 0。</p>
+        </article>
+        <article class="health-item">
+          <strong>Production build</strong>
+          <p>通過。Next.js 16.2.10 產生 12 個靜態頁。</p>
+        </article>
+        <article class="health-item">
+          <strong>ESLint</strong>
+          <p>未通過。27 errors、11 warnings。</p>
+        </article>
+        <article class="health-item">
+          <strong>HTML visual check</strong>
+          <p>未完成。Browser 的本機 file URL 安全政策阻擋直接開啟。</p>
+        </article>
+      </div>
+
+      <div style="margin-top:28px">
+        <details open>
+          <summary>已直接確認的事實</summary>
+          <div class="detail-body">
+            30 份 HTML 的標題、heading、按鈕與互動訊號；正式 React 原始碼；8 份 episode Markdown；
+            7 份 VTT；47 筆 glossary 規則；685 行逐字稿來源；TypeScript、lint 與 production build 結果。
+          </div>
+        </details>
+        <details>
+          <summary>由檔案軌跡推論的工作方式</summary>
+          <div class="detail-body">
+            「先 Demo、再比較、再實裝、再自審」是高可信推論，因為多組檔名與 HTML 內容都呈現同一模式；
+            但 repo 沒有 task metadata，所以無法從機器資料確定每一份 Demo 是否獲得過你的明確核准。
+          </div>
+        </details>
+        <details>
+          <summary>不能從現有資料證明的事項</summary>
+          <div class="detail-body">
+            無法證明所有 HTML 宣稱的修復都仍保留在最新程式、無法證明逐字稿每一句翻譯正確，
+            也無法證明 pipeline 能在無人工介入下端到端完成。
+          </div>
+        </details>
+      </div>
+
+      <p class="method">
+        產生時間：2026-07-28，Asia/Taipei。分析範圍：
+        `public/*.html`、`src/`、`content/`、根目錄與 `scripts/` 中的內容處理程式。
+        本報告存放於 `reports/`，不會因 Vercel 的 `public` 靜態檔規則而自動對外公開。
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const revealItems = document.querySelectorAll(".reveal");
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        }
+      }, { threshold: 0.08 });
+
+      revealItems.forEach((item) => observer.observe(item));
+    } else {
+      revealItems.forEach((item) => item.classList.add("is-visible"));
+    }
+
+    const filterButtons = document.querySelectorAll("[data-filter]");
+    const inventoryRows = document.querySelectorAll("[data-category]");
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const filter = button.dataset.filter;
+
+        filterButtons.forEach((item) => item.classList.remove("is-active"));
+        button.classList.add("is-active");
+
+        inventoryRows.forEach((row) => {
+          row.hidden = filter !== "all" && row.dataset.category !== filter;
+        });
+      });
+    });
+  </script>
+</body>
+</html>

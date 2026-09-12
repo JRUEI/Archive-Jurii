@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>版本控制與 Vercel 部署報告｜はるまとぺーじ Wiki</title>
+  <style>
+    :root {
+      --bg: #111111;
+      --panel: #191919;
+      --panel-2: #202020;
+      --line: #343434;
+      --text: #f4f2ed;
+      --muted: #aaa8a2;
+      --lavender: #b39ddb;
+      --lime: #b2ff59;
+      --amber: #ffd166;
+      --red: #ff8a80;
+      --max: 1100px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(179, 157, 219, 0.12), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--lime);
+      text-underline-offset: 0.2em;
+    }
+
+    code {
+      padding: 0.12rem 0.38rem;
+      border: 1px solid var(--line);
+      border-radius: 0.35rem;
+      background: #0d0d0d;
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 0.9em;
+      overflow-wrap: anywhere;
+    }
+
+    .page {
+      width: min(calc(100% - 2rem), var(--max));
+      margin-inline: auto;
+    }
+
+    header {
+      padding: 5rem 0 3rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 1rem;
+      color: var(--lime);
+      font: 700 0.76rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 18ch;
+      margin-bottom: 1.25rem;
+      font-size: clamp(2.6rem, 6vw, 5.1rem);
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+    }
+
+    h2 {
+      margin-bottom: 1.25rem;
+      font-size: clamp(1.7rem, 4vw, 2.7rem);
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin-bottom: 0.55rem;
+      font-size: 1.05rem;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin-bottom: 2rem;
+      color: #d1cec7;
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+    }
+
+    .answer {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: start;
+      max-width: 850px;
+      padding: 1.25rem;
+      border: 1px solid rgba(178, 255, 89, 0.45);
+      border-radius: 1rem;
+      background: rgba(178, 255, 89, 0.06);
+    }
+
+    .answer-mark {
+      display: grid;
+      width: 2.25rem;
+      height: 2.25rem;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--lime);
+      color: #111;
+      font-weight: 900;
+    }
+
+    .answer strong {
+      color: var(--lime);
+    }
+
+    .answer p {
+      margin: 0;
+    }
+
+    main {
+      padding: 3rem 0 5rem;
+    }
+
+    section {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-label {
+      display: block;
+      margin-bottom: 0.7rem;
+      color: var(--lavender);
+      font: 700 0.75rem/1.2 "Cascadia Code", Consolas, monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .status-grid,
+    .responsibility-grid,
+    .check-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .status-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .responsibility-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .check-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+      min-width: 0;
+      padding: 1.25rem;
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: linear-gradient(145deg, var(--panel-2), var(--panel));
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .status {
+      display: inline-flex;
+      margin-bottom: 1rem;
+      padding: 0.3rem 0.65rem;
+      border: 1px solid currentColor;
+      border-radius: 99rem;
+      font: 700 0.72rem/1 "Cascadia Code", Consolas, monospace;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .ready {
+      color: var(--lime);
+    }
+
+    .pending {
+      color: var(--amber);
+    }
+
+    .blocked {
+      color: var(--red);
+    }
+
+    .metric {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      gap: 0.65rem;
+      align-items: center;
+      margin: 1.5rem 0;
+    }
+
+    .flow-step {
+      min-height: 9rem;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 0.9rem;
+      background: var(--panel);
+    }
+
+    .flow-step b {
+      display: block;
+      margin-bottom: 0.65rem;
+      color: var(--lavender);
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 0.8rem;
+    }
+
+    .arrow {
+      color: var(--lime);
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .decision {
+      padding: 1.25rem;
+      border-left: 4px solid var(--lavender);
+      border-radius: 0 0.75rem 0.75rem 0;
+      background: rgba(179, 157, 219, 0.09);
+    }
+
+    .decision p:last-child {
+      margin-bottom: 0;
+    }
+
+    ol,
+    ul {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+
+    li + li {
+      margin-top: 0.6rem;
+    }
+
+    .command {
+      overflow-x: auto;
+      margin: 1rem 0 0;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      background: #090909;
+      color: #d9f7b7;
+      font: 0.88rem/1.7 "Cascadia Code", Consolas, monospace;
+      white-space: pre;
+    }
+
+    .warning {
+      border-color: rgba(255, 209, 102, 0.5);
+      background: rgba(255, 209, 102, 0.06);
+    }
+
+    footer {
+      padding: 2rem 0 3rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 820px) {
+      header {
+        padding-top: 3.5rem;
+      }
+
+      .status-grid,
+      .responsibility-grid,
+      .check-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-step {
+        min-height: auto;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+        justify-self: center;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+
+    @media print {
+      :root {
+        --bg: #fff;
+        --panel: #fff;
+        --panel-2: #f4f4f4;
+        --line: #c8c8c8;
+        --text: #111;
+        --muted: #555;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      header {
+        padding-top: 1rem;
+      }
+
+      section,
+      .card,
+      .flow-step {
+        break-inside: avoid;
+      }
+
+      a {
+        color: #111;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="page">
+      <p class="eyebrow">Decision brief · 2026-07-29 · local workspace</p>
+      <h1>版本控制與 Vercel 部署</h1>
+      <p class="lead">
+        はるまとぺーじ Wiki 已通過本機部署檢查，但還沒有完成版控與平台連結。
+        現在適合先建立 Git 遠端，再讓 Vercel 接手每次 push 後的建置與上線。
+      </p>
+      <div class="answer">
+        <div class="answer-mark" aria-hidden="true">✓</div>
+        <p>
+          <strong>你不必每次親自操作部署。</strong>
+          第一次需要授權 GitHub 與 Vercel；之後 Codex 可以在你明確說「提交／發布」後完成驗證與 push，
+          Vercel 會自動產生預覽或正式版本。你主要負責看結果與決定是否公開。
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section>
+      <span class="section-label">01 · Current status</span>
+      <h2>程式可部署，版控與平台還沒接上。</h2>
+      <div class="status-grid">
+        <article class="card">
+          <span class="status ready">Ready</span>
+          <span class="metric">可建置</span>
+          <p>Lint、型別檢查、內容驗證、Next.js production build 與瀏覽器 smoke test 已通過。</p>
+        </article>
+        <article class="card">
+          <span class="status blocked">Not versioned</span>
+          <span class="metric">78</span>
+          <p>個未追蹤檔案（包含本報告）；另有 9 個已追蹤檔案被修改。現在只有 Create Next App 的初始 commit。</p>
+        </article>
+        <article class="card">
+          <span class="status pending">Not linked</span>
+          <span class="metric">0</span>
+          <p>個 Git remote；也沒有本機 <code>.vercel</code> 專案連結。因此目前尚未真正上線。</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <span class="section-label">02 · What becomes automatic</span>
+      <h2>一次設定後，部署流程可以大部分自動化。</h2>
+      <div class="flow" aria-label="從修改到部署的流程">
+        <article class="flow-step">
+          <b>01 / CHANGE</b>
+          <h3>Codex 修改</h3>
+          <p class="muted">依你的指示改程式或內容，不直接發布。</p>
+        </article>
+        <div class="arrow" aria-hidden="true">→</div>
+        <article class="flow-step">
+          <b>02 / VERIFY</b>
+          <h3>本機驗證</h3>
+          <p class="muted"><code>npm run verify</code>，再檢查實際頁面。</p>
+        </article>
+        <div class="arrow" aria-hidden="true">→</div>
+        <article class="flow-step">
+          <b>03 / VERSION</b>
+          <h3>Git commit + push</h3>
+          <p class="muted">留下可回復的版本紀錄；只有你授權後才推送。</p>
+        </article>
+        <div class="arrow" aria-hidden="true">→</div>
+        <article class="flow-step">
+          <b>04 / DEPLOY</b>
+          <h3>Vercel 自動部署</h3>
+          <p class="muted">分支得到 Preview；production branch 更新正式網址。</p>
+        </article>
+      </div>
+      <p class="muted">
+        Vercel 官方說明：連接 Git repository 後，每次 branch push 可產生部署；
+        production branch（通常是 <code>main</code>）更新時建立 Production deployment。
+      </p>
+    </section>
+
+    <section>
+      <span class="section-label">03 · Ownership</span>
+      <h2>你只需處理一次授權與最後決定。</h2>
+      <div class="responsibility-grid">
+        <article class="card">
+          <span class="status pending">You · one time</span>
+          <h3>帳號與公開範圍</h3>
+          <ul>
+            <li>登入或授權 GitHub、Vercel。</li>
+            <li>確認 repository 使用 Private。</li>
+            <li>若要自訂網域，再處理網域或 DNS 授權。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="status ready">Codex · per task</span>
+          <h3>檔案與版控</h3>
+          <ul>
+            <li>修改、驗證並整理要提交的檔案。</li>
+            <li>依授權建立 commit、push 或 PR。</li>
+            <li>檢查 Preview 與 Production 頁面。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="status ready">Vercel · automatic</span>
+          <h3>建置與託管</h3>
+          <ul>
+            <li>安裝相依套件並執行 Next.js build。</li>
+            <li>產生 Preview／Production URL。</li>
+            <li>保留部署紀錄，必要時可回復前一版。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <span class="section-label">04 · Recommended version control</span>
+      <h2>最小可用方案：Private GitHub + main + Preview branch。</h2>
+      <div class="decision">
+        <p>
+          <strong>為什麼要 Private：</strong>
+          repository 含完整逐字稿、字幕來源、歷史 Demo 與維護腳本；不應因為要部署網站就連原始工作檔一起公開。
+          網站是否公開，和 GitHub repository 是否公開，是兩個不同設定。
+        </p>
+      </div>
+      <div class="check-grid" style="margin-top: 1rem">
+        <article class="card">
+          <h3>分支規則</h3>
+          <ul>
+            <li><code>main</code>：正式網站來源。</li>
+            <li><code>codex/&lt;任務&gt;</code>：先取得 Vercel Preview。</li>
+            <li>Preview 通過後才合併到 <code>main</code>。</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Commit 規則</h3>
+          <ul>
+            <li>一個 commit 只處理一個目的。</li>
+            <li>提交前跑完整 <code>npm run verify</code>。</li>
+            <li>內容污染警告不在沒有來源時自動修正。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <span class="section-label">05 · Before first deployment</span>
+      <h2>第一次上線前還有 4 個動作。</h2>
+      <ol>
+        <li><strong>盤點並納入版本：</strong>檢查 78 個未追蹤檔案，避免盲目執行 <code>git add .</code>。</li>
+        <li><strong>建立遠端：</strong>新增 Private GitHub repository，將本機分支改為 <code>main</code> 並 push。</li>
+        <li><strong>連接平台：</strong>在 Vercel 匯入該 repository；專案已在 <code>package.json</code> 指定 Node.js <code>24.x</code>。</li>
+        <li><strong>先 Preview 再 Production：</strong>確認 8 集、404、安全標頭與手機版後，再讓正式網域指向該部署。</li>
+      </ol>
+      <div class="card warning" style="margin-top: 1.25rem">
+        <h3>目前不要直接正式部署的原因</h3>
+        <p>
+          網站程式本身已經可建置；問題是現在的 Git 只有 19 個 tracked files。
+          若直接使用 Git-based deployment，多數頁面、內容與元件不會存在於遠端 repository。
+          先完成一次乾淨的版本盤點，才有可靠的回復點。
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <span class="section-label">06 · Verified facts</span>
+      <h2>本次判斷依據</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>檢查項目</th>
+            <th>結果</th>
+            <th>意義</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>npm run verify</code></td>
+            <td><span class="status ready">Pass</span></td>
+            <td>ESLint、TypeScript、內容驗證與 production build 通過。</td>
+          </tr>
+          <tr>
+            <td>瀏覽器 smoke test</td>
+            <td><span class="status ready">Pass</span></td>
+            <td>首頁、ep01–ep08、404、互動與安全標頭可用。</td>
+          </tr>
+          <tr>
+            <td>Production audit</td>
+            <td><span class="status ready">0 vulnerabilities</span></td>
+            <td>部署用 dependencies 的已知 npm 漏洞為 0。</td>
+          </tr>
+          <tr>
+            <td>完整 npm audit</td>
+            <td><span class="status pending">9 dev-only</span></td>
+            <td>集中在 ESLint／brace-expansion 開發工具鏈；未強制升級到不相容的 major。</td>
+          </tr>
+          <tr>
+            <td>內容驗證</td>
+            <td><span class="status pending">0 errors · 10 warnings</span></td>
+            <td>不阻擋部署；警告涉及來源品質，沒有可信來源前不自動改寫。</td>
+          </tr>
+          <tr>
+            <td>環境變數</td>
+            <td><span class="status ready">None required</span></td>
+            <td>目前正式程式沒有 API key 或外部服務設定需求。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <span class="section-label">07 · Sources</span>
+      <h2>官方平台依據</h2>
+      <ul>
+        <li><a href="https://vercel.com/docs/git">Vercel：Deploying Git Repositories</a> — branch push、Preview 與 production branch。</li>
+        <li><a href="https://vercel.com/docs/deployments/overview">Vercel：Deployment Overview</a> — Git 與 CLI 部署方式。</li>
+        <li><a href="https://vercel.com/docs/functions/runtimes/node-js/node-js-versions">Vercel：Supported Node.js Versions</a> — 支援 Node.js 24.x。</li>
+        <li><a href="https://vercel.com/docs/deployments/vercel-ignore">Vercel：.vercelignore</a> — 排除不需部署的工作檔。</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="page">
+      <p>
+        產生時間：2026-07-29，Asia/Taipei。Repository：
+        <code>E:\Documents\Antigravity\Project_Testing\harumatope-wiki</code>。
+        本報告位於 <code>reports/</code>，並已列入 <code>.vercelignore</code>。
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日期排版候選方案</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#8b5cf6',
+                            green: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #09090b; /* zinc-950 */
+            color: #fafafa;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+        }
+        .demo-box {
+            background-color: #18181b; /* zinc-900 */
+            border: 1px solid #27272a; /* zinc-800 */
+            border-radius: 1rem;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        .demo-label {
+            position: absolute;
+            top: -1rem;
+            left: 2rem;
+            background: linear-gradient(135deg, #8b5cf6, #10b981);
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-10 text-center text-zinc-400">請比較以下三種日期排版樣式</h1>
+
+        <!-- 方案 A -->
+        <div class="demo-box">
+            <div class="demo-label">方案 A：整齊劃一的標籤列</div>
+            <header class="text-center flex flex-col items-center">
+                <div class="flex flex-wrap justify-center items-center gap-3 mb-5">
+                    <span class="px-5 py-2 bg-zinc-800 text-zinc-400 rounded-full text-sm font-bold tracking-wider">
+                        2026-07-25 配信
+                    </span>
+                    <span class="px-6 py-2 bg-brand-purple/20 text-brand-purple rounded-full text-lg font-bold tracking-wider">
+                        第 8 回
+                    </span>
+                    <span class="px-5 py-2 bg-amber-500/20 text-amber-300 rounded-full text-lg font-bold tracking-wider">
+                        來賓：根本優奈
+                    </span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold leading-tight">嘉賓根本優奈登場！夏日素麵與謎題破解！</h1>
+            </header>
+        </div>
+
+        <!-- 方案 B -->
+        <div class="demo-box">
+            <div class="demo-label">方案 B：精緻的肩標 (雜誌感)</div>
+            <header class="text-center flex flex-col items-center">
+                <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <span class="px-6 py-2 bg-brand-purple/20 text-brand-purple rounded-full text-lg font-bold tracking-wider">
+                        第 8 回
+                    </span>
+                    <span class="px-5 py-2 bg-amber-500/20 text-amber-300 rounded-full text-lg font-bold tracking-wider">
+                        來賓：根本優奈
+                    </span>
+                </div>
+                
+                <p class="text-brand-purple/70 text-sm font-bold tracking-[0.2em] mb-3 uppercase">
+                    DELIVERED ON 2026-07-25
+                </p>
+                <h1 class="text-3xl md:text-4xl font-bold leading-tight">嘉賓根本優奈登場！夏日素麵與謎題破解！</h1>
+            </header>
+        </div>
+
+        <!-- 方案 C (置中版) -->
+        <div class="demo-box">
+            <div class="demo-label">方案 C (修改版)：置中漸層線條</div>
+            <header class="flex flex-col items-center w-full">
+                <div class="flex flex-wrap justify-center gap-3 mb-5">
+                    <span class="px-6 py-2 bg-brand-purple/20 text-brand-purple rounded-full text-lg font-bold tracking-wider">
+                        第 8 回
+                    </span>
+                    <span class="px-5 py-2 bg-amber-500/20 text-amber-300 rounded-full text-lg font-bold tracking-wider">
+                        來賓：根本優奈
+                    </span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center leading-tight">嘉賓根本優奈登場！夏日素麵與謎題破解！</h1>
+                
+                <div class="w-full max-w-2xl flex items-center justify-center gap-4">
+                    <!-- 左側漸層線條 -->
+                    <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent to-brand-purple/50"></div>
+                    <!-- 日期 (置中) -->
+                    <p class="text-zinc-400 text-sm font-medium whitespace-nowrap tracking-wider">
+                        2026-07-25 配信
+                    </p>
+                    <!-- 右側漸層線條 -->
+                    <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent to-brand-purple/50"></div>
+                </div>
+            </header>
+        </div>
+    </div>
+
+</body>
+</html>

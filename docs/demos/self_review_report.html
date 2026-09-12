@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自我審理與修復報告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#8B5CF6', green: '#10B981', dark: '#18181B' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-zinc-50 text-zinc-900 p-4 md:p-8 font-sans">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-3xl shadow-lg border border-zinc-200 overflow-hidden">
+            <div class="bg-amber-100 px-8 py-6 border-b border-amber-200 flex items-center gap-4">
+                <div class="p-3 bg-amber-500 text-white rounded-xl shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-amber-900">自我審理報告：遺漏與瑕疵清單</h1>
+                    <p class="text-amber-700 text-sm mt-1">感謝您的提醒，我仔細盤點了最近的實作，確實發現了幾個隱藏的體驗瑕疵！</p>
+                </div>
+            </div>
+            
+            <div class="p-8 space-y-8">
+                <!-- 錯誤 1 -->
+                <div class="flex gap-4">
+                    <div class="shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xl">1</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-zinc-900 mb-2">HTML Demo 的導覽列忘了對齊</h2>
+                        <p class="text-zinc-600 mb-3">
+                            您之前特別交代「影片清單、首頁跟設定，這個上下的 length 記得調成一致的」。我在 React 正式版中確實將它們統一改成了 <code class="bg-zinc-100 px-2 py-1 rounded text-red-500">h-10 (40px)</code> 的固定高度，<strong>但我竟然忘記同步更新給您看的 HTML Demo (`timeline_demo.html`)！</strong> 導致您在看 Demo 時依然覺得高低不平。
+                        </p>
+                        <div class="bg-green-50 text-green-800 p-3 rounded-xl border border-green-200 text-sm font-medium">
+                            ✓ 修復方案：已全面將 HTML Demo 的 Header 按鈕也套用嚴格的 40px 高度對齊。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 錯誤 2 -->
+                <div class="flex gap-4">
+                    <div class="shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xl">2</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-zinc-900 mb-2">時間軸間距重複計算 (破圖邊緣)</h2>
+                        <p class="text-zinc-600 mb-3">
+                            在 React 程式碼中，我為了拉開卡片距離，同時保留了外層的 <code class="bg-zinc-100 px-2 py-1 rounded">gap-8</code> 以及卡片容器的 <code class="bg-zinc-100 px-2 py-1 rounded">pb-12</code>，這導致兩集之間的距離被「重複疊加」變得過大 (高達 80px)！更嚴重的是，這導致我計算時間軸垂直線段時產生了 8px 的超界重疊 (Overlap)，放大看會發現線段接縫處怪怪的。
+                        </p>
+                        <div class="bg-green-50 text-green-800 p-3 rounded-xl border border-green-200 text-sm font-medium">
+                            ✓ 修復方案：移除多餘的 pb-12，完美利用 gap-8 作為精準間距，並將連接線長度修正為精確跨越 gap 的長度。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 錯誤 3 -->
+                <div class="flex gap-4">
+                    <div class="shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xl">3</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-zinc-900 mb-2">關閉「特效」時，最新一集的邏輯不一致</h2>
+                        <p class="text-zinc-600 mb-3">
+                            目前如果從設定選單把「特效」關閉，最新一集的時間軸圓點會變成「死氣沉沉的灰色」，但下方延伸出去的線條卻還是「紫色的漸層」。更糟的是，我們才剛把最新一集的小標改為「亮綠色」，圓點跟線條卻沒跟著變成綠色，導致視覺重點非常混亂。
+                        </p>
+                        <div class="bg-green-50 text-green-800 p-3 rounded-xl border border-green-200 text-sm font-medium">
+                            ✓ 修復方案：統一將最新一集的圓點與漸層線預設改為「亮綠色 (Brand Green)」，即使關閉特效，它依然會是顯眼的綠色實心點，完美呼應旁邊綠色的最新回小標！
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-zinc-50 border-t border-zinc-200 p-6 text-center">
+                <p class="text-zinc-600 font-medium">我正在同步把這些細節進行全網 (HTML + React) 的深度修正！</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

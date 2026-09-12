@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首頁時間軸 Demo (含暗色與模式切換)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#8b5cf6',
+                            green: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            padding-bottom: 20vh;
+        }
+        /* JS 切換用的 CSS class */
+        .timeline-off .date-col, .timeline-off .timeline-center-col {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-purple/30 bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100">
+
+    <!-- 模擬全站導覽列 Header -->
+    <nav class="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50 transition-colors duration-300">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="h-10 text-base md:text-xl font-black tracking-widest flex items-center justify-center px-4 md:px-5 rounded-full bg-brand-purple/10 dark:bg-brand-purple/30 text-brand-purple dark:text-purple-300 hover:bg-brand-purple/20 dark:hover:bg-brand-purple/40 transition-all shadow-sm hover:shadow-md hover:shadow-brand-purple/10 hover:-translate-y-0.5 truncate max-w-[50%]">
+                <span class="truncate">はるまとぺーじ</span>
+            </a>
+
+            <!-- 右側選單區域 -->
+            <div class="flex gap-2 md:gap-4 items-center font-medium text-sm">
+                <!-- 原有的影片清單按鈕 -->
+                <a href="#" class="h-10 inline-flex items-center justify-center gap-1.5 px-3 md:px-5 bg-red-100 text-red-800 dark:bg-red-500/30 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-500/40 rounded-full font-bold transition-all shadow-sm hover:shadow-md hover:shadow-red-500/10 hover:-translate-y-0.5">
+                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <span class="tracking-wide hidden sm:inline">影片清單</span>
+                </a>
+
+                <!-- 整合設定按鈕與下拉選單 (已經拉到 Header 上) -->
+                <div class="relative">
+                    <button id="settings-btn" onclick="toggleSettingsMenu()" class="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-brand-purple dark:hover:text-brand-purple hover:bg-brand-purple/10 dark:hover:bg-brand-purple/20 transition-all shadow-sm focus:outline-none" title="設定">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="settings-dropdown" class="absolute top-full right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl z-50 opacity-0 invisible transform scale-95 origin-top-right transition-all duration-200 p-2 sm:p-3">
+                        <div class="px-3 pb-2 pt-1 border-b border-zinc-100 dark:border-zinc-800 mb-2">
+                            <span class="text-xs font-black text-zinc-400 dark:text-zinc-500 tracking-wider">排版與主題設定</span>
+                        </div>
+                        
+                        <div class="flex flex-col gap-1">
+                            <!-- Toggle 1: 時間軸開關 -->
+                            <label class="flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors">
+                                <span class="text-sm font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-brand-purple transition-colors" id="text-timeline">時間軸：開啟</span>
+                                <div class="relative">
+                                    <input type="checkbox" id="toggle-timeline" class="sr-only" checked onchange="handleToggles()">
+                                    <div class="block bg-brand-purple w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 track-timeline"></div>
+                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transition-transform duration-300 ease-in-out dot-timeline"></div>
+                                </div>
+                            </label>
+
+                            <!-- Toggle 4: 日期位置 -->
+                            <label class="flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors">
+                                <span class="text-sm font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-brand-purple transition-colors" id="text-date-pos">日期：外部</span>
+                                <div class="relative">
+                                    <input type="checkbox" id="toggle-date-pos" class="sr-only" checked onchange="handleToggles()">
+                                    <div class="block bg-zinc-200 dark:bg-zinc-700 w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 track-date-pos"></div>
+                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transition-transform duration-300 ease-in-out dot-date-pos"></div>
+                                </div>
+                            </label>
+
+                            <!-- Toggle 2: 收合內容 -->
+                            <label class="flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors">
+                                <span class="text-sm font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-brand-purple transition-colors" id="text-compact">卡片：展開</span>
+                                <div class="relative">
+                                    <input type="checkbox" id="toggle-compact" class="sr-only" onchange="handleToggles()">
+                                    <div class="block bg-zinc-200 dark:bg-zinc-700 w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 track-compact"></div>
+                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transition-transform duration-300 ease-in-out dot-compact"></div>
+                                </div>
+                            </label>
+
+                            <!-- Toggle 5: 視覺特效 (Focus Mode) -->
+                            <label class="flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors">
+                                <span class="text-sm font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-brand-purple transition-colors" id="text-effects">特效：開啟</span>
+                                <div class="relative">
+                                    <input type="checkbox" id="toggle-effects" class="sr-only" checked onchange="handleToggles()">
+                                    <div class="block bg-brand-purple w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 track-effects"></div>
+                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transition-transform duration-300 ease-in-out dot-effects"></div>
+                                </div>
+                            </label>
+
+                            <!-- Toggle 3: 暗色模式 -->
+                            <label class="flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors border-t border-zinc-100 dark:border-zinc-800 mt-1 pt-2">
+                                <span class="text-sm font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-brand-purple transition-colors" id="text-dark">主題：亮色</span>
+                                <div class="relative">
+                                    <input type="checkbox" id="toggle-dark" class="sr-only" onchange="handleToggles()">
+                                    <div class="block bg-zinc-200 dark:bg-zinc-700 w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 track-dark"></div>
+                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transition-transform duration-300 ease-in-out dot-dark"></div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首頁 Hero Section (模擬) -->
+    <div class="max-w-6xl mx-auto px-6 py-16">
+        <div class="text-center mb-16 relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-brand-purple/20 blur-[100px] rounded-full pointer-events-none"></div>
+            <h1 class="flex flex-col items-center text-[clamp(2rem,10vw,3rem)] sm:text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-[1.3] sm:leading-tight">
+                <span>福嶋晴菜の</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-brand-green mt-2 whitespace-nowrap">
+                    「はるまとぺーじ」
+                </span>
+            </h1>
+        </div>
+
+        <!-- 列表區塊 (可透過 body class 關閉 timeline) -->
+        <div class="max-w-4xl mx-auto" id="list-container">
+            
+            <!-- Item 1 (最新一集) -->
+            <div class="flex gap-4 sm:gap-8 relative group timeline-item">
+                <!-- 左側日期 -->
+                <div class="hidden sm:block w-28 shrink-0 pt-7 text-right date-col">
+                    <div class="text-brand-purple font-bold tracking-wide">2026-07-25</div>
+                    <div class="text-xs text-zinc-400 mt-1">最新發布</div>
+                </div>
+
+                <!-- 中間時間軸與節點 -->
+                <div class="relative flex flex-col items-center timeline-center-col shrink-0">
+                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-brand-green to-emerald-400 mt-7 relative z-10 shadow-[0_0_12px_rgba(16,185,129,0.6)] ring-4 ring-slate-50 dark:ring-zinc-950 node-dot transition-all duration-300 effect-glow"></div>
+                    <!-- 第一集的線從點開始往下 -->
+                    <div class="absolute top-7 bottom-0 w-1 bg-gradient-to-b from-brand-green to-zinc-200 dark:to-zinc-800 line-segment transition-all duration-300"></div>
+                </div>
+
+                <!-- 右側卡片內容 -->
+                <div class="flex-1 pb-8 sm:pb-12 card-wrapper transition-all duration-300 w-full">
+                    <!-- 手機版或無時間軸時的日期 -->
+                    <div class="sm:hidden text-brand-purple font-bold tracking-wide mb-2 pt-6 mobile-date transition-all duration-300">2026-07-25 <span class="text-xs text-zinc-400 font-normal ml-2">最新發布</span></div>
+                    
+                    <a href="#" class="block bg-white dark:bg-zinc-900 border border-brand-purple/30 dark:border-brand-purple/40 rounded-2xl p-6 md:p-8 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-brand-green/10 hover:-translate-y-1 relative overflow-hidden episode-card effect-card group/card">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-purple/10 dark:bg-brand-purple/20 blur-[50px] rounded-full pointer-events-none effect-blur"></div>
+                        
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4 relative z-10 tags-container transition-all duration-300">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-brand-green text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                                    第 8 回
+                                </span>
+                                <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider shadow-sm bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300">
+                                    來賓：根本優奈
+                                </span>
+                            </div>
+                            <!-- 內部日期 (原版樣式，預設隱藏) -->
+                            <div class="inner-date hidden text-zinc-500 dark:text-zinc-400 text-sm font-medium tracking-wide whitespace-nowrap mt-2 sm:mt-0">
+                                2026-07-25 <span class="text-xs text-brand-purple ml-1">最新</span>
+                            </div>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4 group-hover/card:text-brand-green transition-all duration-300 leading-snug relative z-10 card-title">
+                            嘉賓根本優奈登場！夏日素麵與謎題破解！
+                        </h2>
+                        <div class="card-summary transition-all duration-300 overflow-hidden relative z-10">
+                            <p class="text-zinc-600 dark:text-zinc-400 text-base md:text-lg line-clamp-2 leading-relaxed">
+                                根本優奈首次作為嘉賓登場！分享夏日素麵的特殊吃法，以及對節目謎題的獨到見解...
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="flex gap-4 sm:gap-8 relative group timeline-item">
+                <div class="hidden sm:block w-28 shrink-0 pt-7 text-right date-col">
+                    <div class="text-zinc-500 dark:text-zinc-400 font-medium tracking-wide group-hover:text-brand-purple transition-colors">2026-07-18</div>
+                </div>
+
+                <div class="relative flex flex-col items-center timeline-center-col shrink-0">
+                    <div class="w-4 h-4 rounded-full bg-zinc-300 dark:bg-zinc-700 mt-7 relative z-10 ring-4 ring-slate-50 dark:ring-zinc-950 group-hover:bg-brand-purple transition-all duration-300 node-dot"></div>
+                    <!-- 延續的線從最上方連接到底部 -->
+                    <div class="absolute top-0 bottom-0 w-1 bg-zinc-200 dark:bg-zinc-800 group-hover:bg-brand-purple/30 transition-all duration-300 line-segment"></div>
+                </div>
+
+                <div class="flex-1 pb-8 sm:pb-12 card-wrapper transition-all duration-300 w-full">
+                    <div class="sm:hidden text-zinc-500 dark:text-zinc-400 font-medium tracking-wide mb-2 pt-6 mobile-date transition-all duration-300">2026-07-18</div>
+                    
+                    <a href="#" class="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:shadow-brand-green/5 hover:-translate-y-1 hover:border-brand-green/30 dark:hover:border-brand-green/30 episode-card group/card">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4 tags-container transition-all duration-300">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-brand-purple/10 dark:bg-zinc-800 text-brand-purple dark:text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-wider transition-colors">
+                                    第 7 回
+                                </span>
+                                <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300">
+                                    個人回
+                                </span>
+                            </div>
+                            <div class="inner-date hidden text-zinc-500 dark:text-zinc-400 text-sm font-medium tracking-wide whitespace-nowrap mt-2 sm:mt-0">
+                                2026-07-18
+                            </div>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4 group-hover/card:text-brand-green transition-all duration-300 leading-snug card-title">
+                            炎炎夏日的消暑秘方與日常閒聊
+                        </h2>
+                        <div class="card-summary transition-all duration-300 overflow-hidden">
+                            <p class="text-zinc-600 dark:text-zinc-400 text-base md:text-lg line-clamp-2 leading-relaxed">
+                                這週天氣真的太熱了！跟大家分享我最近找到的超讚消暑飲料，還有在錄音室發生的趣事。
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="flex gap-4 sm:gap-8 relative group timeline-item">
+                <div class="hidden sm:block w-28 shrink-0 pt-7 text-right date-col">
+                    <div class="text-zinc-500 dark:text-zinc-400 font-medium tracking-wide group-hover:text-brand-purple transition-colors">2026-07-11</div>
+                </div>
+
+                <div class="relative flex flex-col items-center timeline-center-col shrink-0">
+                    <div class="w-4 h-4 rounded-full bg-zinc-300 dark:bg-zinc-700 mt-7 relative z-10 ring-4 ring-slate-50 dark:ring-zinc-950 group-hover:bg-brand-purple transition-all duration-300 node-dot"></div>
+                    <!-- 最後一項的線從頂部往下漸隱 -->
+                    <div class="absolute top-0 h-32 w-1 bg-gradient-to-b from-zinc-200 dark:from-zinc-800 to-transparent transition-all duration-300 line-segment"></div>
+                </div>
+
+                <div class="flex-1 pb-4 card-wrapper transition-all duration-300 w-full">
+                    <div class="sm:hidden text-zinc-500 dark:text-zinc-400 font-medium tracking-wide mb-2 pt-6 mobile-date transition-all duration-300">2026-07-11</div>
+                    
+                    <a href="#" class="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:shadow-brand-purple/5 hover:-translate-y-1 hover:border-brand-purple/30 dark:hover:border-brand-purple/30 episode-card">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4 tags-container transition-all duration-300">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-4 py-1.5 rounded-full text-sm font-bold tracking-wider group-hover:bg-brand-purple/10 group-hover:text-brand-purple transition-colors">
+                                    第 6 回
+                                </span>
+                                <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-amber-50 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300">
+                                    來賓：結川麻希
+                                </span>
+                            </div>
+                            <div class="inner-date hidden text-zinc-500 dark:text-zinc-400 text-sm font-medium tracking-wide whitespace-nowrap mt-2 sm:mt-0">
+                                2026-07-11
+                            </div>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4 group-hover:text-brand-purple transition-all duration-300 leading-snug card-title">
+                            結川麻希學姊駕到！前輩的配音經驗談
+                        </h2>
+                        <div class="card-summary transition-all duration-300 overflow-hidden">
+                            <p class="text-zinc-600 dark:text-zinc-400 text-base md:text-lg line-clamp-2 leading-relaxed">
+                                非常榮幸邀請到結川前輩！跟前輩請教了很多在錄音室的技巧，還被爆料了初次見面的糗事...
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function handleToggles() {
+            const isTimeline = document.getElementById('toggle-timeline').checked;
+            const isDateInside = document.getElementById('toggle-date-pos').checked;
+            const isCompact = document.getElementById('toggle-compact').checked;
+            const isEffects = document.getElementById('toggle-effects').checked;
+            const isDark = document.getElementById('toggle-dark').checked;
+            
+            const offset = window.innerWidth < 640 ? '1.5rem' : '1.75rem';
+
+            // --- 5. 視覺特效 ---
+            const textEffects = document.getElementById('text-effects');
+            const trackEffects = document.querySelector('.track-effects');
+            const dotEffects = document.querySelector('.dot-effects');
+            
+            if (isEffects) {
+                textEffects.textContent = '特效：開啟';
+                textEffects.classList.add('text-brand-purple');
+                trackEffects.classList.replace('bg-zinc-200', 'bg-brand-purple');
+                trackEffects.classList.replace('dark:bg-zinc-700', 'bg-brand-purple');
+                dotEffects.style.transform = `translateX(${offset})`;
+                
+                document.querySelectorAll('.effect-glow').forEach(el => {
+                    el.classList.add('bg-gradient-to-br', 'from-brand-green', 'to-emerald-400', 'shadow-[0_0_12px_rgba(16,185,129,0.6)]');
+                    el.classList.remove('bg-brand-green');
+                });
+                document.querySelectorAll('.effect-blur').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.effect-card').forEach(el => {
+                    el.classList.add('border-brand-purple/30', 'dark:border-brand-purple/40', 'hover:shadow-brand-purple/10');
+                    el.classList.remove('border-zinc-200', 'dark:border-zinc-800', 'hover:shadow-lg');
+                });
+            } else {
+                textEffects.textContent = '特效：關閉';
+                textEffects.classList.remove('text-brand-purple');
+                trackEffects.classList.replace('bg-brand-purple', 'bg-zinc-200');
+                if(isDark) trackEffects.classList.add('dark:bg-zinc-700');
+                dotEffects.style.transform = 'translateX(0)';
+                
+                document.querySelectorAll('.effect-glow').forEach(el => {
+                    el.classList.remove('bg-gradient-to-br', 'from-brand-green', 'to-emerald-400', 'shadow-[0_0_12px_rgba(16,185,129,0.6)]');
+                    el.classList.add('bg-brand-green');
+                });
+                document.querySelectorAll('.effect-blur').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.effect-card').forEach(el => {
+                    el.classList.remove('border-brand-purple/30', 'dark:border-brand-purple/40', 'hover:shadow-brand-purple/10');
+                    el.classList.add('border-zinc-200', 'dark:border-zinc-800', 'hover:shadow-lg');
+                });
+            }
+
+            // --- 1. 暗色模式 ---
+            const html = document.documentElement;
+            const textDark = document.getElementById('text-dark');
+            const trackDark = document.querySelector('.track-dark');
+            const dotDark = document.querySelector('.dot-dark');
+            
+            if (isDark) {
+                html.classList.add('dark');
+                textDark.textContent = '主題：暗色';
+                textDark.classList.add('text-brand-purple');
+                trackDark.classList.replace('bg-zinc-200', 'bg-brand-purple');
+                trackDark.classList.replace('dark:bg-zinc-700', 'bg-brand-purple');
+                dotDark.style.transform = `translateX(${offset})`;
+            } else {
+                html.classList.remove('dark');
+                textDark.textContent = '主題：亮色';
+                textDark.classList.remove('text-brand-purple');
+                trackDark.classList.replace('bg-brand-purple', 'bg-zinc-200');
+                dotDark.style.transform = 'translateX(0)';
+            }
+
+            // --- 2. 時間軸模式 ---
+            const textTimeline = document.getElementById('text-timeline');
+            const trackTimeline = document.querySelector('.track-timeline');
+            const dotTimeline = document.querySelector('.dot-timeline');
+            const container = document.getElementById('list-container');
+
+            if (isTimeline) {
+                textTimeline.textContent = '時間軸：開啟';
+                textTimeline.classList.add('text-brand-purple');
+                trackTimeline.classList.replace('bg-zinc-200', 'bg-brand-purple');
+                trackTimeline.classList.replace('dark:bg-zinc-700', 'bg-brand-purple');
+                dotTimeline.style.transform = `translateX(${offset})`; 
+                container.classList.remove('timeline-off');
+            } else {
+                textTimeline.textContent = '時間軸：關閉';
+                textTimeline.classList.remove('text-brand-purple');
+                trackTimeline.classList.replace('bg-brand-purple', 'bg-zinc-200');
+                if(isDark) trackTimeline.classList.add('dark:bg-zinc-700'); 
+                dotTimeline.style.transform = 'translateX(0)';
+                container.classList.add('timeline-off');
+            }
+
+            // --- 4. 日期位置 ---
+            const textDatePos = document.getElementById('text-date-pos');
+            const trackDatePos = document.querySelector('.track-date-pos');
+            const dotDatePos = document.querySelector('.dot-date-pos');
+
+            if (isDateInside) {
+                textDatePos.textContent = '日期：卡片內';
+                textDatePos.classList.add('text-brand-purple');
+                trackDatePos.classList.replace('bg-zinc-200', 'bg-brand-purple');
+                trackDatePos.classList.replace('dark:bg-zinc-700', 'bg-brand-purple');
+                dotDatePos.style.transform = `translateX(${offset})`;
+                
+                document.querySelectorAll('.date-col, .mobile-date').forEach(el => {
+                    el.style.opacity = '0';
+                    setTimeout(() => el.style.display = 'none', 150);
+                });
+                document.querySelectorAll('.inner-date').forEach(el => {
+                    el.classList.remove('hidden');
+                });
+            } else {
+                textDatePos.textContent = '日期：外部';
+                textDatePos.classList.remove('text-brand-purple');
+                trackDatePos.classList.replace('bg-brand-purple', 'bg-zinc-200');
+                if(isDark) trackDatePos.classList.add('dark:bg-zinc-700'); 
+                dotDatePos.style.transform = 'translateX(0)';
+                
+                document.querySelectorAll('.date-col').forEach(el => {
+                    el.style.display = '';
+                    setTimeout(() => el.style.opacity = '1', 50);
+                });
+                document.querySelectorAll('.mobile-date').forEach(el => {
+                    el.style.display = '';
+                    setTimeout(() => el.style.opacity = '1', 50);
+                });
+                document.querySelectorAll('.inner-date').forEach(el => {
+                    el.classList.add('hidden');
+                });
+            }
+            
+            if (!isDateInside) {
+                if (!isTimeline) {
+                    document.querySelectorAll('.mobile-date').forEach(el => el.classList.remove('sm:hidden'));
+                } else {
+                    document.querySelectorAll('.mobile-date').forEach(el => el.classList.add('sm:hidden'));
+                }
+            }
+
+            // --- 3. 收合模式 ---
+            const textCompact = document.getElementById('text-compact');
+            const trackCompact = document.querySelector('.track-compact');
+            const dotCompact = document.querySelector('.dot-compact');
+
+            if (isCompact) {
+                textCompact.textContent = '卡片：收合';
+                textCompact.classList.add('text-brand-purple');
+                trackCompact.classList.replace('bg-zinc-200', 'bg-brand-purple');
+                trackCompact.classList.replace('dark:bg-zinc-700', 'bg-brand-purple');
+                dotCompact.style.transform = `translateX(${offset})`;
+                
+                document.querySelectorAll('.card-summary').forEach(el => { el.style.maxHeight = '0'; el.style.opacity = '0'; });
+                document.querySelectorAll('.episode-card').forEach(el => { el.classList.replace('p-6', 'p-4'); el.classList.replace('md:p-8', 'md:p-5'); });
+                document.querySelectorAll('.card-title').forEach(el => { el.classList.replace('mb-4', 'mb-0'); el.classList.replace('text-2xl', 'text-xl'); el.classList.replace('md:text-3xl', 'md:text-xl'); });
+                document.querySelectorAll('.tags-container').forEach(el => { el.classList.replace('mb-4', 'mb-2'); });
+                document.querySelectorAll('.node-dot').forEach(el => { el.classList.replace('mt-7', 'mt-5'); });
+                document.querySelectorAll('.line-segment').forEach(el => { el.classList.replace('top-7', 'top-5'); });
+                document.querySelectorAll('.date-col').forEach(el => { el.classList.replace('pt-7', 'pt-4'); });
+                document.querySelectorAll('.mobile-date').forEach(el => { el.classList.replace('pt-6', 'pt-4'); });
+                document.querySelectorAll('.card-wrapper').forEach(el => { el.classList.replace('pb-8', 'pb-4'); el.classList.replace('sm:pb-12', 'sm:pb-6'); });
+            } else {
+                textCompact.textContent = '卡片：展開';
+                textCompact.classList.remove('text-brand-purple');
+                trackCompact.classList.replace('bg-brand-purple', 'bg-zinc-200');
+                if(isDark) trackCompact.classList.add('dark:bg-zinc-700'); 
+                dotCompact.style.transform = 'translateX(0)';
+                
+                document.querySelectorAll('.card-summary').forEach(el => { el.style.maxHeight = '100px'; el.style.opacity = '1'; });
+                document.querySelectorAll('.episode-card').forEach(el => { el.classList.replace('p-4', 'p-6'); el.classList.replace('md:p-5', 'md:p-8'); });
+                document.querySelectorAll('.card-title').forEach(el => { el.classList.replace('mb-0', 'mb-4'); el.classList.replace('text-xl', 'text-2xl'); el.classList.replace('md:text-xl', 'md:text-3xl'); });
+                document.querySelectorAll('.tags-container').forEach(el => { el.classList.replace('mb-2', 'mb-4'); });
+                document.querySelectorAll('.node-dot').forEach(el => { el.classList.replace('mt-5', 'mt-7'); });
+                document.querySelectorAll('.line-segment').forEach(el => { el.classList.replace('top-5', 'top-7'); });
+                document.querySelectorAll('.date-col').forEach(el => { el.classList.replace('pt-4', 'pt-7'); });
+                document.querySelectorAll('.mobile-date').forEach(el => { el.classList.replace('pt-4', 'pt-6'); });
+                document.querySelectorAll('.card-wrapper').forEach(el => { el.classList.replace('pb-4', 'pb-8'); el.classList.replace('sm:pb-6', 'sm:pb-12'); });
+            }
+        }
+        
+        // Init
+        document.querySelectorAll('.card-summary').forEach(el => {
+            el.style.maxHeight = '100px';
+            el.style.opacity = '1';
+        });
+        
+        function toggleSettingsMenu() {
+            const dropdown = document.getElementById('settings-dropdown');
+            if (dropdown.classList.contains('opacity-0')) {
+                dropdown.classList.remove('opacity-0', 'invisible', 'scale-95');
+                dropdown.classList.add('opacity-100', 'visible', 'scale-100');
+            } else {
+                dropdown.classList.add('opacity-0', 'invisible', 'scale-95');
+                dropdown.classList.remove('opacity-100', 'visible', 'scale-100');
+            }
+        }
+
+        // Click outside to close dropdown
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('settings-dropdown');
+            const btn = document.getElementById('settings-btn');
+            if (!dropdown.contains(event.target) && !btn.contains(event.target)) {
+                dropdown.classList.add('opacity-0', 'invisible', 'scale-95');
+                dropdown.classList.remove('opacity-100', 'visible', 'scale-100');
+            }
+        });
+
+        // Initial trigger for all toggle states based on checkboxes
+        setTimeout(() => {
+            handleToggles();
+        }, 50);
+    </script>
+</body>
+</html>

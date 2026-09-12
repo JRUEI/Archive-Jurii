@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時間軸根本性修復 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-purple': '#c084fc',
+                        'brand-green': '#34d399',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#0a0a0f] text-zinc-100 p-4 md:p-8 min-h-screen">
+
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-black mb-4 text-center">時間軸線段「根本邏輯」解析與改善</h1>
+        <p class="text-zinc-400 text-center mb-12">
+            您觀察得非常敏銳！把點改到 <code>top-1/2</code> 雖然解決了卡片內部比例，但<strong>破壞了跨卡片連線的數學邏輯</strong>。
+        </p>
+
+        <!-- Explanation -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- 失敗原因 -->
+            <div class="bg-zinc-900/50 border border-red-500/30 p-6 rounded-2xl">
+                <h2 class="text-red-400 font-bold text-xl mb-4">❌ 為什麼「居中對齊 (top-1/2)」注定失敗？</h2>
+                <p class="text-zinc-300 text-sm mb-4 leading-relaxed">
+                    如果圓點在卡片正中央，因為每張卡片高度不同（H1 ≠ H2），兩點之間的距離會變成 <code>H1/2 + Gap + H2/2</code>。<br><br>
+                    CSS 無法畫出一條預知下一張卡片高度的線，導致我們被迫讓 <strong>卡片A畫下半截、卡片B畫上半截</strong>，最後在中間相撞。<br>
+                    👉 <strong>結果：</strong>產生重疊色差、Hover 時線條斷成兩截。
+                </p>
+            </div>
+            
+            <!-- 終極解法 -->
+            <div class="bg-zinc-900/50 border border-green-500/30 p-6 rounded-2xl">
+                <h2 class="text-green-400 font-bold text-xl mb-4">✅ 終極解法：絕對定點 + 精確橋接</h2>
+                <p class="text-zinc-300 text-sm mb-4 leading-relaxed">
+                    我們必須回到<strong>固定距離</strong>（例如 <code>top: 32px</code>），讓它剛好對齊右邊卡片的文字基準線。<br><br>
+                    只要起點固定為 32px，往下畫的線只要設定 <code>bottom: -(Gap + 32px)</code>，就<strong>絕對會精準命中</strong>下一張卡片的圓點中心！<br>
+                    👉 <strong>結果：</strong>每個區段只有「一條線」，完全無縫，Hover 效果完美連貫。
+                </p>
+            </div>
+        </div>
+
+        <!-- DEMO AREA -->
+        <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl">
+            <h3 class="font-bold text-lg mb-8 text-center text-zinc-400">實際套用「絕對定點 + 精確橋接」的 Demo</h3>
+            
+            <div class="max-w-2xl mx-auto flex flex-col gap-4"> <!-- gap-4 = 16px -->
+                
+                <!-- Item 1 (高度較高) -->
+                <div class="flex gap-4 relative group">
+                    <div class="shrink-0 text-right w-20 pt-[24px]"> <!-- 微調對齊視覺 -->
+                        <div class="font-medium tracking-wide text-brand-purple text-sm">2026-05-30</div>
+                    </div>
+                    
+                    <div class="relative flex flex-col items-center shrink-0 w-6">
+                        <!-- 圓點固定在 top: 32px (剛好是 pt-8 左右) -->
+                        <div class="absolute top-[32px] -translate-y-1/2 rounded-full z-10 ring-4 ring-zinc-900 w-5 h-5 bg-brand-green"></div>
+                        
+                        <!-- 神奇的一條線：top: 32px, bottom: -(gap:16px + 32px) = -48px -->
+                        <div class="absolute w-1 top-[32px] bottom-[-48px] bg-zinc-800 group-hover:bg-brand-purple/50 transition-colors duration-300 z-0"></div>
+                        
+                        <!-- 標示 -->
+                        <div class="absolute left-8 top-[32px] text-[10px] text-green-400 whitespace-nowrap bg-zinc-900 px-1 border border-green-400/30 rounded z-20">← 固定 top:32px</div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <div class="bg-zinc-800/50 rounded-2xl p-6 border border-zinc-700/50 group-hover:border-brand-purple/50 transition-colors duration-300 h-40">
+                            <span class="bg-brand-green text-zinc-950 px-3 py-1 rounded-full text-xs font-bold">第 8 回</span>
+                            <h2 class="text-lg font-bold text-zinc-100 mt-3">我是一張比較高的卡片 (H=160px)</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 (高度較矮) -->
+                <div class="flex gap-4 relative group">
+                    <div class="shrink-0 text-right w-20 pt-[24px]">
+                        <div class="font-medium tracking-wide text-zinc-400 text-sm">2026-05-23</div>
+                    </div>
+                    
+                    <div class="relative flex flex-col items-center shrink-0 w-6">
+                        <div class="absolute top-[32px] -translate-y-1/2 rounded-full z-10 ring-4 ring-zinc-900 w-4 h-4 bg-zinc-700 group-hover:bg-brand-purple transition-colors duration-300"></div>
+                        
+                        <!-- 這條線精準連到下一顆點 -->
+                        <div class="absolute w-1 top-[32px] bottom-[-48px] bg-zinc-800 group-hover:bg-brand-purple/50 transition-colors duration-300 z-0"></div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <div class="bg-zinc-800/50 rounded-2xl p-6 border border-zinc-700/50 group-hover:border-brand-purple/50 transition-colors duration-300 h-24">
+                            <span class="bg-zinc-700 text-brand-purple px-3 py-1 rounded-full text-xs font-bold">第 7 回</span>
+                            <h2 class="text-lg font-bold text-zinc-100 mt-3">我是比較矮的卡片</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 (最後一個) -->
+                <div class="flex gap-4 relative group">
+                    <div class="shrink-0 text-right w-20 pt-[24px]">
+                        <div class="font-medium tracking-wide text-zinc-400 text-sm">2026-05-16</div>
+                    </div>
+                    
+                    <div class="relative flex flex-col items-center shrink-0 w-6">
+                        <div class="absolute top-[32px] -translate-y-1/2 rounded-full z-10 ring-4 ring-zinc-900 w-4 h-4 bg-zinc-700 group-hover:bg-brand-purple transition-colors duration-300"></div>
+                        
+                        <!-- 最後一條線，漸層消失，隨意長度即可 -->
+                        <div class="absolute w-1 top-[32px] h-32 bg-gradient-to-b from-zinc-800 to-transparent z-0"></div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <div class="bg-zinc-800/50 rounded-2xl p-6 border border-zinc-700/50 group-hover:border-brand-purple/50 transition-colors duration-300 h-32">
+                            <span class="bg-zinc-700 text-brand-purple px-3 py-1 rounded-full text-xs font-bold">第 6 回</span>
+                            <h2 class="text-lg font-bold text-zinc-100 mt-3">我是最後一張卡片</h2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

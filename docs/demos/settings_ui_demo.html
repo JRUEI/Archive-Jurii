@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定面板 UI 修正 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc' } /* 使用暗色模式的紫色 */
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#09090b] text-zinc-100 p-8 font-sans flex justify-center">
+    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-12">
+        
+        <!-- 原始狀況 -->
+        <div>
+            <h2 class="text-xl font-bold text-red-400 mb-2">原始版本 (截圖現狀)</h2>
+            <p class="text-sm text-zinc-400 mb-6 h-16">
+                最大的問題是 <strong>視覺邏輯矛盾</strong>。<br>
+                「日期」與「卡片」的文字亮起紫色（代表啟用），但後方的開關卻是灰色的（代表關閉）。這會讓大腦產生認知混淆。
+            </p>
+            
+            <div class="w-64 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl p-2">
+                <div class="px-3 pb-2 pt-1 border-b border-zinc-800 mb-2">
+                    <span class="text-xs font-black text-zinc-500 tracking-wider">排版與主題設定</span>
+                </div>
+                
+                <div class="flex flex-col gap-1">
+                    <!-- 時間軸 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg">
+                        <span class="text-sm font-bold text-brand-purple">時間軸：開啟</span>
+                        <div class="relative">
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-brand-purple"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)]"></div>
+                        </div>
+                    </label>
+
+                    <!-- 日期 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg">
+                        <span class="text-sm font-bold text-brand-purple">日期：外部</span>
+                        <div class="relative">
+                            <!-- 問題所在：灰色背景 -->
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-zinc-600"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)]"></div>
+                        </div>
+                    </label>
+
+                    <!-- 卡片 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg">
+                        <span class="text-sm font-bold text-brand-purple">卡片：展開</span>
+                        <div class="relative">
+                            <!-- 問題所在：灰色背景 -->
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-zinc-600"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)]"></div>
+                        </div>
+                    </label>
+
+                    <!-- 特效 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg">
+                        <span class="text-sm font-bold text-brand-purple">特效：開啟</span>
+                        <div class="relative">
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-brand-purple"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)]"></div>
+                        </div>
+                    </label>
+
+                    <!-- 主題 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg border-t border-zinc-800 mt-1 pt-2">
+                        <span class="text-sm font-bold text-zinc-300">主題：暗色</span>
+                        <div class="relative">
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-zinc-700"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-1"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 建議修正版本 -->
+        <div>
+            <h2 class="text-xl font-bold text-emerald-400 mb-2">修正建議 (視覺統一 & 去冗餘)</h2>
+            <p class="text-sm text-zinc-400 mb-6 h-16">
+                1. <strong>統一開關顏色</strong>：只要白色按鈕在右側（Active），背景一律亮起紫色，消除矛盾感。<br>
+                2. <strong>精簡文案</strong>：開關本身就代表「開/關」，文字不需再重複贅述狀態，讓介面更現代、更乾淨。
+            </p>
+            
+            <div class="w-64 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl p-2">
+                <div class="px-3 pb-2 pt-1 border-b border-zinc-800 mb-2">
+                    <span class="text-xs font-black text-zinc-500 tracking-wider">排版與主題設定</span>
+                </div>
+                
+                <div class="flex flex-col gap-1">
+                    <!-- 時間軸 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg cursor-pointer hover:bg-zinc-800/50">
+                        <span class="text-sm font-bold text-zinc-300">顯示垂直時間軸</span>
+                        <div class="relative">
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-brand-purple transition-colors"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)] transition-all"></div>
+                        </div>
+                    </label>
+
+                    <!-- 日期 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg cursor-pointer hover:bg-zinc-800/50">
+                        <span class="text-sm font-bold text-zinc-300">日期獨立於卡片外</span>
+                        <div class="relative">
+                            <!-- 修正：統一使用紫色代表啟用狀態 -->
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-brand-purple transition-colors"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)] transition-all"></div>
+                        </div>
+                    </label>
+
+                    <!-- 卡片 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg cursor-pointer hover:bg-zinc-800/50">
+                        <span class="text-sm font-bold text-zinc-300">預設展開卡片內容</span>
+                        <div class="relative">
+                            <!-- 修正：統一使用紫色代表啟用狀態 -->
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-brand-purple transition-colors"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)] transition-all"></div>
+                        </div>
+                    </label>
+
+                    <!-- 特效 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg cursor-pointer hover:bg-zinc-800/50">
+                        <span class="text-sm font-bold text-zinc-300">啟用發光特效</span>
+                        <div class="relative">
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-brand-purple transition-colors"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-[calc(100%-1.25rem)] transition-all"></div>
+                        </div>
+                    </label>
+
+                    <!-- 主題 -->
+                    <label class="flex justify-between items-center p-2 rounded-lg border-t border-zinc-800 mt-1 pt-2 cursor-pointer hover:bg-zinc-800/50">
+                        <span class="text-sm font-bold text-zinc-300">亮色主題</span>
+                        <div class="relative">
+                            <div class="block w-11 h-6 rounded-full shadow-inner bg-zinc-700 transition-colors"></div>
+                            <div class="absolute top-1 bg-white w-4 h-4 rounded-full shadow left-1 transition-all"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

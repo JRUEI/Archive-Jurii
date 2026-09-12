@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>間距與對齊終極測試 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#8B5CF6' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-zinc-950 text-white p-4 sm:p-10 font-sans">
+    <div class="max-w-4xl mx-auto space-y-16">
+        
+        <!-- 原始版本 -->
+        <div>
+            <h2 class="text-xl font-bold text-red-400 mb-2 flex items-center gap-2">
+                原始版本 (Original)
+            </h2>
+            <p class="text-sm text-zinc-400 mb-6">
+                YouTube方塊為 <code>p-4</code>，控制面板為 <code>p-3</code>。<br>
+                縮窄時左右內縮對不齊。放大時，高度雖然都剛好是 72px，但在視覺比例上，裡面的按鈕與框的上下留白距離不同，導致「看起歪斜/不平衡」。
+            </p>
+            <div class="w-full flex flex-col lg:flex-row gap-4">
+                <!-- YouTube Link -->
+                <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-sm relative">
+                    <!-- 紅色對齊線 -->
+                    <div class="absolute left-0 top-0 bottom-0 w-4 bg-red-500/20 border-r border-red-500/50"></div>
+                    <div class="absolute left-[-20px] right-[-20px] top-0 h-px bg-red-500/50"></div>
+                    <div class="absolute left-[-20px] right-[-20px] bottom-0 h-px bg-red-500/50"></div>
+
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </div>
+                        <h3 class="font-bold text-base text-zinc-100">官方 YouTube 收聽</h3>
+                    </div>
+                    <a href="#" class="px-5 py-2 bg-red-500/20 text-red-400 font-bold rounded-xl text-sm whitespace-nowrap ml-2 flex-shrink-0 border border-red-500/30 relative z-10">前往</a>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="flex-[1.5] bg-zinc-900 border border-zinc-800 rounded-2xl p-3 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm relative">
+                    <!-- 紅色對齊線 -->
+                    <div class="absolute left-0 top-0 bottom-0 w-3 bg-red-500/20 border-r border-red-500/50"></div>
+                    <div class="absolute left-[-20px] right-[-20px] top-0 h-px bg-red-500/50 hidden lg:block"></div>
+                    <div class="absolute left-[-20px] right-[-20px] bottom-0 h-px bg-red-500/50 hidden lg:block"></div>
+
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl relative z-10">
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm text-zinc-400">精簡總結</button>
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-sm border border-transparent dark:border-zinc-700/50">完整無損</button>
+                    </div>
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl relative z-10">
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm text-zinc-400">圖卡模式</button>
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm bg-brand-purple/20 text-brand-purple shadow-sm border border-transparent dark:border-brand-purple/20">文字模式</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 建議修正版本 -->
+        <div>
+            <h2 class="text-xl font-bold text-emerald-400 mb-2 flex items-center gap-2">
+                建議修正版本 (Proposed Fix)
+            </h2>
+            <p class="text-sm text-zinc-400 mb-6">
+                完全拋棄強制高度 (`h-20` / `min-h`)，回歸最自然乾淨的 Tailwind 設定：<br>
+                1. 兩個方塊統一設定為 <code>p-4 sm:px-5 sm:py-4</code>，保證縮窄時左右內縮絕對一致。<br>
+                2. 利用 Flexbox 預設的 <code>items-stretch</code>，自動將兩者拉伸到相同高度，再由各自內部的 <code>items-center</code> 將內容垂直置中。<br>
+                3. 黑底框 <code>p-1.5</code> 保持不變，按鈕不再破圖。
+            </p>
+            <div class="w-full flex flex-col lg:flex-row gap-4">
+                <!-- YouTube Link -->
+                <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:px-5 sm:py-4 flex items-center justify-between shadow-sm relative">
+                    <!-- 綠色對齊線 -->
+                    <div class="absolute left-0 top-0 bottom-0 w-4 sm:w-5 bg-emerald-500/20 border-r border-emerald-500/50"></div>
+                    <div class="absolute left-[-20px] right-[-20px] top-0 h-px bg-emerald-500/50"></div>
+                    <div class="absolute left-[-20px] right-[-20px] bottom-0 h-px bg-emerald-500/50"></div>
+
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </div>
+                        <h3 class="font-bold text-base text-zinc-100">官方 YouTube 收聽</h3>
+                    </div>
+                    <a href="#" class="px-5 py-2 bg-red-500/20 text-red-400 font-bold rounded-xl text-sm whitespace-nowrap ml-2 flex-shrink-0 border border-red-500/30 relative z-10">前往</a>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="flex-[1.5] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:px-5 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm relative">
+                    <!-- 綠色對齊線 -->
+                    <div class="absolute left-0 top-0 bottom-0 w-4 sm:w-5 bg-emerald-500/20 border-r border-emerald-500/50 hidden sm:block"></div>
+                    <div class="absolute left-[-20px] right-[-20px] top-0 h-px bg-emerald-500/50 hidden lg:block"></div>
+                    <div class="absolute left-[-20px] right-[-20px] bottom-0 h-px bg-emerald-500/50 hidden lg:block"></div>
+
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl relative z-10">
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm text-zinc-400">精簡總結</button>
+                        <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white shadow-sm border border-transparent dark:border-zinc-700/50">完整無損</button>
+                    </div>
+                    <div class="flex w-full sm:w-auto bg-zinc-950 p-1.5 rounded-xl relative z-10">
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm text-zinc-400">圖卡模式</button>
+                        <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold text-sm bg-brand-purple/20 text-brand-purple shadow-sm border border-transparent dark:border-brand-purple/20">文字模式</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

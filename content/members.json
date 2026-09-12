@@ -1,0 +1,334 @@
+{
+  "group": {
+    "name": "≒JOY",
+    "reading": "ニアリーイコールジョイ",
+    "alias": "ニアジョイ",
+    "producer": "指原莉乃",
+    "revealed": "2022-03",
+    "debut": "2024-01",
+    "debutWork": "きっと、絶対、絶対",
+    "siblings": [
+      "=LOVE",
+      "≠ME"
+    ],
+    "officialUrl": "https://nearly-equal-joy.jp/",
+    "links": [
+      {
+        "label": "官方網站",
+        "url": "https://nearly-equal-joy.jp/",
+        "icon": "site"
+      },
+      {
+        "label": "YouTube 官方頻道",
+        "url": "https://www.youtube.com/@nearlyequaljoy5843",
+        "icon": "youtube"
+      },
+      {
+        "label": "X",
+        "url": "https://x.com/Nearlyequal_joy",
+        "icon": "x"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/nearlyequal_joy/",
+        "icon": "instagram"
+      },
+      {
+        "label": "TikTok",
+        "url": "https://www.tiktok.com/@nearlyequal_joy",
+        "icon": "tiktok"
+      },
+      {
+        "label": "OFFICIAL SHOP",
+        "url": "https://store.plusmember.jp/nearlyequaljoy/",
+        "icon": "shop"
+      }
+    ]
+  },
+  "rules": [
+    "一律用漢字本名，不要照讀音音譯（ありす 是「愛月」，不是「愛麗絲」；じゅりい 是「珠里依」）。",
+    "「〜ちゃん」可譯成「小◯」（あおちゃん → 小葵），同一集內保持一致。",
+    "首次出現可加註假名，例如「愛月（ありす）」。",
+    "暱稱有歧義時用生日判斷：ep01 慶生段的「あいちゃん／あーちゃん」是 8/6 生日的大西葵。"
+  ],
+  "sources": [
+    {
+      "label": "≒JOY 官方 PROFILE",
+      "url": "https://nearly-equal-joy.jp/feature/profile"
+    },
+    {
+      "label": "≒JOY ABOUT／DISCOGRAPHY",
+      "url": "https://nearly-equal-joy.jp/feature/about"
+    },
+    {
+      "label": "ニアジョイ あだ名まとめ（がなぷら）",
+      "url": "https://hiragana-plan.com/niajoy-nickname-matome"
+    },
+    {
+      "label": "メンバーの年齢順・誕生日一覧（あの坂）",
+      "url": "https://anosaka.com/nealy-equal-member-years-list"
+    }
+  ],
+  "members": [
+    {
+      "name": "逢田珠里依",
+      "kana": "あいだ じゅりい",
+      "romaji": "Aida Jurii",
+      "zh": "珠里依",
+      "nicknames": [
+        "じゅりい"
+      ],
+      "asr": [
+        "ジュリー"
+      ],
+      "birthday": "2005-09-13",
+      "isHost": true,
+      "note": "本 Wiki 收錄的 SHOWROOM 直播主。",
+      "sns": {
+        "x": "https://x.com/aida_jurii",
+        "instagram": "https://www.instagram.com/aida_jurii__/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_jurii",
+        "showroom": "https://www.showroom-live.com/r/JOY_JURII_AIDA"
+      }
+    },
+    {
+      "name": "天野香乃愛",
+      "kana": "あまの このあ",
+      "romaji": "Amano Konoa",
+      "zh": "香乃愛",
+      "nicknames": [
+        "このたん"
+      ],
+      "asr": [
+        "このあ"
+      ],
+      "birthday": "2007-01-21",
+      "isHost": false,
+      "note": "",
+      "sns": {
+        "x": "https://x.com/amano_konoa",
+        "instagram": "https://www.instagram.com/amano_konoa__/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_konoa",
+        "showroom": "https://www.showroom-live.com/r/JOY_KONOA_AMANO"
+      }
+    },
+    {
+      "name": "市原愛弓",
+      "kana": "いちはら あゆみ",
+      "romaji": "Ichihara Ayumi",
+      "zh": "愛弓",
+      "nicknames": [
+        "あゆみん",
+        "大先生"
+      ],
+      "asr": [
+        "あゆみ"
+      ],
+      "birthday": "2003-08-21",
+      "isHost": false,
+      "note": "",
+      "sns": {
+        "x": "https://x.com/ichihara_ayumi_",
+        "instagram": "https://www.instagram.com/ichihara_ayumi_/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_ayumi",
+        "showroom": "https://www.showroom-live.com/r/JOY_AYUMI_ICHIHARA"
+      }
+    },
+    {
+      "name": "江角怜音",
+      "kana": "えすみ れのん",
+      "romaji": "Esumi Renon",
+      "zh": "怜音",
+      "nicknames": [
+        "れのん"
+      ],
+      "asr": [
+        "レノン"
+      ],
+      "birthday": "2005-04-26",
+      "isHost": false,
+      "note": "",
+      "sns": {
+        "x": "https://x.com/esumi_renon",
+        "instagram": "https://www.instagram.com/esumi_renon/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_renon",
+        "showroom": "https://www.showroom-live.com/r/JOY_RENON_ESUMI"
+      }
+    },
+    {
+      "name": "大信田美月",
+      "kana": "おおしだ みつき",
+      "romaji": "Oshida Mitsuki",
+      "zh": "美月",
+      "nicknames": [
+        "みっちゃん"
+      ],
+      "asr": [
+        "青田みっちゃん"
+      ],
+      "birthday": "2004-09-27",
+      "isHost": false,
+      "note": "字幕會把「大信田」聽成「青田」。",
+      "sns": {
+        "x": "https://x.com/oshida_mitsuki",
+        "instagram": "https://www.instagram.com/oshida_mitsuki/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_mitsuki",
+        "showroom": "https://www.showroom-live.com/r/JOY_MITSUKI_OSHIDA"
+      }
+    },
+    {
+      "name": "大西葵",
+      "kana": "おおにし あおい",
+      "romaji": "Onishi Aoi",
+      "zh": "葵（小葵）",
+      "nicknames": [
+        "あおちゃん",
+        "あおさん"
+      ],
+      "asr": [
+        "西蒼",
+        "蒼井",
+        "青い"
+      ],
+      "birthday": "2005-08-06",
+      "isHost": false,
+      "note": "ep01（2026-08-05）尾聲的慶生對象，字幕錯字最多的一位。",
+      "sns": {
+        "x": "https://x.com/onishi_aoi",
+        "instagram": "https://www.instagram.com/onishi_aoi_/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_aoi",
+        "showroom": "https://www.showroom-live.com/r/JOY_AOI_ONISHI"
+      }
+    },
+    {
+      "name": "小澤愛実",
+      "kana": "おざわ あいみ",
+      "romaji": "Ozawa Aimi",
+      "zh": "愛実",
+      "nicknames": [
+        "あいみ",
+        "あいみん"
+      ],
+      "asr": [
+        "あいみ"
+      ],
+      "birthday": "2003-04-09",
+      "isHost": false,
+      "note": "「あいちゃん」有可能是她，需依前後文判斷。",
+      "sns": {
+        "x": "https://x.com/ozawa_aimi__",
+        "instagram": "https://www.instagram.com/ozawa_aimi_/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_aimi",
+        "showroom": "https://www.showroom-live.com/r/JOY_OZAWA_AIMI"
+      }
+    },
+    {
+      "name": "髙橋舞",
+      "kana": "たかはし まい",
+      "romaji": "Takahashi Mai",
+      "zh": "舞",
+      "nicknames": [
+        "まいちゃん",
+        "まいまい"
+      ],
+      "asr": [
+        "まい"
+      ],
+      "birthday": "2005-02-22",
+      "isHost": false,
+      "note": "",
+      "sns": {
+        "x": "https://x.com/takahashi_mai__",
+        "instagram": "https://www.instagram.com/takahashi_mai__/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_mai_",
+        "showroom": "https://www.showroom-live.com/r/JOY_MAI_TAKAHASHI"
+      }
+    },
+    {
+      "name": "藤沢莉子",
+      "kana": "ふじさわ りこ",
+      "romaji": "Fujisawa Riko",
+      "zh": "莉子",
+      "nicknames": [
+        "りこ"
+      ],
+      "asr": [
+        "りこちゃん"
+      ],
+      "birthday": "2004-01-16",
+      "isHost": false,
+      "note": "「りこ」單獨出現常是「かなり」「逆張り」的誤判，只認「りこちゃん」。",
+      "sns": {
+        "x": "https://x.com/fujisawa_riko",
+        "instagram": "https://www.instagram.com/fujisawa_riko/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_riko",
+        "showroom": "https://www.showroom-live.com/r/JOY_RIKO_FUJISAWA"
+      }
+    },
+    {
+      "name": "村山結香",
+      "kana": "むらやま ゆうか",
+      "romaji": "Murayama Yuka",
+      "zh": "結香",
+      "nicknames": [
+        "ゆうか"
+      ],
+      "asr": [
+        "ゆうか"
+      ],
+      "birthday": "2004-02-15",
+      "isHost": false,
+      "note": "",
+      "sns": {
+        "x": "https://x.com/murayama_yuuka",
+        "instagram": "https://www.instagram.com/murayama_yuuka_/",
+        "showroom": "https://www.showroom-live.com/r/JOY_YUUKA_MURAYAMA"
+      }
+    },
+    {
+      "name": "山田杏佳",
+      "kana": "やまだ ももか",
+      "romaji": "Yamada Momoka",
+      "zh": "杏佳",
+      "nicknames": [
+        "やまもも",
+        "ももちゃん"
+      ],
+      "asr": [
+        "ももか"
+      ],
+      "birthday": "2006-02-02",
+      "isHost": false,
+      "note": "",
+      "sns": {
+        "x": "https://x.com/yamada_momoka__",
+        "instagram": "https://www.instagram.com/yamada_momoka_/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_momoka",
+        "showroom": "https://www.showroom-live.com/r/JOY_MOMOKA_YAMADA"
+      }
+    },
+    {
+      "name": "山野愛月",
+      "kana": "やまの ありす",
+      "romaji": "Yamano Arisu",
+      "zh": "愛月",
+      "nicknames": [
+        "ありす",
+        "あーちゃん"
+      ],
+      "asr": [
+        "アリス",
+        "あーちゃん"
+      ],
+      "birthday": "2006-10-21",
+      "isHost": false,
+      "note": "名字讀作「ありす」，中文請寫「愛月」，不要音譯成「愛麗絲」。",
+      "sns": {
+        "x": "https://x.com/yamano_arisu",
+        "instagram": "https://www.instagram.com/yamano_arisu_/",
+        "tiktok": "https://www.tiktok.com/@nearlyequal_joy_arisu",
+        "showroom": "https://www.showroom-live.com/r/JOY_ARISU_YAMANO"
+      }
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 8 回 單集頁面 Demo (暗色模式)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#8b5cf6',
+                            green: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #09090b; /* zinc-950 */
+            color: #fafafa;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            padding-bottom: 50vh;
+        }
+        
+        .section-block {
+            transition: all 0.5s ease-out;
+            padding: 2rem 2rem 2rem 0;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            background-color: transparent;
+        }
+
+        .prose-text {
+            color: #d4d4d8;
+            line-height: 1.8;
+            font-size: 1.125rem;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-purple/30 text-zinc-50">
+
+    <div class="max-w-4xl mx-auto py-10 px-4">
+        
+        <!-- ======================= -->
+        <!-- 1. Header (方案 C 置中版) -->
+        <!-- ======================= -->
+        <header class="mb-6 flex flex-col items-center w-full">
+            <div class="flex flex-wrap justify-center gap-3 mb-5">
+                <span class="px-6 py-2 dark:bg-zinc-800 text-brand-purple rounded-full text-lg font-bold tracking-wider">
+                    第 8 回
+                </span>
+                <span class="px-6 py-2 rounded-full text-lg font-bold tracking-wider shadow-sm dark:bg-amber-500/20 dark:text-amber-300">
+                    來賓：根本優奈
+                </span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center leading-tight text-white">嘉賓根本優奈登場！夏日素麵與謎題破解！</h1>
+            
+            <div class="w-full max-w-2xl flex items-center justify-center gap-4">
+                <!-- 左側漸層線條 -->
+                <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent to-brand-purple/50"></div>
+                <!-- 日期 (置中) -->
+                <p class="dark:text-zinc-400 text-sm font-medium whitespace-nowrap tracking-wider">
+                    2026-07-25 配信
+                </p>
+                <!-- 右側漸層線條 -->
+                <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent to-brand-purple/50"></div>
+            </div>
+        </header>
+
+        <!-- ======================= -->
+        <!-- 2. Toolbar Area (修復版)  -->
+        <!-- ======================= -->
+        <div class="w-full flex flex-col lg:flex-row gap-4 mb-6">
+            
+            <!-- YouTube Link (暗色模式樣式) -->
+            <div class="flex-1 dark:bg-zinc-900 border dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="dark:bg-red-500/10 text-red-500 p-2.5 rounded-full flex-shrink-0">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-base dark:text-zinc-100">官方 YouTube 收聽</h3>
+                </div>
+                <!-- 「前往」按鈕的暗色模式 -->
+                <a href="#" class="px-5 py-2 dark:bg-red-500/20 hover:dark:bg-red-500/30 dark:text-red-400 font-bold rounded-xl transition-colors text-sm whitespace-nowrap ml-2 flex-shrink-0 shadow-sm border border-red-500/30">
+                    前往
+                </a>
+            </div>
+
+            <!-- Control Panel (暗色模式) -->
+            <div class="flex-[1.5] relative z-10 dark:bg-zinc-900 border dark:border-zinc-800 rounded-2xl p-3 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
+                
+                <!-- Content Toggle -->
+                <div class="flex w-full sm:w-auto dark:bg-zinc-950 p-1.5 rounded-xl">
+                    <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold transition-all text-sm dark:text-zinc-400 hover:dark:text-zinc-200">
+                        精簡總結
+                    </button>
+                    <button class="flex-1 sm:flex-none px-5 py-2 rounded-lg font-bold transition-all text-sm dark:bg-zinc-800 dark:text-white shadow-sm border border-zinc-700/50">
+                        完整無損
+                    </button>
+                </div>
+
+                <!-- Mode Toggle -->
+                <div class="flex w-full sm:w-auto dark:bg-zinc-950 p-1.5 rounded-xl">
+                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold transition-all text-sm dark:text-zinc-400 hover:dark:text-zinc-200">
+                        <i data-lucide="layout-grid" class="w-[18px] h-[18px]" style="stroke-width: 2.5px;"></i>
+                        圖卡模式
+                    </button>
+                    <!-- 「文字模式」按鈕暗色模式 -->
+                    <button class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold transition-all text-sm dark:bg-brand-purple/20 text-brand-purple shadow-sm border border-brand-purple/20">
+                        <i data-lucide="align-left" class="w-[18px] h-[18px]" style="stroke-width: 2.5px;"></i>
+                        文字模式
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- 3. Content Area (模擬 TextMode 暗色) -->
+        <!-- ======================= -->
+        <div class="w-full flex justify-center">
+            <div class="w-full dark:bg-zinc-900 border dark:border-zinc-800 rounded-2xl p-8 md:p-12 shadow-xl">
+                <h2 class="text-2xl font-bold text-brand-purple mb-8 pb-4 border-b dark:border-zinc-800">節目文字全紀錄</h2>
+                
+                <div class="space-y-16">
+                    <!-- Block 1 -->
+                    <div class="relative pl-6 md:pl-8">
+                        <div class="hidden sm:block absolute top-0 bottom-0 w-1 left-0 dark:bg-zinc-800 rounded-full"></div>
+                        <div class="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+                            <span class="inline-flex w-fit dark:bg-zinc-800 text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                                嘉賓登場
+                            </span>
+                            <h3 class="text-2xl font-bold dark:text-zinc-200/90 m-0 leading-snug">根本優奈初次作為嘉賓！</h3>
+                        </div>
+                        <div class="mt-8 prose-text space-y-6">
+                            <p>節目一開始就迎來了這集的嘉賓「根本優奈」！根本表示這不僅是她第一次來這檔節目，更是她工作生涯中「第一次作為嘉賓」出席，讓她非常期待。</p>
+                        </div>
+                    </div>
+
+                    <!-- Block 2 -->
+                    <div class="relative pl-6 md:pl-8">
+                        <div class="hidden sm:block absolute top-0 bottom-0 w-1 left-0 dark:bg-zinc-800 rounded-full"></div>
+                        <div class="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+                            <span class="inline-flex w-fit dark:bg-zinc-800 text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                                近況分享
+                            </span>
+                            <h3 class="text-2xl font-bold dark:text-zinc-200/90 m-0 leading-snug">夏日的素麵與不同吃法</h3>
+                        </div>
+                        <div class="mt-8 prose-text space-y-6">
+                            <p>根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

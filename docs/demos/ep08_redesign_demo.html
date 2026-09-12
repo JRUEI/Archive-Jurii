@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ep08 原有內容升級 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#34d399' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+        .glass { background: rgba(18, 18, 26, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- 頂部導覽列 (Sticky) -->
+    <nav class="sticky top-0 z-50 glass border-b border-zinc-800/50">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m15 18-6-6 6-6"/></svg>
+                <span class="font-bold text-sm tracking-widest">返回列表</span>
+            </a>
+            <div class="text-sm font-bold text-zinc-500">
+                はるまとぺーじ Wiki
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主視覺 Header (讀取 Markdown Frontmatter) -->
+    <header class="relative pt-16 pb-12 overflow-hidden border-b border-zinc-800/30">
+        <!-- 裝飾光暈 -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-green/10 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 relative z-10 text-center">
+            <div class="flex flex-wrap justify-center gap-3 mb-6">
+                <span class="bg-brand-green text-zinc-950 px-4 py-1.5 rounded-full text-sm font-bold tracking-widest shadow-[0_0_15px_rgba(52,211,153,0.3)]">第 8 回</span>
+                <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-4 py-1.5 rounded-full text-sm font-bold tracking-widest">來賓：根本優奈</span>
+                <span class="bg-zinc-800/80 text-zinc-400 border border-zinc-700 px-4 py-1.5 rounded-full text-sm font-bold tracking-widest">2026-07-25</span>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-black mb-6 leading-tight text-white tracking-tight">
+                嘉賓根本優奈登場！夏日素麵與謎題破解！
+            </h1>
+            
+            <div class="flex justify-center gap-4 text-sm text-zinc-500 font-medium">
+                <a href="https://www.youtube.com/watch?v=tCatupRDFqE" target="_blank" class="flex items-center gap-1.5 text-red-400 hover:text-red-300 transition-colors bg-red-400/10 px-3 py-1 rounded-full border border-red-400/20">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                    前往 YouTube 觀看
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto px-4 py-12 flex flex-col lg:flex-row gap-12">
+        
+        <!-- 左側主內容區 -->
+        <main class="flex-1 min-w-0">
+
+            <!-- 區塊 1：精簡總結 (來自 ## 【精簡總結】) -->
+            <section id="summary" class="mb-14 scroll-mt-28">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3 text-zinc-100">
+                    <span class="w-8 h-8 rounded-lg bg-brand-green/20 text-brand-green flex items-center justify-center">✨</span>
+                    精華總結
+                </h2>
+                <!-- 將原本 Markdown 的 ul/li 轉換為更高級的卡片樣式 -->
+                <div class="bg-brand-green/5 border border-brand-green/20 rounded-3xl p-6 md:p-8">
+                    <ul class="space-y-4 text-zinc-300 text-lg leading-relaxed">
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-green mt-1 text-xl">✦</span>
+                            <div>本集節目迎來了第一次作為廣播嘉賓登場的「根本優奈」，兩人展現了如同姐妹般的好感情。</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-green mt-1 text-xl">✦</span>
+                            <div>兩人在節目中大聊夏日的「素麵」話題：福嶋喜歡準備冷熱兩種沾醬，還必加蟹肉棒；而根本則是喜歡加芥末，並搭配稻荷壽司。</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-green mt-1 text-xl">✦</span>
+                            <div>福嶋展示了節目專屬的筆記本，並分享了兩人私下一起去新宿玩「街頭解謎」的趣事。</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-green mt-1 text-xl">✦</span>
+                            <div>回應聽眾來信，分享了關於 ASMR 的喜好：根本喜歡聽切菜聲與小狗美容，福嶋則喜歡在咖啡廳等有點白噪音的地方看書。</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-green mt-1 text-xl">✦</span>
+                            <div>在解謎單元『Mystery Harustory』中，兩人合作無間地解開了兩題由聽眾投稿的謎題（答案分別是「LABO」與「人任せ」）。</div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 區塊 2：無損還原 (來自 ## 【無損還原】與其下的 ### 小標題) -->
+            <section id="details" class="scroll-mt-28">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3 text-zinc-100">
+                    <span class="w-8 h-8 rounded-lg bg-brand-purple/20 text-brand-purple flex items-center justify-center">📝</span>
+                    詳細重點還原
+                </h2>
+                
+                <div class="space-y-8">
+                    
+                    <!-- Markdown 段落: ### [嘉賓登場] 根本優奈初次作為嘉賓！ -->
+                    <div class="bg-[#12121a] border border-zinc-800/80 rounded-3xl p-6 md:p-8 hover:border-brand-purple/30 transition-colors duration-300">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="bg-brand-purple/20 text-brand-purple px-3 py-1 rounded-full text-xs font-bold tracking-widest">嘉賓登場</span>
+                            <h3 class="text-xl font-bold text-zinc-100">根本優奈初次作為嘉賓！</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-zinc-800/30 rounded-xl p-4 border border-zinc-800/50">
+                                <strong class="text-brand-purple block mb-1">初次作客</strong>
+                                <p class="text-zinc-400 leading-relaxed">節目一開始就迎來了這集的嘉賓「根本優奈」！根本表示這不僅是她第一次來這檔節目，更是她工作生涯中「第一次作為嘉賓」出席，讓她非常期待。</p>
+                            </div>
+                            <div class="bg-zinc-800/30 rounded-xl p-4 border border-zinc-800/50">
+                                <strong class="text-brand-purple block mb-1">可靠的姐姐</strong>
+                                <p class="text-zinc-400 leading-relaxed">當聽眾問到兩人的關係時，福嶋形容根本就像是「可靠的姐姐（姉貴）」。雖然福嶋總是很想把根本當成小寶寶寵愛，但根本那種開朗、愛喝酒、又會帶領大家的性格，反而更像個大姐。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Markdown 段落: ### [近況分享] 夏日的素麵與不同吃法 -->
+                    <div class="bg-[#12121a] border border-zinc-800/80 rounded-3xl p-6 md:p-8 hover:border-brand-purple/30 transition-colors duration-300">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="bg-brand-purple/20 text-brand-purple px-3 py-1 rounded-full text-xs font-bold tracking-widest">近況分享</span>
+                            <h3 class="text-xl font-bold text-zinc-100">夏日的素麵與不同吃法</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-zinc-800/30 rounded-xl p-4 border border-zinc-800/50">
+                                <strong class="text-brand-purple block mb-1">素麵話題</strong>
+                                <p class="text-zinc-400 leading-relaxed">根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。</p>
+                            </div>
+                            <div class="bg-zinc-800/30 rounded-xl p-4 border border-zinc-800/50">
+                                <strong class="text-brand-purple block mb-1">兩種沾醬</strong>
+                                <p class="text-zinc-400 leading-relaxed">而福嶋則分享了自己家裡獨特的吃法：她會同時準備「冷」跟「熱」（通常有豬肉和蔥）兩種沾醬，交替著吃才不會膩。這讓根本笑說簡直像是瑪麗·安東妮（Marie Antoinette）般的奢華吃法。</p>
+                            </div>
+                            <div class="bg-zinc-800/30 rounded-xl p-4 border border-zinc-800/50">
+                                <strong class="text-brand-purple block mb-1">必備蟹肉棒</strong>
+                                <p class="text-zinc-400 leading-relaxed">福嶋還提到她吃冷素麵時一定會加「蟹肉棒」跟蔥，就像把中華涼麵的配料搬過來一樣，這點也讓根本大開眼界。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Markdown 段落: ### [解謎單元] Mystery Harustory -->
+                    <div class="bg-[#12121a] border border-zinc-800/80 rounded-3xl p-6 md:p-8 hover:border-brand-purple/30 transition-colors duration-300 relative overflow-hidden">
+                        <!-- 為解謎單元加一點特效底圖 -->
+                        <div class="absolute right-0 top-0 text-9xl text-zinc-800/20 font-black rotate-12 -mr-8 -mt-8 pointer-events-none">?</div>
+                        
+                        <div class="flex items-center gap-3 mb-6 relative z-10">
+                            <span class="bg-brand-purple/20 text-brand-purple px-3 py-1 rounded-full text-xs font-bold tracking-widest">解謎單元</span>
+                            <h3 class="text-xl font-bold text-zinc-100">Mystery Harustory</h3>
+                        </div>
+                        <div class="space-y-4 relative z-10">
+                            <div class="bg-zinc-800/30 rounded-xl p-4 border border-zinc-800/50">
+                                <strong class="text-brand-purple block mb-1">理科實驗器材</strong>
+                                <p class="text-zinc-400 leading-relaxed">聽眾「Doral」出了一題理科器材圖示題。兩人沒有依靠任何提示，憑著記憶順利拼湊出燒杯（Beaker）、酒精燈（Alcohol lamp）等器材的英文首字母，成功解出答案「LABO」。</p>
+                            </div>
+                            <div class="bg-zinc-800/30 rounded-xl p-4 border border-zinc-800/50">
+                                <strong class="text-brand-purple block mb-1">人任せなLabo</strong>
+                                <p class="text-zinc-400 leading-relaxed">第二題由聽眾投稿。兩人透過五十音的平移法則，解出了「人任せ」（Hitomakase），與上一題合起來剛好就是兩人共同參與的另一個節目《人任せなLabo》，展現了聽眾滿滿的愛。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- 右側 Sidebar (目錄導覽) -->
+        <aside class="w-72 hidden lg:block shrink-0">
+            <div class="sticky top-28 bg-[#12121a] border border-zinc-800/80 rounded-3xl p-6">
+                <h3 class="font-bold text-zinc-100 mb-6 flex items-center gap-2 text-lg">
+                    <svg class="w-5 h-5 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                    本集導覽
+                </h3>
+                <nav class="flex flex-col gap-1 relative">
+                    <!-- 進度指示線 -->
+                    <div class="absolute left-[7px] top-4 bottom-4 w-px bg-zinc-800"></div>
+                    
+                    <a href="#summary" class="flex items-center gap-4 text-brand-green font-bold py-2 group">
+                        <div class="w-4 h-4 rounded-full bg-[#12121a] border-2 border-brand-green z-10 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                        <span>✨ 精華總結</span>
+                    </a>
+                    <a href="#details" class="flex items-center gap-4 text-brand-purple font-bold py-2 group mt-2">
+                        <div class="w-4 h-4 rounded-full bg-[#12121a] border-2 border-zinc-800 group-hover:border-brand-purple z-10 transition-colors"></div>
+                        <span>📝 詳細還原</span>
+                    </a>
+                    
+                    <!-- 細項導覽 (從 markdown 抓出) -->
+                    <a href="#" class="flex items-center gap-4 text-zinc-500 hover:text-white py-2 group">
+                        <div class="w-4 h-4 rounded-full bg-[#12121a] border-2 border-zinc-800 group-hover:border-zinc-500 z-10 transition-colors"></div>
+                        <span class="font-medium text-sm">└ 嘉賓登場</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-4 text-zinc-500 hover:text-white py-2 group">
+                        <div class="w-4 h-4 rounded-full bg-[#12121a] border-2 border-zinc-800 group-hover:border-zinc-500 z-10 transition-colors"></div>
+                        <span class="font-medium text-sm">└ 近況分享</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-4 text-zinc-500 hover:text-white py-2 group">
+                        <div class="w-4 h-4 rounded-full bg-[#12121a] border-2 border-zinc-800 group-hover:border-zinc-500 z-10 transition-colors"></div>
+                        <span class="font-medium text-sm">└ 解謎單元</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+    </div>
+
+</body>
+</html>

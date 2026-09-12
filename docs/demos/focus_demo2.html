@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>閱讀焦點追蹤 (原版樣式)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#8b5cf6',
+                            green: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #18181b; /* zinc-900 like in the app */
+            color: #e2e8f0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            padding-bottom: 50vh;
+        }
+        
+        .section-block {
+            transition: all 0.5s ease-out;
+            padding: 2rem 2rem 2rem 0; /* Left padding is handled by pl-6/8 from Tailwind */
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            background-color: transparent;
+        }
+
+        /* 尚未讀到或已讀過的區塊，稍微變淡，讓焦點更集中 */
+        .section-block:not(.active) {
+            opacity: 0.4;
+        }
+
+        /* 啟動時的區塊底色變化 */
+        .section-block.active {
+            opacity: 1;
+            background-color: rgba(139, 92, 246, 0.05); /* 微弱的品牌紫色底色 */
+            box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.1); /* 微微的邊框感 */
+        }
+
+        /* 左側的直槓 (Citation bar) 原本樣式 */
+        .timeline-bar {
+            transition: all 0.5s ease-out;
+            background-color: #27272a; /* zinc-800 */
+        }
+
+        /* 啟動時的左側直槓顏色變化 (漸層) */
+        .section-block.active .timeline-bar {
+            background: linear-gradient(to bottom, #8b5cf6, #10b981);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+            width: 6px; /* 稍微變粗 */
+            left: -1px; /* 修正因為變粗的位置偏移 */
+        }
+
+        /* typography */
+        .prose-text {
+            color: #d4d4d8; /* zinc-300 */
+            line-height: 1.8;
+            font-size: 1.125rem;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-purple/30 flex justify-center py-16">
+
+    <div class="w-full max-w-4xl bg-zinc-900 border border-zinc-800 rounded-2xl p-8 md:p-12 shadow-xl">
+        <h2 class="text-2xl font-bold text-brand-purple mb-8 pb-4 border-b border-zinc-800">節目文字全紀錄 (原版樣式對焦展示)</h2>
+        <p class="text-zinc-500 mb-8 text-sm">請向下捲動，體驗基於原版排版的「直槓發光與區塊底色」聚焦效果</p>
+        
+        <div class="space-y-8" id="content-container">
+            <!-- 區塊將透過 JS 載入 -->
+        </div>
+    </div>
+
+    <script>
+        const contentData = [
+            { tag: "嘉賓登場", title: "根本優奈初次作為嘉賓！", text: "節目一開始就迎來了這集的嘉賓「根本優奈」！根本表示這不僅是她第一次來這檔節目，更是她工作生涯中「第一次作為嘉賓」出席，讓她非常期待。<br><br>當聽眾問到兩人的關係時，福嶋形容根本就像是「可靠的姐姐（姉貴）」。雖然福嶋總是很想把根本當成小寶寶寵愛，但根本那種開朗、愛喝酒、又會帶領大家的性格，反而更像個大姐。" },
+            { tag: "近況分享", title: "夏日的素麵與不同吃法", text: "根本分享自己最近感受到了夏天的氣息，因為她開始吃素麵了！她喜歡在素麵裡加入芥末和海苔，並且習慣配著「稻荷壽司」一起吃。<br><br>而福嶋則分享了自己家裡獨特的吃法：她會同時準備「冷」跟「熱」（通常有豬肉和蔥）兩種沾醬，交替著吃才不會膩。這讓根本笑說簡直像是瑪麗·安東妮般的奢華吃法。" },
+            { tag: "聽眾來信", title: "街頭解謎與ASMR喜好", text: "回應聽眾來信，兩人分享了之前一起去新宿玩街頭解謎的經歷。身為解謎老手的福嶋，甚至教導根本要準備「附夾子的板夾」跟「多色擦擦筆」（紅色用來重解），讓根本大讚福嶋非常有安全感。<br><br>有聽眾問到根本在事務所的興趣欄寫了ASMR。根本分享自己喜歡聽做菜時切菜的聲音，以及「小狗（豆柴）被清耳朵或按摩」的美容影片。" },
+            { tag: "廣播播報", title: "專業廣播播報技巧", text: "面對聽眾請教如何做好廣播與呼叫，兩人給出專業建議：可以想像自己是在對著「麥克風更深處」的人喊話，並且要「刻意把嘴巴張大」讓對方也能透過唇語讀懂，甚至可以加入一些炒熱氣氛的語調。" },
+            { tag: "解謎單元", title: "Mystery Harustory", text: "在解謎單元中，聽眾「Doral」出了一題理科器材圖示題。兩人沒有依靠任何提示，憑著記憶順利拼湊出燒杯（Beaker）、酒精燈（Alcohol lamp）等器材的英文首字母，成功解出答案「LABO」。<br><br>第二題由「君にあげるキムチなんてない」投稿。兩人透過五十音的平移法則，解出了「人任せ」（Hitomakase），與上一題合起來剛好就是兩人共同參與的另一個節目《人任せなLabo》（Hitomakase na Labo），展現了聽眾滿滿的愛。" }
+        ];
+
+        const container = document.getElementById('content-container');
+        
+        contentData.forEach((item, index) => {
+            const block = document.createElement('div');
+            // 原本 TextMode 裡的 class: relative pl-0 sm:pl-6 md:pl-8
+            // 加上 section-block 方便我們套用聚焦特效
+            block.className = 'section-block relative pl-6 md:pl-8 cursor-pointer';
+            block.innerHTML = `
+                <!-- 左側直槓 (原本是 w-1 bg-zinc-800) -->
+                <div class="hidden sm:block absolute left-0 top-0 bottom-0 w-1 rounded-full timeline-bar"></div>
+                
+                <div class="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="inline-flex w-fit bg-zinc-800 text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                        ${item.tag}
+                    </span>
+                    <h3 class="text-2xl font-bold text-zinc-200/90 m-0 leading-snug">
+                        ${item.title}
+                    </h3>
+                </div>
+                <div class="mt-6 prose-text">
+                    <p>${item.text}</p>
+                </div>
+            `;
+            
+            // 點擊可以手動滾動到畫面中間
+            block.addEventListener('click', () => {
+                block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            
+            container.appendChild(block);
+        });
+
+        // Intersection Observer
+        const blocks = document.querySelectorAll('.section-block');
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: '-30% 0px -40% 0px', 
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    blocks.forEach(b => b.classList.remove('active'));
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        blocks.forEach(block => observer.observe(block));
+
+        // 初始確保第一個元素為 active
+        setTimeout(() => {
+            if(!document.querySelector('.section-block.active') && blocks.length > 0) {
+                blocks[0].classList.add('active');
+            }
+        }, 100);
+    </script>
+</body>
+</html>

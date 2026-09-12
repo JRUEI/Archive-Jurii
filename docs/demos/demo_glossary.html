@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary Impact Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#c084fc', green: '#4ade80' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; background: #0a0a0f; color: #f4f4f5; }
+    </style>
+</head>
+<body class="min-h-screen py-12 px-6 sm:px-12 relative">
+
+    <div class="max-w-5xl mx-auto space-y-16 relative z-10">
+        
+        <!-- Title -->
+        <div class="text-center">
+            <h1 class="text-4xl sm:text-5xl font-black mb-4"><span class="text-brand-purple">專屬詞語庫</span> 的威力展示</h1>
+            <p class="text-zinc-400 text-lg">有與沒有 Glossary (詞彙表)，對 AI 的實作流程與最終呈現有著決定性的影響。</p>
+        </div>
+
+        <!-- Section 1: Implementation Differences -->
+        <section class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 sm:p-10 shadow-2xl">
+            <h2 class="text-2xl font-bold mb-8 text-brand-green flex items-center gap-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                實作上的區別 (Implementation Workflow)
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Before -->
+                <div class="bg-zinc-950 p-6 rounded-2xl border border-zinc-800/50 relative">
+                    <div class="absolute top-0 right-0 bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl">沒有詞語庫</div>
+                    <h3 class="text-lg font-bold mb-4 text-zinc-300">一般流程：盲目聽寫</h3>
+                    <ul class="space-y-4 text-zinc-400 text-sm">
+                        <li class="flex gap-3"><span class="text-red-400">❌</span> 語音模型 (Whisper) 只能依靠通用日文模型猜測發音。</li>
+                        <li class="flex gap-3"><span class="text-red-400">❌</span> 遇到「造詞」或「冷門詞彙」時，強制用拼音 (Romaji) 或是發音相近的錯字填補。</li>
+                        <li class="flex gap-3"><span class="text-red-400">❌</span> 翻譯模型 (LLM) 看到錯字，只能跟著亂翻，導致語意完全脫節。</li>
+                    </ul>
+                </div>
+
+                <!-- After -->
+                <div class="bg-brand-purple/5 p-6 rounded-2xl border border-brand-purple/30 relative">
+                    <div class="absolute top-0 right-0 bg-brand-purple text-zinc-950 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl">注入詞語庫後</div>
+                    <h3 class="text-lg font-bold mb-4 text-brand-purple">進化流程：上下文增強 (Context Injection)</h3>
+                    <ul class="space-y-4 text-zinc-300 text-sm">
+                        <li class="flex gap-3"><span class="text-brand-purple">✅</span> <b>Prompt Injection</b>：我們將詞語表作為 System Prompt 注入給所有的聽寫 AI 子代理 (Subagents)。</li>
+                        <li class="flex gap-3"><span class="text-brand-purple">✅</span> <b>強制錨點 (Anchoring)</b>：當 AI 聽到發音類似「O-to-chu-ru-bo-i-su」，它會自動比對字典並校正為『オートクチュールボイス』。</li>
+                        <li class="flex gap-3"><span class="text-brand-purple">✅</span> <b>統一翻譯規範</b>：翻譯模型看到專有名詞時，會遵循「人名正確、單元名稱加雙引號」的嚴格規則，不再發明新詞。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Presentation Differences -->
+        <section class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 sm:p-10 shadow-2xl">
+            <h2 class="text-2xl font-bold mb-8 text-[#d8b4fe] flex items-center gap-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                呈現上的區別 (Presentation Quality)
+            </h2>
+            <p class="text-zinc-400 mb-8">以下是同一段對話，在有無字典輔助下的劇烈品質落差：</p>
+            
+            <div class="space-y-6">
+                <!-- Bad Example -->
+                <div class="border border-red-500/30 bg-red-500/5 rounded-2xl p-6 relative">
+                    <div class="absolute -top-3 left-6 bg-zinc-900 border border-red-500/50 text-red-400 text-xs font-bold px-3 py-1 rounded-full">無詞語庫 (災難現場)</div>
+                    <div class="mt-2 space-y-4 font-mono text-sm sm:text-base">
+                        <div class="flex gap-4">
+                            <span class="text-red-400/70 shrink-0">[02:15] 福島なの：</span>
+                            <span class="text-zinc-400">Konmatope！我是 Harumato page 的 Fukushima。今天有特別來賓 今泉里奧拉！</span>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="text-blue-400/70 shrink-0">[02:18] 今泉里奧拉：</span>
+                            <span class="text-zinc-400">Konmatope！好懷念啊，從舞台ウマ娘的初舞台以來，我就一直把妳當 Snoopy 一樣疼愛呢。</span>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="text-red-400/70 shrink-0">[02:25] 福島なの：</span>
+                            <span class="text-zinc-400">對啊！今天我們要用 娜咪head麥克風 來玩 HMR，還會進行海龜湯的 渣托基 (解謎) 喔！大家都準備好 Chipi Chipi Chapa Chapa 了嗎？</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Good Example -->
+                <div class="border border-brand-green/30 bg-brand-green/5 rounded-2xl p-6 relative">
+                    <div class="absolute -top-3 left-6 bg-zinc-900 border border-brand-green/50 text-brand-green text-xs font-bold px-3 py-1 rounded-full">使用專屬詞語庫 (完美還原)</div>
+                    <div class="mt-2 space-y-4 text-sm sm:text-base">
+                        <div class="flex gap-4 group">
+                            <span class="text-brand-purple font-bold shrink-0 pt-0.5">[02:15] 福嶋晴菜：</span>
+                            <span class="text-zinc-300 group-hover:text-white transition-colors">
+                                こんまとぺ！我是『はるまとぺーじ』的<span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">福嶋晴菜</span>。今天有特別來賓 <span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">今泉りおな</span>！
+                            </span>
+                        </div>
+                        <div class="flex gap-4 group">
+                            <span class="text-amber-500 font-bold shrink-0 pt-0.5">[02:18] 今泉りおな：</span>
+                            <span class="text-zinc-300 group-hover:text-white transition-colors">
+                                こんまとぺ！好懷念啊，從<span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">舞台「ウマ娘」</span>的<span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">初舞台</span>以來，我就一直把妳當<span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">史努比</span>一樣疼愛呢。
+                            </span>
+                        </div>
+                        <div class="flex gap-4 group">
+                            <span class="text-brand-purple font-bold shrink-0 pt-0.5">[02:25] 福嶋晴菜：</span>
+                            <span class="text-zinc-300 group-hover:text-white transition-colors">
+                                對啊！今天我們要用<span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">假人頭麥克風(ダミーヘッドマイク)</span>來玩 <span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">ASMR</span>，還會進行海龜湯的<span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">謎解き</span>喔！大家都準備好<span class="text-brand-green font-bold bg-brand-green/10 px-1 rounded">チピチピチャパチャパ</span>了嗎？
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>

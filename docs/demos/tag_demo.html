@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小標（Tags）設計方案展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { purple: '#8B5CF6', green: '#10B981', dark: '#18181B' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-black mb-2 text-center">小標（Tags）設計方案展示</h1>
+        <p class="text-zinc-500 text-center mb-12">請比較以下三種方案在「最新一集」與「歷史集數」中的標籤呈現差異。</p>
+
+        <div class="flex flex-col gap-12">
+
+            <!-- 方案 A (修改版) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                <h2 class="text-2xl font-bold mb-2">方案 A（修改版）：最新回小標亮綠色</h2>
+                <p class="text-zinc-500 mb-8">最新一集的小標改為亮綠色以作區分。歷史集數維持原版設計。標題滑鼠移過時會變成原先指定的綠色。</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 最新一集 (Hover 測試區) -->
+                    <div class="border border-zinc-100 rounded-xl p-6 bg-zinc-50/50 hover:border-brand-green/30 transition-all duration-300 group/card cursor-pointer hover:shadow-lg">
+                        <div class="text-sm font-bold text-brand-green mb-4">最新一集 (Item 1)</div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <!-- 亮綠色設計 -->
+                            <span class="bg-brand-green text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-wider shadow-sm">
+                                第 8 回
+                            </span>
+                            <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-amber-100 text-amber-800">
+                                來賓：根本優奈
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover/card:text-brand-green transition-colors duration-300">嘉賓根本優奈登場！</h3>
+                    </div>
+
+                    <!-- 歷史集數 (Hover 測試區) -->
+                    <div class="border border-zinc-100 rounded-xl p-6 bg-zinc-50/50 hover:border-brand-purple/30 transition-all duration-300 group/card cursor-pointer hover:shadow-lg">
+                        <div class="text-sm font-bold text-zinc-500 mb-4">歷史集數 (Item 2+)</div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <!-- 原版設計 (紫) -->
+                            <span class="bg-brand-purple/10 text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                                第 7 回
+                            </span>
+                            <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-blue-100 text-blue-800">
+                                個人回
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover/card:text-brand-green transition-colors duration-300">炎炎夏日的消暑秘方</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 方案 B -->
+            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-2 h-full bg-brand-purple"></div>
+                <h2 class="text-2xl font-bold mb-2">方案 B：微特化（僅高亮最新一集）</h2>
+                <p class="text-zinc-500 mb-8">舊集數完全保留原版設計。僅將最新一集的「第X回」改為實心紫色，稍微突顯焦點。</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 最新一集 -->
+                    <div class="border border-zinc-100 rounded-xl p-6 bg-zinc-50/50">
+                        <div class="text-sm font-bold text-brand-purple mb-4">最新一集 (Item 1)</div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <!-- 實心紫 -->
+                            <span class="bg-brand-purple text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                                第 8 回
+                            </span>
+                            <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-amber-100 text-amber-800">
+                                來賓：根本優奈
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold">嘉賓根本優奈登場！</h3>
+                    </div>
+
+                    <!-- 歷史集數 -->
+                    <div class="border border-zinc-100 rounded-xl p-6 bg-zinc-50/50">
+                        <div class="text-sm font-bold text-zinc-500 mb-4">歷史集數 (Item 2+)</div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <!-- 原版設計 -->
+                            <span class="bg-brand-purple/10 text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                                第 7 回
+                            </span>
+                            <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-blue-100 text-blue-800">
+                                個人回
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold">炎炎夏日的消暑秘方</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 方案 C -->
+            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-2 h-full bg-zinc-800"></div>
+                <h2 class="text-2xl font-bold mb-2">方案 C：強烈階層化（目前實裝版本）</h2>
+                <p class="text-zinc-500 mb-8">最新一集給予最強視覺重量。歷史集數預設退化為灰階，<span class="font-bold text-brand-purple">滑過卡片時才會亮起紫色</span>。</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 最新一集 -->
+                    <div class="border border-brand-purple/30 rounded-xl p-6 bg-white shadow-md">
+                        <div class="text-sm font-bold text-brand-purple mb-4">最新一集 (Item 1)</div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <!-- 實心紫 -->
+                            <span class="bg-brand-purple text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-wider">
+                                第 8 回
+                            </span>
+                            <!-- 淡色陰影 -->
+                            <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-amber-100 text-amber-800 shadow-sm">
+                                來賓：根本優奈
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold">嘉賓根本優奈登場！</h3>
+                    </div>
+
+                    <!-- 歷史集數 (Hover 測試區) -->
+                    <div class="border border-zinc-200 rounded-xl p-6 bg-white hover:border-brand-purple/30 transition-all duration-300 group/card cursor-pointer hover:shadow-lg">
+                        <div class="text-sm font-bold text-zinc-500 mb-4 group-hover/card:text-brand-purple transition-colors">歷史集數 (Item 2+) <span class="text-xs font-normal ml-2 text-zinc-400">← 試著把滑鼠移上來</span></div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <!-- 預設灰階，Hover變紫 -->
+                            <span class="bg-zinc-100 text-zinc-600 group-hover/card:bg-brand-purple/10 group-hover/card:text-brand-purple px-4 py-1.5 rounded-full text-sm font-bold tracking-wider transition-colors">
+                                第 7 回
+                            </span>
+                            <!-- 淡色系 -->
+                            <span class="px-4 py-1.5 rounded-full text-sm font-bold tracking-wider bg-blue-50 text-blue-700">
+                                個人回
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover/card:text-brand-green transition-colors">炎炎夏日的消暑秘方</h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

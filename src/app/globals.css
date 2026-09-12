@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #111111;
+  /* 取色自制服視覺：卡其米棕外套 + 奶油黃緞帶 + 金釦 + 膚棕背景 */
+  --color-brand-yellow: #A97C2B; /* light: 金釦色（白底可讀的深金） */
+  --color-brand-ochre: #8A6A4B;  /* light: 制服中棕 */
+  --color-brand-brown: #5C4433;  /* light: 深咖啡棕（實心章底） */
+  --color-brand-cream: #F3E3A6;  /* 緞帶奶油黃 */
+  --color-brand-tan: #D9B48F;    /* 背景膚棕 */
+  --color-brand-gold: #C9A227;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --color-brand-yellow: #E8C97A; /* dark: 金釦色 */
+  --color-brand-ochre: #D2B48C;  /* dark: 卡其 */
+  --color-brand-brown: #8A6647;  /* dark: 中深棕（實心章底） */
+  --color-brand-cream: #F3E3A6;
+  --color-brand-tan: #C9A27E;
+  --color-brand-gold: #E8C97A;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-yellow: var(--color-brand-yellow);
+  --color-brand-ochre: var(--color-brand-ochre);
+  --color-brand-brown: var(--color-brand-brown);
+  --color-brand-cream: var(--color-brand-cream);
+  --color-brand-tan: var(--color-brand-tan);
+  --color-brand-gold: var(--color-brand-gold);
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Helvetica Neue", var(--font-noto-sans-tc), "Microsoft JhengHei", sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-noto-serif-tc), "Songti TC", "PMingLiU", serif;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 0.3s, color 0.3s;
+}
