@@ -6,6 +6,7 @@ import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Clock } from 'lucid
 import { formatDuration } from '@/lib/format';
 import type { EpisodeListItem, EpisodeSection } from '@/lib/markdown';
 import { useHomeLayout } from './HomeLayoutProvider';
+import { readStoredString, useHydrated, writeStoredString } from '@/lib/client-state';
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
 const NO_SUMMARY = '尚未整理摘要';
@@ -608,6 +609,8 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
   );
 }
 
+const SELECTED_STORAGE_KEY = 'jurii-selected-episode';
+
 export default function HomeEpisodeList({ episodes }: { episodes: EpisodeListItem[] }) {
   const { showCalendar } = useHomeLayout();
 
@@ -619,23 +622,31 @@ export default function HomeEpisodeList({ episodes }: { episodes: EpisodeListIte
   // 長條共用同一把尺，跨月份才比得出誰長誰短
   const maxMinutes = episodes.reduce((max, episode) => Math.max(max, episode.durationMinutes ?? 0), 0);
 
-  const [selectedId, setSelectedId] = useState(latest?.id ?? '');
-  const [monthIndex, setMonthIndex] = useState(months.length - 1);
+  // 上次點的日期。SSR 跟首次 client render 一律當作沒有，掛載後才採用，
+  // 不然 hydration 對不起來。集數被刪掉時 find 找不到，自動退回最新一集。
+  const mounted = useHydrated();
+  const [storedId] = useState(() => readStoredString(SELECTED_STORAGE_KEY));
+  const [pickedId, setPickedId] = useState<string | null>(null);
+  // 箭頭翻月只改月曆顯示的月份，不動選取；選新的一集就把它清掉
+  const [steppedMonth, setSteppedMonth] = useState<number | null>(null);
 
   if (episodes.length === 0) return null;
 
-  const selected = episodes.find((episode) => episode.id === selectedId) ?? latest;
+  const selected =
+    episodes.find((episode) => episode.id === (pickedId ?? (mounted ? storedId : null))) ?? latest;
 
-  // 點日期時，月曆也跟著跳到那一集所在的月份
   const handleSelect = (id: string) => {
-    setSelectedId(id);
-    const target = episodes.find((episode) => episode.id === id);
-    if (!target) return;
-    const { year, month } = parseDate(target.date);
-    const index = months.findIndex((group) => group.year === year && group.month === month);
-    if (index >= 0) setMonthIndex(index);
+    setPickedId(id);
+    setSteppedMonth(null);
+    writeStoredString(SELECTED_STORAGE_KEY, id);
   };
 
+  // 沒翻頁的話，月曆就停在選取那一集所在的月份
+  const selectedDate = parseDate(selected.date);
+  const selectedMonth = months.findIndex(
+    (group) => group.year === selectedDate.year && group.month === selectedDate.month,
+  );
+  const monthIndex = steppedMonth ?? (selectedMonth >= 0 ? selectedMonth : months.length - 1);
   const currentMonth = months[Math.min(monthIndex, months.length - 1)];
 
   return (
@@ -651,7 +662,7 @@ export default function HomeEpisodeList({ episodes }: { episodes: EpisodeListIte
               group={currentMonth}
               selectedId={selected.id}
               onSelect={handleSelect}
-              onStep={(delta) => setMonthIndex((index) => index + delta)}
+              onStep={(delta) => setSteppedMonth(monthIndex + delta)}
               canPrev={monthIndex > 0}
               canNext={monthIndex < months.length - 1}
               maxMinutes={maxMinutes}

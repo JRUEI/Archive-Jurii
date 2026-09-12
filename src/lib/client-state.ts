@@ -57,3 +57,23 @@ export function writeStoredNumber(key: string, value: number) {
     // Preference persistence is best-effort when browser storage is unavailable.
   }
 }
+
+export function readStoredString(key: string) {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+export function writeStoredString(key: string, value: string) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Preference persistence is best-effort when browser storage is unavailable.
+  }
+}
