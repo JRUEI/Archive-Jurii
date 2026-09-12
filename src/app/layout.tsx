@@ -34,7 +34,12 @@ export const metadata: Metadata = {
   description: "逢田珠里依（≒JOY） 非公式逐字稿與內容紀錄",
   // 不要被搜尋引擎收錄。GitHub Pages 子路徑站的 robots.txt 會落在
   // jruei.github.io/robots.txt（不屬於這個 repo），所以只能用 meta 標。
-  robots: { index: false, follow: false, nocache: true },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false, noimageindex: true },
+  },
 };
 
 export default function RootLayout({
