@@ -225,16 +225,19 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
               title="回目錄"
               className="relative z-10 flex-1 min-w-0 flex items-center gap-2 px-1 -mx-1 rounded-md text-left hover:bg-brand-yellow/10 dark:hover:bg-zinc-800 transition-colors"
             >
-              <span className="shrink-0 text-brand-ochre dark:text-brand-yellow">
+              <span className="shrink-0 flex text-brand-ochre dark:text-brand-yellow">
                 <ChevronLeft size={16} />
               </span>
-              {openSection.tag && (
-                <span className="shrink-0 font-mono text-[14px] text-brand-ochre dark:text-brand-yellow">
-                  {openSection.tag}
+              {/* 標籤是 mono、標題是內文字體，行高不同，置中會錯位，改用 baseline 對齊 */}
+              <span className="min-w-0 flex items-baseline gap-2">
+                {openSection.tag && (
+                  <span className="shrink-0 font-mono text-[14px] text-brand-ochre dark:text-brand-yellow">
+                    {openSection.tag}
+                  </span>
+                )}
+                <span className="min-w-0 truncate text-[15px] text-zinc-600 dark:text-zinc-300">
+                  {openSection.title}
                 </span>
-              )}
-              <span className="min-w-0 truncate text-[15px] text-zinc-600 dark:text-zinc-300">
-                {openSection.title}
               </span>
             </button>
           </div>
