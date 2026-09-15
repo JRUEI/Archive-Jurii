@@ -43,4 +43,13 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   transition: background-color 0.3s, color 0.3s;
+  /* 中文每個字都能斷行，段落最後一行常常只剩一個字 */
+  text-wrap-style: pretty;
+}
+
+@layer base {
+  /* 手機寬度標題折成兩行時，第二行只剩一兩個字，改成兩行等長 */
+  h1, h2, h3, h4 {
+    text-wrap-style: balance;
+  }
 }
