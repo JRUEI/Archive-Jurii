@@ -59,8 +59,9 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
             const title = cardMatch[1];
             const text = cardMatch[2];
             return (
-              <div key={lineIdx} className="bg-white dark:bg-[#1a1a20] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-4 md:gap-8 hover:bg-zinc-50 dark:hover:bg-[#1f1f26] transition-colors shadow-sm dark:shadow-none">
-                <div className="text-brand-ochre dark:text-brand-brown text-lg md:w-32 shrink-0 mt-0.5 tracking-wider font-bold">
+              // 左右兩欄行高不同，用 baseline 讓小標跟內文第一行對齊
+              <div key={lineIdx} className="bg-white dark:bg-[#1a1a20] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-baseline gap-4 md:gap-8 hover:bg-zinc-50 dark:hover:bg-[#1f1f26] transition-colors shadow-sm dark:shadow-none">
+                <div className="text-brand-ochre dark:text-brand-brown text-lg md:w-32 shrink-0 tracking-wider font-bold">
                   {title}
                 </div>
                 <div className="text-zinc-700 dark:text-zinc-400 text-lg leading-relaxed m-0 flex-1">

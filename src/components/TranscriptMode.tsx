@@ -434,10 +434,10 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                 <div
                   key={line.index}
                   onClick={() => seekTo(line.seconds, line.index)}
-                  className="group py-2.5 sm:py-3 px-2 sm:px-3 flex items-start gap-3 sm:gap-4 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
+                  className="group py-2.5 sm:py-3 px-2 sm:px-3 flex items-baseline gap-3 sm:gap-4 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
                 >
-                  {/* 時間戳播放按鈕 */}
-                  <div className="shrink-0 pt-0.5">
+                  {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊的說話者標籤同一條線 */}
+                  <div className="shrink-0">
                     <span
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-semibold border border-zinc-200/80 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/90 text-zinc-600 dark:text-zinc-300 shadow-sm transition-all group-hover:border-transparent group-hover:bg-brand-brown group-hover:text-brand-cream dark:group-hover:bg-brand-tan dark:group-hover:text-[#2E2118]"
                       title="點擊跳轉影片至此秒數"
@@ -465,13 +465,14 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
         )}
 
         {/* 3. 控制與導航列 */}
+        {/* 放不下一排時整組換到下一行；原本 sm 起硬排成一排，兩組各自折行，按鈕高低對不上 */}
         <div
           id="transcript-controls"
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-sm"
+          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm"
         >
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
             {/* 播放進度 */}
-            <div className="flex items-center gap-2 font-mono text-xs">
+            <div className="flex items-baseline gap-2 font-mono text-xs">
               <span className="text-zinc-500 dark:text-zinc-400">目前進度:</span>
               <span className={`font-bold text-sm tabular-nums px-2.5 py-1 rounded-lg ${SOFT_ACCENT}`}>
                 {formatSeconds(currentTime)}
@@ -496,7 +497,8 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* 手機寬度放不下兩個，換行比讓字斷成「（4 / 句）」好看 */}
+          <div className="flex flex-wrap items-center gap-3">
             {/* 字幕群開關 */}
             <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white">
               <input
@@ -580,13 +582,14 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               role="tab"
               aria-selected={!isSectionTab}
               onClick={() => setDrawerTab('lines')}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border ${
+              className={`flex items-baseline gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border ${
                 !isSectionTab
                   ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow border-transparent dark:border-brand-yellow/20 shadow-sm'
                   : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
-              <FileText size={13} />
+              {/* 分頁名跟句數字級不同，用 baseline 對齊，圖示另外置中 */}
+              <FileText size={13} className="self-center" />
               <span>逐字稿</span>
               <span className="font-mono text-[10px] opacity-70">{parsedLines.length}</span>
             </button>
@@ -596,13 +599,13 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               aria-selected={isSectionTab}
               onClick={() => setDrawerTab('sections')}
               disabled={cards.length === 0}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border disabled:opacity-40 disabled:cursor-not-allowed ${
+              className={`flex items-baseline gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border disabled:opacity-40 disabled:cursor-not-allowed ${
                 isSectionTab
                   ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow border-transparent dark:border-brand-yellow/20 shadow-sm'
                   : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
-              <LayoutList size={13} />
+              <LayoutList size={13} className="self-center" />
               <span>段落紀錄</span>
               <span className="font-mono text-[10px] opacity-70">{cards.length}</span>
             </button>
@@ -699,7 +702,8 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
         {/* 釘選中的段落：切回逐字稿分頁也跟著走，邊聽邊對照 */}
         {pinned && !isSectionTab && (
           <div className="border-b border-zinc-200 dark:border-zinc-800 border-l-[3px] border-l-brand-yellow bg-brand-yellow/[0.07] dark:bg-brand-yellow/10 px-4 py-3">
-            <div className="flex items-center gap-2">
+            {/* 「對照中」跟標題字級不同，文字走 baseline，右邊兩顆按鈕自己置中 */}
+            <div className="flex items-baseline gap-2">
               <span className="text-[10px] font-mono font-bold tracking-widest text-brand-yellow shrink-0">
                 對照中
               </span>
@@ -710,7 +714,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               <button
                 type="button"
                 onClick={() => setIsPinExpanded(prev => !prev)}
-                className="p-1 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition shrink-0"
+                className="self-center p-1 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition shrink-0"
                 title={isPinExpanded ? '收合重點' : '展開重點'}
               >
                 <ChevronDown size={15} className={`transition-transform ${isPinExpanded ? 'rotate-180' : ''}`} />
@@ -718,7 +722,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               <button
                 type="button"
                 onClick={() => setPinnedCard(null)}
-                className="p-1 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition shrink-0"
+                className="self-center p-1 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition shrink-0"
                 title="取消釘選"
               >
                 <X size={15} />
@@ -773,14 +777,14 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                   lineRefs.current[line.index] = el;
                 }}
                 onClick={() => seekTo(line.seconds, line.index)}
-                className={`group flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
+                className={`group flex items-baseline gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
                   isActive
                     ? 'border-brand-yellow bg-brand-yellow/10 shadow-[0_0_16px_rgba(169,124,43,0.12)] dark:shadow-[0_0_16px_rgba(232,201,122,0.10)]'
                     : 'border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40'
                 }`}
               >
-                {/* 時間戳播放按鈕 */}
-                <div className="shrink-0 pt-0.5">
+                {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊的說話者標籤同一條線 */}
+                <div className="shrink-0">
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all ${
                       isActive
@@ -916,7 +920,7 @@ function DrawerSectionCard({
           aria-expanded={isOpen}
           className="flex-1 min-w-0 text-left"
         >
-          <div className="flex items-center gap-2 flex-wrap mb-1">
+          <div className="flex items-baseline gap-2 flex-wrap mb-1">
             <span className="font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500 tabular-nums">
               {String(index + 1).padStart(2, '0')}
             </span>

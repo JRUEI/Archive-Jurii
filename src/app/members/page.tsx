@@ -56,8 +56,9 @@ export default function MembersPage() {
 
       {/* 成員表：桌機表格 */}
       <section className="mb-12">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <span className="w-1 h-5 bg-brand-yellow rounded-full" />
+        {/* 標題跟人數字級不同，文字走 baseline，色條另外置中 */}
+        <h2 className="text-xl font-bold mb-4 flex items-baseline gap-2">
+          <span className="w-1 h-5 bg-brand-yellow rounded-full self-center" />
           成員一覽
           <span className="text-sm font-medium text-zinc-400">{members.length} 名</span>
         </h2>
@@ -133,7 +134,8 @@ export default function MembersPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <div className="text-brand-ochre dark:text-brand-yellow font-bold">{member.zh}</div>
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400 inline-flex items-center gap-1 mt-0.5">
+                  {/* 用區塊 flex 靠右，inline-flex 會吃到外層 16px 字的行高，比左邊讀音那行低 3px */}
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-end gap-1 mt-0.5">
                     <Cake size={12} />
                     {formatBirthday(member.birthday)}
                   </div>

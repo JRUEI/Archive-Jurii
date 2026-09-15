@@ -55,8 +55,9 @@ function groupByMonth(episodes: EpisodeListItem[]): MonthGroup[] {
 
 function SectionTitle({ children, note }: { children: React.ReactNode; note?: string }) {
   return (
-    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-      <span className="w-1 h-5 bg-brand-yellow rounded-full" />
+    // 標題跟旁註字級不同，文字走 baseline，色條另外置中
+    <h2 className="text-xl font-bold mb-4 flex items-baseline gap-2">
+      <span className="w-1 h-5 bg-brand-yellow rounded-full self-center" />
       {children}
       {note && <span className="text-sm font-medium text-zinc-400">{note}</span>}
     </h2>
@@ -113,30 +114,35 @@ function SectionIndex({
   const visible = sections.slice(start, start + perPage);
 
   return (
+    // 手機寬度切兩欄，標題一行只剩四五個字，所以 sm 以下一律單欄往下排
     <ol
-      className="h-full grid grid-flow-col gap-x-5"
-      style={{
-        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-      }}
+      className="h-full grid gap-x-5 sm:grid-flow-col sm:grid-cols-(--cols) sm:grid-rows-(--rows)"
+      style={
+        {
+          '--cols': `repeat(${columns}, minmax(0, 1fr))`,
+          '--rows': `repeat(${rows}, minmax(0, 1fr))`,
+        } as React.CSSProperties
+      }
     >
       {visible.map((section, index) => {
         const absolute = start + index;
+        // 標題折成兩行時，標籤要貼齊第一行，不是浮在兩行中間
         const body = (
-          <>
+          <span className="min-w-0 flex items-baseline gap-2.5">
             {section.tag && (
               <span className="shrink-0 font-mono text-[14px] text-brand-ochre dark:text-brand-yellow">
                 {section.tag}
               </span>
             )}
             <span className="min-w-0 line-clamp-2">{section.title}</span>
-          </>
+          </span>
         );
 
         return (
+          // lg 以下卡片不定高，列高貼著字，要自己留上下空白才不會壓到分隔線
           <li
             key={`${absolute}-${section.tag}`}
-            className="flex min-w-0 border-b border-zinc-100 dark:border-zinc-800/70 text-[14px] leading-[1.45] text-zinc-600 dark:text-zinc-300"
+            className="flex min-w-0 py-2 lg:py-0 border-b border-zinc-100 dark:border-zinc-800/70 text-[14px] leading-[1.45] text-zinc-600 dark:text-zinc-300"
           >
             {/* 還沒寫簡述的段落點開也沒東西看，就讓它留在底層的整卡連結上 */}
             {section.brief ? (
@@ -200,13 +206,14 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
         className="absolute inset-0 rounded-2xl"
       />
 
-      <div className="flex items-start justify-between gap-4 mb-3">
+      {/* 手機寬度放不下一整列，時長換到日期下一行，不要把「週日」擠成兩行 */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 mb-3">
         <div className="flex items-baseline gap-3 font-mono text-2xl md:text-3xl font-bold tracking-tight">
           <span className="tabular-nums">{episode.date.replace(/-/g, '/')}</span>
           <span>週{weekdayOf(episode.date)}</span>
         </div>
         {duration && (
-          <span className="shrink-0 mt-1.5 inline-flex items-center gap-1.5 tabular-nums text-[13px] text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
+          <span className="shrink-0 inline-flex items-center gap-1.5 tabular-nums text-[13px] text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
             <Clock size={14} />
             {duration}
           </span>
