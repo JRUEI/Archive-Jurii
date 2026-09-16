@@ -149,7 +149,7 @@ function SectionIndex({
               <button
                 type="button"
                 onClick={() => onSelect(absolute)}
-                className="group/row relative z-10 flex-1 min-w-0 flex items-center gap-2.5 text-left px-1 -mx-1 rounded-md hover:bg-brand-yellow/10 dark:hover:bg-zinc-800/60 transition-colors"
+                className="group/row relative z-10 flex-1 min-w-0 flex items-center gap-2.5 text-left px-2 -mx-2 rounded-md hover:bg-brand-yellow/10 dark:hover:bg-zinc-800/60 transition-colors"
               >
                 {body}
                 <ChevronRight
@@ -230,7 +230,7 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
               onClick={() => setOpenIndex(null)}
               aria-label="回目錄"
               title="回目錄"
-              className="relative z-10 flex-1 min-w-0 flex items-center gap-2 px-1 -mx-1 rounded-md text-left hover:bg-brand-yellow/10 dark:hover:bg-zinc-800 transition-colors"
+              className="relative z-10 flex-1 min-w-0 flex items-center gap-2 px-2 -mx-2 rounded-md text-left hover:bg-brand-yellow/10 dark:hover:bg-zinc-800 transition-colors"
             >
               <span className="shrink-0 flex text-brand-ochre dark:text-brand-yellow">
                 <ChevronLeft size={16} />
