@@ -368,7 +368,8 @@ function MonthCalendar({
   const stepButton = 'w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 inline-flex items-center justify-center transition-colors enabled:hover:bg-brand-brown enabled:hover:text-brand-cream dark:enabled:hover:bg-brand-tan dark:enabled:hover:text-[#2E2118] disabled:opacity-30';
 
   return (
-    <div className="h-full min-h-0 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm flex flex-col">
+    // 格子高度跟著寬度走，卡片太寬格子就變巨大，lg 以下限成一張手機月曆的寬度
+    <div className="h-full min-h-0 w-full max-w-96 lg:max-w-none mx-auto rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-sm flex flex-col">
       <div className="flex items-center justify-between gap-2 mb-3">
         <button type="button" onClick={() => onStep(-1)} disabled={!canPrev} className={stepButton} aria-label="上個月">
           <ChevronLeft size={16} />
@@ -394,8 +395,8 @@ function MonthCalendar({
         ))}
       </div>
 
-      {/* 框有多的高度就分一點給日期格，最多長到 2.75rem，不會變成細長條 */}
-      <div className="grid grid-cols-7 gap-1 flex-[0_1_auto] min-h-0 content-center [grid-auto-rows:minmax(1.75rem,2.75rem)]">
+      {/* 格子比例固定，高度不跟著視窗變形；正方形看起來會偏高，壓 6% 才像方的 */}
+      <div className="grid grid-cols-7 gap-1 shrink-0 [&>*]:aspect-[16/15]">
         {cells.map((day, index) => {
           if (day === null) return <div key={`blank-${index}`} />;
 
@@ -419,18 +420,13 @@ function MonthCalendar({
               onClick={() => onSelect(episode.id)}
               aria-pressed={isSelected}
               title={`${episode.date}　${episode.episodeLabel || `第 ${episode.episodeNumber} 回`}`}
-              className={`flex flex-col items-center justify-center gap-[3px] rounded-lg font-mono tabular-nums text-[13px] font-bold transition-colors ${
+              className={`flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] font-bold transition-colors ${
                 isSelected
                   ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]'
-                  : 'bg-brand-yellow/10 dark:bg-zinc-800 text-brand-ochre dark:text-brand-yellow hover:bg-brand-yellow/25 dark:hover:bg-zinc-700'
+                  : 'bg-brand-yellow/10 dark:bg-brand-yellow/12 text-brand-ochre dark:text-brand-yellow hover:bg-brand-yellow/25 dark:hover:bg-brand-yellow/25'
               }`}
             >
               {day}
-              <span
-                className={`w-1 h-1 rounded-full ${
-                  isSelected ? 'bg-brand-cream dark:bg-[#2E2118]' : 'bg-brand-yellow'
-                }`}
-              />
             </button>
           );
         })}
@@ -440,7 +436,7 @@ function MonthCalendar({
 
       <div className="mt-auto pt-3 flex items-center gap-4 text-xs text-zinc-400 dark:text-zinc-500">
         <span className="inline-flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-brand-yellow/25 dark:bg-zinc-800" />
+          <span className="w-2.5 h-2.5 rounded bg-brand-yellow/25" />
           有直播
         </span>
         <span className="inline-flex items-center gap-1.5">
