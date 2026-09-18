@@ -365,7 +365,7 @@ function MonthCalendar({
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
-  const stepButton = 'w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 inline-flex items-center justify-center transition-colors enabled:hover:bg-brand-brown enabled:hover:text-brand-cream dark:enabled:hover:bg-brand-tan dark:enabled:hover:text-[#2E2118] disabled:opacity-30';
+  const stepButton = 'w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 inline-flex items-center justify-center transition-colors enabled:hover:bg-brand-brown enabled:hover:text-brand-cream dark:enabled:hover:bg-brand-tan dark:enabled:hover:text-brand-ink disabled:opacity-30';
 
   return (
     // 格子高度跟著寬度走，卡片太寬格子就變巨大，lg 以下限成一張手機月曆的寬度
@@ -422,7 +422,7 @@ function MonthCalendar({
               title={`${episode.date}　${episode.episodeLabel || `第 ${episode.episodeNumber} 回`}`}
               className={`flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] font-bold transition-colors ${
                 isSelected
-                  ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]'
+                  ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
                   : 'bg-brand-yellow/10 dark:bg-brand-yellow/12 text-brand-ochre dark:text-brand-yellow hover:bg-brand-yellow/25 dark:hover:bg-brand-yellow/25'
               }`}
             >
@@ -573,7 +573,7 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
           <span
             className={`shrink-0 px-3 py-1 rounded-full text-[13px] font-bold tracking-wider ${
               isSelected
-                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]'
+                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
                 : 'bg-brand-yellow/10 dark:bg-zinc-800 text-brand-yellow'
             }`}
           >

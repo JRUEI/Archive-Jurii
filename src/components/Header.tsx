@@ -12,7 +12,7 @@ import { InstagramIcon, TikTokIcon, XIcon } from './BrandIcons';
 import type { MemberSns } from '@/lib/members';
 
 const SNS_CLASS =
-  'w-10 h-10 shrink-0 inline-flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-brand-cream hover:bg-brand-brown dark:hover:text-[#2E2118] dark:hover:bg-brand-tan transition-colors';
+  'w-10 h-10 shrink-0 inline-flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-brand-cream hover:bg-brand-brown dark:hover:text-brand-ink dark:hover:bg-brand-tan transition-colors';
 
 export default function Header({ hostSns }: { hostSns?: MemberSns }) {
   const { theme, setTheme } = useTheme();
@@ -59,7 +59,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
 
   return (
     <>
-    <nav className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50">
+    <nav className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-[var(--z-sticky)]">
       <div className="max-w-6xl mx-auto px-6">
         <div className="relative max-w-4xl mx-auto h-16 flex items-center justify-between">
         <Link href="/" className="shrink-0 text-base sm:text-lg md:text-2xl font-black tracking-tight whitespace-nowrap">
@@ -81,7 +81,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
             href="/members"
             className={`group h-10 inline-flex items-center justify-center px-3 rounded-full font-bold transition-all shadow-sm hover:shadow-md hover:shadow-brand-yellow/10 ${
               isMembers
-                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]'
+                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
                 : 'bg-brand-yellow/10 dark:bg-brand-yellow/20 text-brand-ochre dark:text-brand-yellow hover:bg-brand-yellow/20 dark:hover:bg-brand-yellow/30'
             }`}
           >

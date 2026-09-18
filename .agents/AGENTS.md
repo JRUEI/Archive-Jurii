@@ -1,4 +1,4 @@
-# Harumatope Wiki - Agent Rules (邊界守則)
+# 逢田珠里依 SHOWROOM（Archive-Jurii）- Agent Rules (邊界守則)
 
 因應大語言模型（LLM）的高自主性風險，維護本專案的 AI 代理（Agent）必須嚴格遵守以下邊界守則與 Auto-review 機制。
 
@@ -14,7 +14,8 @@
 
 ## 3. 網站維護邊界
 * **不可隨意覆蓋**：更新 `content/episodes/` 內的 Markdown 廣播紀錄時，若檔案已存在，AI 必須先使用 `view_file` 讀取內容，並徵求使用者同意是否覆寫。
-* **設計系統鎖定**：本站的核心主色為「紫羅蘭色 (`#B39DDB`)」與「青蘋果綠 (`#B2FF59`)」，非經使用者明確指示，AI 不得擅自修改 `globals.css` 內的品牌色系設定。
+* **設計系統鎖定**：本站色票取自制服視覺（卡其米棕外套 + 奶油黃緞帶 + 金釦 + 膚棕背景），以 `--color-brand-yellow`／`ochre`／`brown`／`cream`／`tan`／`gold`／`ink` 七個 token 表示，亮暗兩套實際色值**一律以 `src/app/globals.css` 為準**，不要在其他檔案另抄一份。非經使用者明確指示，AI 不得擅自修改這些 token 的色值。
+* **不要在元件裡寫死色碼**：需要品牌色一律用 token（例如 `text-brand-ink`，而不是 `text-[#2E2118]`）。唯一的例外是 `CardMode.tsx` 的圖卡匯出——`html-to-image` 讀不到 Tailwind class，必須用 inline style，但那份色表應該與 token 同源，不得各自演化。
 
 ## 4. 展現形式的絕對原則 (HTML Demo vs Markdown)
 * **嚴禁使用 Markdown 企劃書/報告**：遇到需要展示規劃、架構或資料庫概念時，**絕對禁止**產出 `implementation_plan.md` 或是任何 Markdown 格式的產出給使用者。

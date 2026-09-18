@@ -11,7 +11,7 @@ const HOST_NAME = '逢田珠里依';
 
 /** 站上的實心強調色，跟月曆翻頁鈕同一套 */
 const SOLID_ACCENT =
-  'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]';
+  'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink';
 /** 淡底強調，用在標籤與次要按鈕 */
 const SOFT_ACCENT =
   'bg-brand-yellow/10 text-brand-yellow border border-brand-yellow/25';
@@ -439,7 +439,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                   {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊的說話者標籤同一條線 */}
                   <div className="shrink-0">
                     <span
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-semibold border border-zinc-200/80 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/90 text-zinc-600 dark:text-zinc-300 shadow-sm transition-all group-hover:border-transparent group-hover:bg-brand-brown group-hover:text-brand-cream dark:group-hover:bg-brand-tan dark:group-hover:text-[#2E2118]"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-semibold border border-zinc-200/80 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/90 text-zinc-600 dark:text-zinc-300 shadow-sm transition-all group-hover:border-transparent group-hover:bg-brand-brown group-hover:text-brand-cream dark:group-hover:bg-brand-tan dark:group-hover:text-brand-ink"
                       title="點擊跳轉影片至此秒數"
                     >
                       <Play size={10} className="fill-current" />
@@ -559,13 +559,13 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
       {isDrawerOpen && (
         <div
           onClick={() => setIsDrawerOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[var(--z-drawer)] transition-opacity"
         />
       )}
 
       {/* 6. 側邊滑動抽屜面板 */}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-[500px] md:w-[540px] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 z-50 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-[500px] md:w-[540px] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 z-[var(--z-drawer)] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
           isDrawerOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
         }`}
       >

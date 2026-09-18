@@ -12,7 +12,7 @@ const ICONS: Record<OfficialLinkIcon, (props: { size?: number }) => React.ReactE
 };
 
 const BASE_CLASS =
-  'group h-10 inline-flex items-center justify-center px-3 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:text-brand-cream hover:bg-brand-brown hover:border-brand-brown dark:hover:text-[#2E2118] dark:hover:bg-brand-tan dark:hover:border-brand-tan transition-colors';
+  'group h-10 inline-flex items-center justify-center px-3 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:text-brand-cream hover:bg-brand-brown hover:border-brand-brown dark:hover:text-brand-ink dark:hover:bg-brand-tan dark:hover:border-brand-tan transition-colors';
 
 export default function OfficialLinks({ links }: { links: OfficialLink[] }) {
   return (

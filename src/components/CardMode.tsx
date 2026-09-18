@@ -599,7 +599,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center overflow-hidden touch-none select-none"
+            className="fixed inset-0 z-[var(--z-overlay)] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center overflow-hidden touch-none select-none"
             onClick={() => setIsFullscreen(false)}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -607,7 +607,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
           >
             {/* Top Navigation Bar - Cleanly positioned at top, zero collision with card */}
             <div 
-              className="absolute top-0 inset-x-0 h-16 z-[10000] flex items-center justify-between px-6 pointer-events-none"
+              className="absolute top-0 inset-x-0 h-16 z-10 flex items-center justify-between px-6 pointer-events-none"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Progress counter badge (top-left) */}
@@ -630,7 +630,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             {currentIndex > 0 && (
               <button 
                 onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                className="hidden sm:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-[10000] bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
+                className="hidden sm:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-10 bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
                 aria-label="上一張"
               >
                 <ChevronLeft size={24} />
@@ -639,7 +639,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             {currentIndex < cardsToRender.length - 1 && (
               <button 
                 onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                className="hidden sm:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-[10000] bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
+                className="hidden sm:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-10 bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
                 aria-label="下一張"
               >
                 <ChevronRight size={24} />
@@ -782,7 +782,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             <button
               onClick={downloadAllCards}
               disabled={isDownloading}
-              className="w-full flex justify-center items-center gap-2 bg-brand-brown hover:bg-brand-ochre text-brand-cream dark:bg-brand-tan dark:hover:bg-brand-ochre dark:text-[#2E2118] px-6 py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center gap-2 bg-brand-brown hover:bg-brand-ochre text-brand-cream dark:bg-brand-tan dark:hover:bg-brand-ochre dark:text-brand-ink px-6 py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5"
             >
               {isDownloading ? (
                 <>

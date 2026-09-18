@@ -85,7 +85,7 @@ export default function MembersPage() {
                     <span className="inline-flex items-center gap-1.5">
                       {member.name}
                       {member.isHost && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118] text-[11px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink text-[11px] font-bold">
                           <Mic size={11} />
                           本站主角
                         </span>
@@ -124,7 +124,7 @@ export default function MembersPage() {
                   <div className="font-bold text-base flex items-center gap-1.5 flex-wrap">
                     {member.name}
                     {member.isHost && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118] text-[11px] font-bold">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink text-[11px] font-bold">
                         <Mic size={11} />
                         本站主角
                       </span>

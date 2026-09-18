@@ -12,6 +12,14 @@
   --color-brand-cream: #F3E3A6;  /* 緞帶奶油黃 */
   --color-brand-tan: #D9B48F;    /* 背景膚棕 */
   --color-brand-gold: #C9A227;
+  /* tan／brown 實心底上的字色。深淺主題同值，所以只定義一次 */
+  --color-brand-ink: #2E2118;
+
+  /* 疊層級距。之前散落 z-50 / z-[100] / z-[9999]，Header 跟抽屜還撞在同一層 */
+  --z-sticky: 50;   /* 站頂 Header */
+  --z-drawer: 60;   /* 逐字稿側邊抽屜與它的遮罩 */
+  --z-overlay: 70;  /* 圖卡全螢幕 */
+  --z-toast: 80;    /* 捲動進度條，永遠在最上層 */
 }
 
 .dark {
@@ -34,9 +42,16 @@
   --color-brand-cream: var(--color-brand-cream);
   --color-brand-tan: var(--color-brand-tan);
   --color-brand-gold: var(--color-brand-gold);
+  --color-brand-ink: var(--color-brand-ink);
+  /* 設定齒輪用。原本只寫了 animate-spin-slow，沒有對應的 keyframes，所以齒輪不會轉 */
+  --animate-spin-slow: spin-slow 2.4s linear infinite;
   --font-sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Helvetica Neue", var(--font-noto-sans-tc), "Microsoft JhengHei", sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-noto-serif-tc), "Songti TC", "PMingLiU", serif;
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
 }
 
 body {

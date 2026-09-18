@@ -101,7 +101,7 @@ export default function TextMode({ episode, isLossless }: { episode: EpisodeData
 
   if (!isLossless) {
     return (
-      <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 md:p-12 shadow-xl prose dark:prose-invert prose-brand max-w-none text-zinc-800 dark:text-zinc-200">
+      <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 md:p-12 shadow-xl text-zinc-800 dark:text-zinc-200">
         <h2 className="text-2xl font-bold text-brand-yellow mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">精簡總結</h2>
         <ul className="space-y-4">
           {episode.summary.map((item, idx) => (
@@ -117,10 +117,10 @@ export default function TextMode({ episode, isLossless }: { episode: EpisodeData
   return (
     <>
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-yellow to-brand-brown origin-left z-[100]"
+        className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-yellow to-brand-brown origin-left z-[var(--z-toast)]"
         style={{ scaleX: scrollYProgress }}
       />
-      <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 md:p-12 shadow-xl prose dark:prose-invert max-w-none">
+      <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 md:p-12 shadow-xl">
         <h2 className="text-2xl font-bold text-brand-yellow mb-8 pb-4 border-b border-zinc-200 dark:border-zinc-800">節目文字全紀錄</h2>
         
         <div className="space-y-8">
