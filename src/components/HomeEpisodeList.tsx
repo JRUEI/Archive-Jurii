@@ -142,7 +142,13 @@ function SectionIndex({
           // lg 以下卡片不定高，列高貼著字，要自己留上下空白才不會壓到分隔線
           <li
             key={`${absolute}-${section.tag}`}
-            className="flex min-w-0 py-2 lg:py-0 border-b border-zinc-100 dark:border-zinc-800/70 text-[14px] leading-[1.45] text-zinc-600 dark:text-zinc-300"
+            // 每一列的底線只用來分隔列與列。整個清單的下緣已經有頁尾那條 border-t，
+            // 最後一列再畫一條就變成兩條平行線。sm 以上是 grid-flow-col 由上往下填，
+            // 所以每一欄最底下那格（index % rows === rows - 1）要收掉；sm 以下是單欄，
+            // 由 last: 處理最後一列
+            className={`flex min-w-0 py-2 lg:py-0 border-b border-zinc-100 dark:border-zinc-800/70 last:border-b-0 ${
+              index % rows === rows - 1 ? 'sm:border-b-0' : ''
+            } text-[14px] leading-[1.45] text-zinc-600 dark:text-zinc-300`}
           >
             {/* 還沒寫簡述的段落點開也沒東西看，就讓它留在底層的整卡連結上 */}
             {section.brief ? (
