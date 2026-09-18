@@ -184,21 +184,117 @@ footer span{font-family:var(--mono); font-size:11.5px}
   <span>2026-09-18</span>
 </div>
 
-<h1>前端體檢：26 件可修的事</h1>
+<h1>前端體檢：26 件可修的事，已全數完成</h1>
 
 <p class="thesis">
-  掃過 <strong>24 個檔案、4,057 行</strong>。排版邏輯本身寫得很紮實——固定卡高避免換面跳動、mono 標籤與內文走 baseline 對齊、中文 <code>text-wrap-style</code>，這些都不用動。
+  掃過 <strong>24 個檔案、4,057 行</strong>。排版邏輯本身寫得很紮實——固定卡高避免換面跳動、mono 標籤與內文走 baseline 對齊、中文 <code>text-wrap-style</code>，這些都沒有動。
   問題不在版面判斷，而在<strong>設計系統沒收斂</strong>：有 class 根本沒生效、有顏色是改版前的殘留、鍵盤使用者有幾處走不過去。
-  以下每一條都附實際檔案行號與實測值，沒有「建議加強」這種話。
+  這份頁面原本是動工前的方案，現在更新成<strong>實際執行的紀錄</strong>：包含三處我當初判斷錯誤、動手實測後更正的地方。
 </p>
 
-<div class="tally">
-  <div class="t-crit"><b>4</b><span>寫了但不會生效</span></div>
-  <div class="t-crit"><b>6</b><span>鍵盤／報讀器擋路</span></div>
-  <div class="t-warn"><b>7</b><span>對比實測未達 AA</span></div>
-  <div class="t-warn"><b>5</b><span>token 缺口</span></div>
-  <div class="t-note"><b>4</b><span>版面細節</span></div>
+<div class="batch" style="border-left-color:var(--ok);margin-top:28px">
+  <h3 style="color:var(--ok)">全部完成並已推送 <em>8 個 commit · 20 檔 · +895/−315</em></h3>
+  <p>
+    最能說明成效的單一數字：用同一支對比掃描腳本（走訪實際渲染頁面的每個文字節點，逐層疊算真實背景色），
+    對首頁／成員頁／單集頁 × 亮暗兩主題各跑一次。為了有對照組，動工前的版本也另外建置起來跑同一支腳本。
+  </p>
+  <p style="margin-top:10px;font-size:17px">
+    <strong style="color:var(--crit)">原始版本 126 處未達 AA</strong>
+    　→　<strong style="color:var(--ok)">現在 0 處</strong>
+  </p>
 </div>
+
+<div class="tally">
+  <div class="t-crit"><b>126→0</b><span>對比未達 AA（實測）</span></div>
+  <div class="t-crit"><b>388→0</b><span>抽屜關閉時誤入 Tab 順序的元素</span></div>
+  <div class="t-warn"><b>−100 KB</b><span>CSS（−14%）</span></div>
+  <div class="t-note"><b>3</b><span>方案判斷錯誤，已更正</span></div>
+  <div class="t-note"><b>0</b><span>npm run verify 錯誤（首次全綠）</span></div>
+</div>
+
+<section>
+<h2>我方案裡寫錯、動手後更正的三件事 <em>照原方案做會做錯</em></h2>
+<p class="lede">這節是這份文件最重要的部分。原始方案有三處判斷是錯的，都在實測後更正。</p>
+
+<div class="findings">
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3><code>scroll-mt</code> 那條是誤判，沒有問題</h3><span class="chip">已更正</span></div>
+      <p>原方案說手機上段落會被 header 加 SNS bar 蓋住。實測後確認那條 SNS bar 是 <code>&lt;nav&gt;</code> 的兄弟節點且 <code>position: static</code>，手機上量到位置在 <strong>−4053px</strong>，早就跟著頁面捲走了，不佔固定高度。</p>
+      <div class="where">固定 header 僅 65px，段落落在 95.5px（390px）／96.3px（1280px），兩種寬度都有 30px 以上餘裕</div>
+      <div class="fix"><b>結果</b>　<code>scroll-mt-20</code> 與 <code>-24</code> 的差異純屬數值不一致，兩者都夠用。<b>未更動</b>——為了消除看不出差別的不一致而改動能正常運作的程式碼，只是製造風險。</div>
+    </div>
+  </div>
+
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3><code>brand-ochre</code> 不夠，差 0.07 沒過</h3><span class="chip">已更正</span></div>
+      <p>原方案提議小字膠囊由 <code>brand-yellow</code> 改 <code>brand-ochre</code>。實算在 <code>bg-brand-yellow/10</code> 的膠囊底上只有 <strong>4.43</strong>，未達 4.5。照原方案做等於沒修好。</p>
+      <div class="where">brand-yellow 3.36　·　brand-ochre 4.43　·　<s>brand-brown 8.07</s></div>
+      <div class="fix"><b>改用</b>　<code>brand-brown</code>（8.07）。底色是白／卡片的地方才用 ochre（4.95 就夠，不必壓那麼重）。</div>
+    </div>
+  </div>
+
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>圖卡全螢幕的方向鍵早就有了</h3><span class="chip">已更正</span></div>
+      <p>原方案說要補 <code>ArrowLeft</code>／<code>ArrowRight</code>。實際上 <code>CardMode.tsx:578</code> 已經有了，而且沒有限定在全螢幕時才生效——非全螢幕的圖卡模式下左右鍵也會翻頁。</p>
+      <div class="where"><s>src/components/CardMode.tsx:578</s></div>
+      <div class="fix"><b>結果</b>　那較像刻意的功能而非 bug，<b>未擅自移除</b>。全螢幕真正缺的是 dialog 語意與焦點管理，已補。</div>
+    </div>
+  </div>
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>沒有照方案加 <code>aria-label="跳至 mm:ss"</code></h3><span class="chip">刻意不做</span></div>
+      <p>那會蓋掉按鈕原本由內容推導的無障礙名稱，報讀器就只唸得到時間、聽不到逐字稿內容本身。維持內容當名稱較好（「00:05 逢田珠里依 喔，大家晚安。」）。</p>
+      <div class="fix"><b>結果</b>　僅把外層改成 <code>&lt;button&gt;</code>，不加 <code>aria-label</code>。</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>動手後才發現、方案裡沒有的 <em>四件</em></h2>
+<div class="findings">
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>目錄列的底色一直在被裁掉</h3><span class="chip">使用者回報</span></div>
+      <p>commit <code>232dd1d</code> 當時把 <code>px-1 -mx-1</code> 改成 <code>px-2 -mx-2</code>，但 <code>SectionIndex</code> 那些列在 <code>overflow-hidden</code> 框內，左側 8px 底色一直被裁；當時真正修好的只有不在框內的「回目錄」列。這就是「單邊圓角、另一邊直角」的成因。</p>
+      <div class="fix"><b>改法</b>　把出血移到裁切框本身（<code>-mx-2 px-2</code>），框往外讓開、內容位置推回原處。實測左欄 213–466、右欄 470–723，裁切框 213–723，兩欄外緣都剛好落在邊界而未被裁。</div>
+    </div>
+  </div>
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>「圖卡／文字」切換組有跟抽屜一樣的問題</h3><span class="chip">同類</span></div>
+      <p>切到逐字稿時那組只用 <code>opacity-50 pointer-events-none</code> 變灰，擋得住滑鼠擋不住鍵盤，Tab 還是進得來而且按得下去。</p>
+      <div class="fix"><b>改法</b>　比照抽屜補 <code>inert</code>。</div>
+    </div>
+  </div>
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>凸顯底色整片貼滿兩條分隔線</h3><span class="chip">使用者回報</span></div>
+      <p>實測列高 94.3px、底色 93.3px，上下各 0px——看起來是一條頂到底的色塊而非圓角區塊。外層容器又只有 <code>pt-4</code> 沒有 <code>pb</code>，最後一列緊貼底部分隔線。</p>
+      <div class="fix"><b>改法</b>　button 加 <code>my-1</code>（上下各內縮 4px），容器 <code>pt-4</code> → <code>py-4</code>。實測改後上下皆 4px、首末列距分隔線皆 16px。</div>
+    </div>
+  </div>
+  <div class="f note">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>字體實測結果與猜測不同</h3><span class="chip">先量再動</span></div>
+      <p>方案裡說「Serif 900 與 Sans 500 可能沒用到，但不想憑印象砍」。實測後發現真正沒被用到的是 <strong>Noto Serif TC 的 400</strong>：襯線體只出現在圖卡匯出，全部是 700 或 900。順手發現 <code>CARD_STYLES.serif</code> 呼叫次數 0，是死碼。</p>
+      <div class="fix"><b>成效</b>　CSS 700.6 → 600.1 KB（−14%）。但字型檔數 224 與總量 11M 不變——多條 <code>@font-face</code> 共用同檔，省的是 CSS 規則不是字型位元組。</div>
+    </div>
+  </div>
+</div>
+</section>
 
 <!-- ══════════════════════════════════════ -->
 <section>
@@ -533,50 +629,68 @@ footer span{font-family:var(--mono); font-size:11.5px}
 
 <!-- ══════════════════════════════════════ -->
 <section>
-<h2>建議的動工順序 <em>三批，可以只做前兩批</em></h2>
+<h2>實際執行 <em>8 個 commit，皆通過 lint／typecheck／build</em></h2>
 
 <div class="batch">
-  <h3>第一批：外觀零變動 <em>安全 · 建議直接做</em></h3>
-  <p>做完之後截圖比對應該<strong>一個像素都不會變</strong>（唯一例外是齒輪開始轉）。但之後每一次改色、改層級都會輕鬆很多。</p>
+  <h3>第一批：外觀零變動 <em>4e327bd</em></h3>
+  <p>除了設定齒輪開始會轉，其餘零視覺變動。</p>
   <ul>
-    <li>修 <code>AGENTS.md</code> 的品牌色與專案名</li>
-    <li>補 <code>--animate-spin-slow</code>；刪掉失效的 <code>prose</code> 三兄弟</li>
-    <li><code>#2E2118</code> → <code>--color-brand-ink</code>（12 處機械替換）</li>
-    <li>z-index 收成四層 token</li>
-    <li><code>harumatope-</code> → <code>jurii-</code> 前綴</li>
-    <li>決定 <code>HeroGlow</code> 掛回去還是刪掉 ← <strong>這個需要你回答</strong></li>
+    <li><code>animate-spin-slow</code> 補上 keyframes，已在產出的 CSS 驗證</li>
+    <li>移除失效的 <code>prose</code> 三兄弟（content 只用 <code>**粗體**</code>，preflight 本來就給 strong 粗體）</li>
+    <li>404 的 <code>hover:bg-brand-brown</code> 與原色同色 → 改 ochre</li>
+    <li>刪除 <code>HeroGlow.tsx</code>：查過完整歷史，初始 commit 就進來且從未被 import</li>
+    <li><code>#2E2118</code>（10 檔 13 處）→ <code>--color-brand-ink</code></li>
+    <li>z-index 收成四層 token；<code>harumatope-</code> → <code>jurii-</code></li>
+    <li><code>AGENTS.md</code> 的品牌色仍寫紫羅蘭與青蘋果綠，改為指向 <code>globals.css</code> 為唯一真相</li>
   </ul>
-  <div class="flag ok">不動任何品牌色相，符合 AGENTS.md §3。</div>
 </div>
 
 <div class="batch">
-  <h3>第二批：鍵盤與輔助技術 <em>視覺幾乎不變 · 效益最大</em></h3>
-  <p>除了新增的焦點框（只在鍵盤操作時出現，滑鼠使用者看不到），其他都是行為修正。</p>
+  <h3>第二批：鍵盤與輔助技術 <em>58a20a3</em></h3>
+  <p>視覺上只多了鍵盤操作時才出現的焦點框。以 Chromium 實際鍵盤操作逐條驗證。</p>
   <ul>
-    <li>抽屜加 <code>inert</code>（一行，最划算）</li>
-    <li>全站統一 <code>:focus-visible</code> ring，移除兩處 <code>focus:outline-none</code></li>
-    <li>逐字稿的 <code>div onClick</code> → <code>&lt;button&gt;</code></li>
-    <li>兩個 overlay 補 dialog 語意＋焦點歸位；抽屜補捲動鎖；全螢幕補方向鍵</li>
-    <li>tab 語意收斂（建議退回 <code>aria-pressed</code>）</li>
-    <li>全域 <code>prefers-reduced-motion</code></li>
+    <li>抽屜加 <code>inert</code>：關閉時內部 <strong>388 個</strong>互動元素可被聚焦 → <strong>0 個</strong></li>
+    <li>全站統一 <code>:focus-visible</code> 焦點框，移除兩處 <code>focus:outline-none</code></li>
+    <li>逐字稿兩處 <code>div onClick</code> → <code>&lt;button&gt;</code>，內層 div/p 一併改 span（button 只能裝 phrasing content）</li>
+    <li>兩個 overlay 補 <code>role="dialog"</code>／焦點歸位；抽屜補捲動鎖；全螢幕補 Tab 焦點鎖</li>
+    <li>tab 語意退回 <code>aria-pressed</code>；單集頁三個主分頁補上語意</li>
+    <li>全域 <code>prefers-reduced-motion</code>；JS 捲動與 framer-motion 另外處理</li>
   </ul>
-  <div class="flag ok">不動色彩，不動版面。</div>
 </div>
 
 <div class="batch">
-  <h3>第三批：對比與版面 <em>會改變外觀 · 需要你逐條點頭</em></h3>
-  <p>這批看得出差別，所以照 AGENTS.md §2 的人工審核點，我會等你確認再動。</p>
+  <h3>第三批：對比與版面 <em>0e36566</em></h3>
   <ul>
-    <li><code>text-zinc-400</code> → <code>zinc-500</code>（次要文字，差異很小但過 AA）</li>
-    <li>月曆無直播日、「尚未整理摘要」說明文字提亮</li>
-    <li>拿掉 <code>#d8b4fe</code>，三個紫調深色底收斂到 zinc 系</li>
-    <li>匯出卡頁尾 <code>#aaa</code> 在亮色主題下加深 ← <strong>分享出去的圖，我建議優先</strong></li>
-    <li>亮色 <code>brand-yellow</code> 在小字膠囊上換成 <code>brand-ochre</code>（4.95，過 AA；色相不變，只是深一階）</li>
-    <li><code>scroll-mt</code> 統一並計入手機 SNS bar</li>
-    <li>觸控目標用 <code>::before</code> 擴大（視覺不變）</li>
-    <li>中文小字地板拉到 13px</li>
+    <li>次要文字 28 處收斂為 <code>text-zinc-500 dark:text-zinc-400</code></li>
+    <li>品牌色小字 15 處改 <code>brand-brown</code>（見上方更正）</li>
+    <li>移除改版殘留的紫色：<code>#d8b4fe</code> 與三個紫調深色底</li>
+    <li>匯出圖卡頁尾在亮色主題由 2.22 提升至 5.19</li>
+    <li>10／11px 中文標籤拉到 13px；純數字 mono 維持</li>
+    <li>月曆翻月鈕可點範圍 28→40px。SNS 圖示與目錄翻頁未比照——相鄰僅 4–6px，擴大會重疊造成誤觸，且都已達 WCAG 2.2 AA 的 24px 下限</li>
   </ul>
-  <div class="flag">這批唯一碰到品牌色的是最後一項：<code>brand-yellow</code> → <code>brand-ochre</code>。兩個都是現有色票裡的顏色，不新增色相，但視覺上會深一點——這條特別需要你點頭。</div>
+</div>
+
+<div class="batch">
+  <h3>使用者回報的兩件 <em>748a83f · 9cc0371</em></h3>
+  <ul>
+    <li>簡述文字貼著 hover 底色左緣 → 照 <code>232dd1d</code> 的慣例補 <code>px-2 -mx-2</code>，並把出血移到裁切框</li>
+    <li>凸顯底色頂到分隔線、上下留白不對稱 → <code>my-1</code> ＋ <code>py-4</code></li>
+  </ul>
+</div>
+
+<div class="batch">
+  <h3>收尾 <em>ac5bb42 · 07378a3</em></h3>
+  <ul>
+    <li>移除沒被用到的 <code>Noto Serif TC 400</code> 與死碼 <code>CARD_STYLES.serif</code></li>
+    <li>刪除 <code>rebrand.js</code>：改名用的一次性腳本，寫死 Windows 絕對路徑、早已跑完，只會讓 <code>npm run verify</code> 每次報錯。刪除後<strong>首次全綠</strong></li>
+  </ul>
+</div>
+
+<div class="flag">
+  <b>唯一未處理，等你決定：</b>　<code>font-black</code>（最粗）用在站名、成員頁 h1、404 與設定選單共 5 處，
+  但中文字型只載了粗體、沒載特粗。實測在沒有 Mac 系統字型的機器上，設「最粗」與設「粗體」寬度完全相同（皆 292.52px）——
+  也就是 Windows／Android 使用者根本看不到那個設定。<b>建議先不動</b>：這不是壞掉，只是不一致，
+  而補載特粗會讓中文字型多出上百塊，改成粗體則會讓你自己 Mac 上的標題變細。
 </div>
 </section>
 
@@ -598,8 +712,9 @@ footer span{font-family:var(--mono); font-size:11.5px}
 
 <footer>
   <span>掃描範圍 src/ 24 檔 4,057 行</span>
-  <span>對比值以 WCAG 2.1 相對亮度公式實算</span>
-  <span>未執行 build（此環境無 node_modules）</span>
+  <span>對比以 Chromium 實際渲染頁面掃描，canvas 轉 sRGB 後依 WCAG 2.1 計算</span>
+  <span>鍵盤行為以 Playwright 實際操作驗證</span>
+  <span>lint ✓ typecheck ✓ build ✓ verify ✓</span>
 </footer>
 
 </div>
