@@ -44,9 +44,6 @@ const CARD_STYLES = {
   // 深色卡底 #1a1a1a 的 7.49 沒問題，所以只換亮色那一側（#6F6961 → 5.19）
   footer: (isDark: boolean) => ({ fontSize: '30px', fontWeight: 300 as const, color: isDark ? '#aaa' : '#6F6961', margin: 0, letterSpacing: '0.03em' }),
   footerDivider: (isDark: boolean) => ({ borderTop: `1px solid ${isDark ? '#444' : '#E5E7EB'}`, paddingTop: '32px', flexShrink: 0 as const }),
-  serif: (size: number, weight: number, color: string) => ({
-    fontFamily: 'var(--font-serif)', fontSize: `${size}px`, fontWeight: weight, color, lineHeight: 1.35 as const, margin: 0,
-  }),
   // Cover
   coverGoldBar: { width: '56px', height: '4px', background: '#E8C97A', marginTop: '60px', marginBottom: '24px' },
   coverBadge: { background: 'rgba(232,201,122,0.12)', border: '1px solid rgba(232,201,122,0.3)', color: '#E8C97A', padding: '10px 22px', borderRadius: '6px', fontSize: '26px', fontWeight: 700 as const, letterSpacing: '0.05em' },
