@@ -280,7 +280,9 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
 
       {/* 這一格的高度由 flex-1 決定，跟裝什麼無關：目錄、單段簡述、沒逐字稿的告示都吃同一個框 */}
       <div className="flex-1 min-h-0 grid [grid-template-rows:minmax(0,1fr)] pt-4">
-        <div className="[grid-area:1/1] min-h-0 overflow-hidden">
+        {/* 裡面的列用 px-2 -mx-2 讓底色往外長，裁切框要跟著讓開同樣寬度，
+            否則左側 8px 會被 overflow-hidden 切掉。px 再把內容推回原位置 */}
+        <div className="[grid-area:1/1] min-h-0 overflow-hidden -mx-2 px-2">
           {!hasSections ? (
             <p className="text-base leading-[1.85] text-zinc-400 dark:text-zinc-600 italic">
               {NO_SUMMARY}
@@ -293,7 +295,7 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
             <Link
               href={`/episodes/${episode.id}#section-${(openIndex ?? 0) + 1}`}
               aria-label={`看「${openSection.title}」這一段`}
-              className="relative z-10 block h-full min-h-0 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+              className="relative z-10 block h-full min-h-0 px-2 -mx-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
             >
               <SectionBrief section={openSection} index={openIndex ?? 0} total={episode.sections.length} />
             </Link>
