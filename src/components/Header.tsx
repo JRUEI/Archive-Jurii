@@ -12,7 +12,7 @@ import { InstagramIcon, TikTokIcon, XIcon } from './BrandIcons';
 import type { MemberSns } from '@/lib/members';
 
 const SNS_CLASS =
-  'w-10 h-10 shrink-0 inline-flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-brand-cream hover:bg-brand-brown dark:hover:text-[#2E2118] dark:hover:bg-brand-tan transition-colors';
+  'w-10 h-10 shrink-0 inline-flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-brand-cream hover:bg-brand-brown dark:hover:text-brand-ink dark:hover:bg-brand-tan transition-colors';
 
 export default function Header({ hostSns }: { hostSns?: MemberSns }) {
   const { theme, setTheme } = useTheme();
@@ -59,7 +59,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
 
   return (
     <>
-    <nav className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50">
+    <nav className="w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-[var(--z-sticky)]">
       <div className="max-w-6xl mx-auto px-6">
         <div className="relative max-w-4xl mx-auto h-16 flex items-center justify-between">
         <Link href="/" className="shrink-0 text-base sm:text-lg md:text-2xl font-black tracking-tight whitespace-nowrap">
@@ -81,8 +81,8 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
             href="/members"
             className={`group h-10 inline-flex items-center justify-center px-3 rounded-full font-bold transition-all shadow-sm hover:shadow-md hover:shadow-brand-yellow/10 ${
               isMembers
-                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]'
-                : 'bg-brand-yellow/10 dark:bg-brand-yellow/20 text-brand-ochre dark:text-brand-yellow hover:bg-brand-yellow/20 dark:hover:bg-brand-yellow/30'
+                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
+                : 'bg-brand-yellow/10 dark:bg-brand-yellow/20 text-brand-brown dark:text-brand-yellow hover:bg-brand-yellow/20 dark:hover:bg-brand-yellow/30'
             }`}
           >
             <Users size={16} className="shrink-0" />
@@ -109,7 +109,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-10 h-10 flex items-center justify-center rounded-full transition-all shadow-sm focus:outline-none hover:shadow-md ${isOpen ? 'bg-brand-yellow text-white shadow-brand-yellow/20' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-brand-yellow dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-brand-yellow/20'}`}
+                className={`w-10 h-10 flex items-center justify-center rounded-full transition-all shadow-sm hover:shadow-md ${isOpen ? 'bg-brand-yellow text-white shadow-brand-yellow/20' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-brand-yellow dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-brand-yellow/20'}`}
                 title="設定"
                 aria-label="Toggle Settings"
               >
@@ -119,13 +119,13 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
               {/* Dropdown Menu */}
               <div className={`absolute top-full right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl z-50 origin-top-right transition-all duration-200 p-2 sm:p-3 ${isOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
                   <div className="px-3 pb-2 pt-1 border-b border-zinc-100 dark:border-zinc-800 mb-2">
-                      <span className="text-xs font-black text-zinc-400 dark:text-zinc-500 tracking-wider">排版與主題設定</span>
+                      <span className="text-xs font-black text-zinc-500 dark:text-zinc-400 tracking-wider">排版與主題設定</span>
                   </div>
                   
                   <div className="flex flex-col gap-1">
                       {isHome && (
                         <label className="flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors">
-                            <span className="text-sm font-bold transition-colors text-zinc-700 dark:text-zinc-300 group-hover:text-brand-yellow">月曆選日區</span>
+                            <span className="text-sm font-bold transition-colors text-zinc-700 dark:text-zinc-300 group-hover:text-brand-ochre dark:group-hover:text-brand-yellow">月曆選日區</span>
                             <div className="relative">
                                 <input type="checkbox" className="sr-only" checked={showCalendar} onChange={() => setShowCalendar(!showCalendar)} />
                                 <div className={`block w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 ${showCalendar ? 'bg-brand-yellow' : 'bg-zinc-200 dark:bg-zinc-700'}`}></div>
@@ -136,7 +136,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
 
                       {!isHome && (
                         <label className="flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors">
-                            <span className="text-sm font-bold transition-colors text-zinc-700 dark:text-zinc-300 group-hover:text-brand-yellow">發光特效</span>
+                            <span className="text-sm font-bold transition-colors text-zinc-700 dark:text-zinc-300 group-hover:text-brand-ochre dark:group-hover:text-brand-yellow">發光特效</span>
                             <div className="relative">
                                 <input type="checkbox" className="sr-only" checked={isFocusMode} onChange={toggleFocusMode} />
                                 <div className={`block w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 ${isFocusMode ? 'bg-brand-yellow' : 'bg-zinc-200 dark:bg-zinc-700'}`}></div>
@@ -146,7 +146,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
                       )}
 
                       <label className={`flex justify-between items-center cursor-pointer group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 p-2 rounded-lg transition-colors ${isHome ? 'border-t border-zinc-100 dark:border-zinc-800 mt-1 pt-2' : ''}`}>
-                          <span className="text-sm font-bold transition-colors text-zinc-700 dark:text-zinc-300 group-hover:text-brand-yellow">亮色主題</span>
+                          <span className="text-sm font-bold transition-colors text-zinc-700 dark:text-zinc-300 group-hover:text-brand-ochre dark:group-hover:text-brand-yellow">亮色主題</span>
                           <div className="relative">
                               <input type="checkbox" className="sr-only" checked={theme === 'light'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
                               <div className={`block w-10 sm:w-11 h-6 rounded-full shadow-inner transition-colors duration-300 ${theme === 'light' ? 'bg-amber-400' : 'bg-zinc-200 dark:bg-zinc-700'}`}></div>

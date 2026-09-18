@@ -27,7 +27,7 @@ export default function MembersPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       {/* Hero */}
       <header className="mb-10 sm:mb-14 text-center">
-        <div className="inline-flex items-center px-4 py-1.5 mb-4 rounded-full bg-brand-yellow/10 dark:bg-brand-yellow/15 text-brand-ochre dark:text-brand-yellow text-xs sm:text-sm font-bold tracking-[0.2em]">
+        <div className="inline-flex items-center px-4 py-1.5 mb-4 rounded-full bg-brand-yellow/10 dark:bg-brand-yellow/15 text-brand-brown dark:text-brand-yellow text-xs sm:text-sm font-bold tracking-[0.2em]">
           {group.reading}
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4">
@@ -60,7 +60,7 @@ export default function MembersPage() {
         <h2 className="text-xl font-bold mb-4 flex items-baseline gap-2">
           <span className="w-1 h-5 bg-brand-yellow rounded-full self-center" />
           成員一覽
-          <span className="text-sm font-medium text-zinc-400">{members.length} 名</span>
+          <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{members.length} 名</span>
         </h2>
 
         <div className="hidden md:block overflow-x-auto rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
@@ -85,7 +85,7 @@ export default function MembersPage() {
                     <span className="inline-flex items-center gap-1.5">
                       {member.name}
                       {member.isHost && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118] text-[11px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink text-[13px] font-bold">
                           <Mic size={11} />
                           本站主角
                         </span>
@@ -99,7 +99,7 @@ export default function MembersPage() {
                   </td>
                   <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
                     {formatBirthday(member.birthday)}
-                    <span className="text-zinc-400 dark:text-zinc-600 ml-1.5">
+                    <span className="text-zinc-500 dark:text-zinc-400 ml-1.5">
                       {getAge(member.birthday)} 歲
                     </span>
                   </td>
@@ -124,7 +124,7 @@ export default function MembersPage() {
                   <div className="font-bold text-base flex items-center gap-1.5 flex-wrap">
                     {member.name}
                     {member.isHost && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118] text-[11px] font-bold">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink text-[13px] font-bold">
                         <Mic size={11} />
                         本站主角
                       </span>
@@ -142,21 +142,21 @@ export default function MembersPage() {
                 </div>
               </div>
               <div className="text-sm mb-3">
-                <span className="text-zinc-400 dark:text-zinc-500">暱稱　</span>
+                <span className="text-zinc-500 dark:text-zinc-400">暱稱　</span>
                 {member.nicknames.join('、')}
               </div>
               <MemberSnsLinks sns={member.sns} name={member.name} />
             </div>
           ))}
         </div>
-        <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-3">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-3">
           年齡以網站建置時間（{buildYear} 年）計算。官方連結依序為 X、Instagram、TikTok、SHOWROOM，取自官方 PROFILE 頁。
         </p>
       </section>
 
       {/* 出處 */}
       <section>
-        <h2 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 mb-3 tracking-wider">資料來源</h2>
+        <h2 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 mb-3 tracking-wider">資料來源</h2>
         <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
           {[{ label: `${group.name} 官方網站`, url: group.officialUrl }, ...sources]
             .filter((source, index, list) => list.findIndex((item) => item.url === source.url) === index)
@@ -166,14 +166,14 @@ export default function MembersPage() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-zinc-500 dark:text-zinc-400 hover:text-brand-yellow dark:hover:text-brand-yellow underline underline-offset-4 decoration-zinc-300 dark:decoration-zinc-700 transition-colors"
+                  className="text-zinc-500 dark:text-zinc-400 hover:text-brand-ochre dark:hover:text-brand-yellow underline underline-offset-4 decoration-zinc-300 dark:decoration-zinc-700 transition-colors"
                 >
                   {source.label}
                 </a>
               </li>
             ))}
         </ul>
-        <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-4">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4">
           本頁為非官方粉絲整理，內容與 {group.name} 官方及所屬事務所無關。
         </p>
       </section>

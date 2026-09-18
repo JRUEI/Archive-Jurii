@@ -9,7 +9,7 @@ type FocusModeContextType = {
 };
 
 const FocusModeContext = createContext<FocusModeContextType | undefined>(undefined);
-const FOCUS_MODE_STORAGE_KEY = 'harumatope-focus-mode';
+const FOCUS_MODE_STORAGE_KEY = 'jurii-focus-mode';
 
 export function FocusModeProvider({ children }: { children: React.ReactNode }) {
   const [isFocusMode, setIsFocusMode] = useState(

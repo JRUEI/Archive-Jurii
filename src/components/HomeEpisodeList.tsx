@@ -59,7 +59,7 @@ function SectionTitle({ children, note }: { children: React.ReactNode; note?: st
     <h2 className="text-xl font-bold mb-4 flex items-baseline gap-2">
       <span className="w-1 h-5 bg-brand-yellow rounded-full self-center" />
       {children}
-      {note && <span className="text-sm font-medium text-zinc-400">{note}</span>}
+      {note && <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{note}</span>}
     </h2>
   );
 }
@@ -82,7 +82,7 @@ function SectionList({ sections, limit }: { sections: EpisodeSection[]; limit?: 
         </li>
       ))}
       {rest > 0 && (
-        <li className="text-[14px] leading-[1.7] text-zinc-400 dark:text-zinc-600">還有 {rest} 段</li>
+        <li className="text-[14px] leading-[1.7] text-zinc-500 dark:text-zinc-400">還有 {rest} 段</li>
       )}
     </ul>
   );
@@ -142,14 +142,22 @@ function SectionIndex({
           // lg 以下卡片不定高，列高貼著字，要自己留上下空白才不會壓到分隔線
           <li
             key={`${absolute}-${section.tag}`}
-            className="flex min-w-0 py-2 lg:py-0 border-b border-zinc-100 dark:border-zinc-800/70 text-[14px] leading-[1.45] text-zinc-600 dark:text-zinc-300"
+            // 每一列的底線只用來分隔列與列。整個清單的下緣已經有頁尾那條 border-t，
+            // 最後一列再畫一條就變成兩條平行線。sm 以上是 grid-flow-col 由上往下填，
+            // 所以每一欄最底下那格（index % rows === rows - 1）要收掉；sm 以下是單欄，
+            // 由 last: 處理最後一列
+            className={`flex min-w-0 py-2 lg:py-0 border-b border-zinc-100 dark:border-zinc-800/70 last:border-b-0 ${
+              index % rows === rows - 1 ? 'sm:border-b-0' : ''
+            } text-[14px] leading-[1.45] text-zinc-600 dark:text-zinc-300`}
           >
             {/* 還沒寫簡述的段落點開也沒東西看，就讓它留在底層的整卡連結上 */}
             {section.brief ? (
               <button
                 type="button"
                 onClick={() => onSelect(absolute)}
-                className="group/row relative z-10 flex-1 min-w-0 flex items-center gap-2.5 text-left px-2 -mx-2 rounded-md hover:bg-brand-yellow/10 dark:hover:bg-zinc-800/60 transition-colors"
+                // 底色原本整片貼滿兩條分隔線之間（上下各 0px），看起來是一條頂到底的色塊。
+                // my-1 讓它上下各內縮 4px，跟水平的 px-2 -mx-2 一樣留出呼吸空間，成為一塊圓角區塊
+                className="group/row relative z-10 flex-1 min-w-0 flex items-center gap-2.5 text-left px-2 -mx-2 my-1 rounded-md hover:bg-brand-yellow/10 dark:hover:bg-zinc-800/60 transition-colors"
               >
                 {body}
                 <ChevronRight
@@ -251,7 +259,7 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
         ) : (
           <div className="flex items-center gap-2 mt-2 pb-2 min-h-[38px] border-b border-zinc-100 dark:border-zinc-800">
             {pages > 1 && (
-              <div className="relative z-10 ml-auto flex items-center gap-1 text-zinc-400 dark:text-zinc-500">
+              <div className="relative z-10 ml-auto flex items-center gap-1 text-zinc-500 dark:text-zinc-400">
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -279,12 +287,16 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
         ))}
 
       {/* 這一格的高度由 flex-1 決定，跟裝什麼無關：目錄、單段簡述、沒逐字稿的告示都吃同一個框 */}
-      <div className="flex-1 min-h-0 grid [grid-template-rows:minmax(0,1fr)] pt-4">
-        <div className="[grid-area:1/1] min-h-0 overflow-hidden">
+      {/* 上下留白要對稱：原本只有 pt-4，最後一列會緊貼著底部的分隔線，
+          hover 底色的下緣圓角也剛好壓在裁切邊界上，看起來像被切掉 */}
+      <div className="flex-1 min-h-0 grid [grid-template-rows:minmax(0,1fr)] py-4">
+        {/* 裡面的列用 px-2 -mx-2 讓底色往外長，裁切框要跟著讓開同樣寬度，
+            否則左側 8px 會被 overflow-hidden 切掉。px 再把內容推回原位置 */}
+        <div className="[grid-area:1/1] min-h-0 overflow-hidden -mx-2 px-2">
           {!hasSections ? (
-            <p className="text-base leading-[1.85] text-zinc-400 dark:text-zinc-600 italic">
+            <p className="text-base leading-[1.85] text-zinc-500 dark:text-zinc-400 italic">
               {NO_SUMMARY}
-              <span className="block not-italic text-sm text-zinc-400 dark:text-zinc-700 mt-1">
+              <span className="block not-italic text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                 逐字稿還沒補上，點進去可以先看原片。
               </span>
             </p>
@@ -293,7 +305,7 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
             <Link
               href={`/episodes/${episode.id}#section-${(openIndex ?? 0) + 1}`}
               aria-label={`看「${openSection.title}」這一段`}
-              className="relative z-10 block h-full min-h-0 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+              className="relative z-10 block h-full min-h-0 px-2 -mx-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
             >
               <SectionBrief section={openSection} index={openIndex ?? 0} total={episode.sections.length} />
             </Link>
@@ -311,7 +323,7 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
         </div>
         <ArrowRight
           size={18}
-          className="shrink-0 text-zinc-300 dark:text-zinc-600 group-hover:text-brand-ochre dark:group-hover:text-brand-yellow group-hover:translate-x-0.5 transition-all"
+          className="shrink-0 text-zinc-500 dark:text-zinc-400 group-hover:text-brand-ochre dark:group-hover:text-brand-yellow group-hover:translate-x-0.5 transition-all"
         />
       </div>
     </div>
@@ -326,7 +338,7 @@ function SectionBrief({ section, index, total }: { section: EpisodeSection; inde
       <div className="flex-1 min-h-0 flex items-center">
         <p className="max-w-[34em] text-[19px] leading-[1.9] text-zinc-600 dark:text-zinc-300">{section.brief}</p>
       </div>
-      <span className="pt-3 font-mono tabular-nums text-[12px] text-zinc-400 dark:text-zinc-600">
+      <span className="pt-3 font-mono tabular-nums text-[12px] text-zinc-500 dark:text-zinc-400">
         第 {index + 1} 段 / 共 {total} 段
       </span>
     </div>
@@ -365,7 +377,9 @@ function MonthCalendar({
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
-  const stepButton = 'w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 inline-flex items-center justify-center transition-colors enabled:hover:bg-brand-brown enabled:hover:text-brand-cream dark:enabled:hover:bg-brand-tan dark:enabled:hover:text-[#2E2118] disabled:opacity-30';
+  // 視覺仍是 28px，但用 ::before 把可點範圍撐到 40px。這兩顆各在一列的兩端，
+  // 不像 SNS 圖示（gap 6px）或目錄翻頁（gap 4px）那樣擴大後會互相重疊
+  const stepButton = 'relative before:absolute before:-inset-1.5 before:content-[""] w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 inline-flex items-center justify-center transition-colors enabled:hover:bg-brand-brown enabled:hover:text-brand-cream dark:enabled:hover:bg-brand-tan dark:enabled:hover:text-brand-ink disabled:opacity-30';
 
   return (
     // 格子高度跟著寬度走，卡片太寬格子就變巨大，lg 以下限成一張手機月曆的寬度
@@ -389,7 +403,7 @@ function MonthCalendar({
 
       <div className="grid grid-cols-7 gap-1 mb-1">
         {WEEKDAYS.map((weekday) => (
-          <div key={weekday} className="text-center text-xs text-zinc-400 dark:text-zinc-600">
+          <div key={weekday} className="text-center text-xs text-zinc-500 dark:text-zinc-400">
             {weekday}
           </div>
         ))}
@@ -405,7 +419,7 @@ function MonthCalendar({
             return (
               <div
                 key={day}
-                className="flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] text-zinc-300 dark:text-zinc-700"
+                className="flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] text-zinc-500 dark:text-zinc-400"
               >
                 {day}
               </div>
@@ -422,8 +436,8 @@ function MonthCalendar({
               title={`${episode.date}　${episode.episodeLabel || `第 ${episode.episodeNumber} 回`}`}
               className={`flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] font-bold transition-colors ${
                 isSelected
-                  ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]'
-                  : 'bg-brand-yellow/10 dark:bg-brand-yellow/12 text-brand-ochre dark:text-brand-yellow hover:bg-brand-yellow/25 dark:hover:bg-brand-yellow/25'
+                  ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
+                  : 'bg-brand-yellow/10 dark:bg-brand-yellow/12 text-brand-brown dark:text-brand-yellow hover:bg-brand-yellow/25 dark:hover:bg-brand-yellow/25'
               }`}
             >
               {day}
@@ -434,7 +448,7 @@ function MonthCalendar({
 
       <MonthDigest group={group} selectedId={selectedId} onSelect={onSelect} maxMinutes={maxMinutes} />
 
-      <div className="mt-auto pt-3 flex items-center gap-4 text-xs text-zinc-400 dark:text-zinc-500">
+      <div className="mt-auto pt-3 flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
         <span className="inline-flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded bg-brand-yellow/25" />
           有直播
@@ -472,7 +486,7 @@ function MonthDigest({
 
   return (
     <div className="flex-1 min-h-0 flex flex-col mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-      <p className="tabular-nums text-xs leading-none text-zinc-400 dark:text-zinc-500 mb-2.5">
+      <p className="tabular-nums text-xs leading-none text-zinc-500 dark:text-zinc-400 mb-2.5">
         {[
           `${group.episodes.length} 回`,
           totalMinutes > 0 ? formatDuration(totalMinutes) : '',
@@ -565,7 +579,7 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
         >
           <span className="w-[4.2rem] shrink-0 font-mono tabular-nums text-sm font-medium text-zinc-700 dark:text-zinc-300">
             {monthDay(episode.date)}
-            <span className="ml-1 text-xs font-normal text-zinc-500 dark:text-zinc-400">
+            <span className="ml-1 text-xs font-normal text-zinc-600 dark:text-zinc-400">
               {weekdayOf(episode.date)}
             </span>
           </span>
@@ -573,20 +587,20 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
           <span
             className={`shrink-0 px-3 py-1 rounded-full text-[13px] font-bold tracking-wider ${
               isSelected
-                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118]'
-                : 'bg-brand-yellow/10 dark:bg-zinc-800 text-brand-yellow'
+                ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
+                : 'bg-brand-yellow/10 dark:bg-zinc-800 text-brand-brown dark:text-brand-yellow'
             }`}
           >
             {episode.episodeLabel || `第 ${episode.episodeNumber} 回`}
           </span>
 
           {episode.guest && (
-            <span className="shrink-0 px-3 py-1 rounded-full text-[13px] font-bold tracking-wider bg-brand-yellow/10 dark:bg-zinc-800 text-brand-ochre dark:text-brand-yellow">
+            <span className="shrink-0 px-3 py-1 rounded-full text-[13px] font-bold tracking-wider bg-brand-yellow/10 dark:bg-zinc-800 text-brand-brown dark:text-brand-yellow">
               來賓：{episode.guest}
             </span>
           )}
 
-          <span className="font-mono tabular-nums text-[13px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors">
+          <span className="font-mono tabular-nums text-[13px] text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">
             {meta || NO_SUMMARY}
           </span>
         </Link>
@@ -599,7 +613,7 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
             onBlur={() => setHovered(false)}
             aria-expanded={open}
             aria-label={open ? '收合段落目錄' : '展開段落目錄'}
-            className="shrink-0 w-8 h-8 mr-1 rounded-lg inline-flex items-center justify-center text-zinc-400 dark:text-zinc-600 hover:text-brand-ochre dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-zinc-800 transition-colors"
+            className="shrink-0 w-8 h-8 mr-1 rounded-lg inline-flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-brand-ochre dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-zinc-800 transition-colors"
           >
             <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
           </button>

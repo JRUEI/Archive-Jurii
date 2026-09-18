@@ -19,7 +19,10 @@ const geistMono = Geist_Mono({
 
 const notoSerif = Noto_Serif_TC({
   variable: "--font-noto-serif-tc",
-  weight: ["400", "700", "900"],
+  // 只有圖卡匯出用得到襯線體，而且全部是 700／900；沒有任何 font-serif class，
+  // 所以 400 不會被任何字元命中。CJK 字型每個字重都要切上百塊 unicode-range，
+  // 留著只是讓 CSS 與部署產物變大
+  weight: ["700", "900"],
   subsets: ["latin"],
 });
 

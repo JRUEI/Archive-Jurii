@@ -27,7 +27,7 @@ export default function Error({
         )}
         <button
           onClick={() => reset()}
-          className="w-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-[#2E2118] py-3 rounded-xl font-bold hover:bg-brand-ochre transition-colors"
+          className="w-full bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink py-3 rounded-xl font-bold hover:bg-brand-ochre transition-colors"
         >
           嘗試重新載入
         </button>

@@ -12,6 +12,14 @@
   --color-brand-cream: #F3E3A6;  /* 緞帶奶油黃 */
   --color-brand-tan: #D9B48F;    /* 背景膚棕 */
   --color-brand-gold: #C9A227;
+  /* tan／brown 實心底上的字色。深淺主題同值，所以只定義一次 */
+  --color-brand-ink: #2E2118;
+
+  /* 疊層級距。之前散落 z-50 / z-[100] / z-[9999]，Header 跟抽屜還撞在同一層 */
+  --z-sticky: 50;   /* 站頂 Header */
+  --z-drawer: 60;   /* 逐字稿側邊抽屜與它的遮罩 */
+  --z-overlay: 70;  /* 圖卡全螢幕 */
+  --z-toast: 80;    /* 捲動進度條，永遠在最上層 */
 }
 
 .dark {
@@ -34,9 +42,16 @@
   --color-brand-cream: var(--color-brand-cream);
   --color-brand-tan: var(--color-brand-tan);
   --color-brand-gold: var(--color-brand-gold);
+  --color-brand-ink: var(--color-brand-ink);
+  /* 設定齒輪用。原本只寫了 animate-spin-slow，沒有對應的 keyframes，所以齒輪不會轉 */
+  --animate-spin-slow: spin-slow 2.4s linear infinite;
   --font-sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Helvetica Neue", var(--font-noto-sans-tc), "Microsoft JhengHei", sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-noto-serif-tc), "Songti TC", "PMingLiU", serif;
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
 }
 
 body {
@@ -51,5 +66,27 @@ body {
   /* 手機寬度標題折成兩行時，第二行只剩一兩個字，改成兩行等長 */
   h1, h2, h3, h4 {
     text-wrap-style: balance;
+  }
+
+  /* 鍵盤焦點。原本全站只有 3 處 focus-visible，Header 設定鈕與逐字稿搜尋框
+     還各自寫了 focus:outline-none 卻沒補回任何提示，鍵盤使用者看不到自己在哪。
+     用 ochre：亮色 #8A6A4B 對白底 4.95、深色 #D2B48C 對近黑底更高，
+     兩邊都過非文字對比 3:1。焦點框畫在元件外側，所以比的是頁面底色 */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-ochre);
+    outline-offset: 2px;
+  }
+}
+
+/* 尊重系統的「減少動態」。站上約 100 處 transition/animate，其中字幕同步
+   指示燈的 ping 與連線狀態點的 pulse 是會一直跑的。
+   framer-motion 走 JS 不吃這段，另外用 useReducedMotion() 處理；
+   JS 的 scrollIntoView({behavior:'smooth'}) 也不吃，改用 scrollBehavior() */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

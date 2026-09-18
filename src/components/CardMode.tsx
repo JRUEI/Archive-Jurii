@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { EpisodeData, EpisodeCard } from '@/lib/markdown';
 import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 
 
@@ -40,11 +40,10 @@ interface ExportableCardProps {
 // --- Card Style Constants (inline styles required for html-to-image export) ---
 const CARD_STYLES = {
   // Shared
-  footer: { fontSize: '30px', fontWeight: 300 as const, color: '#aaa', margin: 0, letterSpacing: '0.03em' },
+  // 這是要分享出去的圖：#aaa 在亮色卡底 #F9FAFB 上只有 2.22，手機上幾乎看不到。
+  // 深色卡底 #1a1a1a 的 7.49 沒問題，所以只換亮色那一側（#6F6961 → 5.19）
+  footer: (isDark: boolean) => ({ fontSize: '30px', fontWeight: 300 as const, color: isDark ? '#aaa' : '#6F6961', margin: 0, letterSpacing: '0.03em' }),
   footerDivider: (isDark: boolean) => ({ borderTop: `1px solid ${isDark ? '#444' : '#E5E7EB'}`, paddingTop: '32px', flexShrink: 0 as const }),
-  serif: (size: number, weight: number, color: string) => ({
-    fontFamily: 'var(--font-serif)', fontSize: `${size}px`, fontWeight: weight, color, lineHeight: 1.35 as const, margin: 0,
-  }),
   // Cover
   coverGoldBar: { width: '56px', height: '4px', background: '#E8C97A', marginTop: '60px', marginBottom: '24px' },
   coverBadge: { background: 'rgba(232,201,122,0.12)', border: '1px solid rgba(232,201,122,0.3)', color: '#E8C97A', padding: '10px 22px', borderRadius: '6px', fontSize: '26px', fontWeight: 700 as const, letterSpacing: '0.05em' },
@@ -236,7 +235,8 @@ const ExportableCard = ({ card, index, isPreview = false, episode, isDark, total
           </p>
         </div>
         <div style={{ borderTop: '1px solid #2A2A2A', paddingTop: '36px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={CARD_STYLES.footer}>逢田珠里依（≒JOY）｜SHOWROOM</p>
+          {/* 封面卡底寫死 #111111，不跟主題，所以固定用深色那一套 */}
+          <p style={CARD_STYLES.footer(true)}>逢田珠里依（≒JOY）｜SHOWROOM</p>
         </div>
       </div>
     );
@@ -387,7 +387,7 @@ const ExportableCard = ({ card, index, isPreview = false, episode, isDark, total
       </div>
 
       <div style={CARD_STYLES.footerDivider(isDark)}>
-        <p className="whitespace-nowrap" style={CARD_STYLES.footer}>逢田珠里依（≒JOY）｜SHOWROOM</p>
+        <p className="whitespace-nowrap" style={CARD_STYLES.footer(isDark)}>逢田珠里依（≒JOY）｜SHOWROOM</p>
       </div>
     </div>
   );
@@ -406,6 +406,12 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
   });
   const containerRef = useRef<HTMLDivElement>(null);
   const hiddenContainerRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  // 系統設了「減少動態」就不要橫移換卡，淡入淡出保留：
+  // 會造成前庭不適的是位移，不是透明度
+  const reduceMotion = useReducedMotion();
+  const slideX = reduceMotion ? 0 : 60;
 
   // Touch swipe states
   const touchStartRef = useRef<number | null>(null);
@@ -583,11 +589,39 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
         setCurrentIndex(prev => Math.min(prev + 1, cardsToRender.length - 1));
       } else if (e.key === 'ArrowLeft') {
         setCurrentIndex(prev => Math.max(prev - 1, 0));
+      } else if (e.key === 'Tab' && isFullscreen && overlayRef.current) {
+        // 全螢幕是蓋住整頁的對話框，Tab 不該跑到底下那層看不見的頁面去
+        const focusables = overlayRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (e.shiftKey && (active === first || active === overlayRef.current)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cardsToRender.length]);
+  }, [cardsToRender.length, isFullscreen]);
+
+  // 開啟時把焦點送進對話框，關閉時還給原本那顆按鈕，
+  // 不然鍵盤使用者關掉全螢幕後焦點會掉回 body，得從頭 Tab 一次
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    overlayRef.current?.focus();
+    return () => previous?.focus?.();
+  }, [isFullscreen]);
 
 
   return (
@@ -596,10 +630,15 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
       <AnimatePresence>
         {isFullscreen && (
           <motion.div
+            ref={overlayRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`圖卡放大檢視（第 ${Math.min(currentIndex + 1, cardsToRender.length)} 張，共 ${cardsToRender.length} 張）`}
+            tabIndex={-1}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center overflow-hidden touch-none select-none"
+            className="fixed inset-0 z-[var(--z-overlay)] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center overflow-hidden touch-none select-none focus:outline-none"
             onClick={() => setIsFullscreen(false)}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -607,7 +646,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
           >
             {/* Top Navigation Bar - Cleanly positioned at top, zero collision with card */}
             <div 
-              className="absolute top-0 inset-x-0 h-16 z-[10000] flex items-center justify-between px-6 pointer-events-none"
+              className="absolute top-0 inset-x-0 h-16 z-10 flex items-center justify-between px-6 pointer-events-none"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Progress counter badge (top-left) */}
@@ -630,7 +669,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             {currentIndex > 0 && (
               <button 
                 onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                className="hidden sm:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-[10000] bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
+                className="hidden sm:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-10 bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
                 aria-label="上一張"
               >
                 <ChevronLeft size={24} />
@@ -639,7 +678,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             {currentIndex < cardsToRender.length - 1 && (
               <button 
                 onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                className="hidden sm:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-[10000] bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
+                className="hidden sm:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-10 bg-zinc-900/80 hover:bg-zinc-800 text-white p-3.5 rounded-full transition-all border border-zinc-700/60 shadow-xl hover:scale-110 active:scale-95"
                 aria-label="下一張"
               >
                 <ChevronRight size={24} />
@@ -663,9 +702,9 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
-                    initial={{ opacity: 0, x: 60 }}
+                    initial={{ opacity: 0, x: slideX }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -60 }}
+                    exit={{ opacity: 0, x: -slideX }}
                     transition={{ duration: 0.18 }}
                     className="w-full h-full"
                   >
@@ -730,9 +769,9 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
              <AnimatePresence mode="wait">
                <motion.div
                  key={currentIndex}
-                 initial={{ opacity: 0, x: 100 }}
+                 initial={{ opacity: 0, x: slideX ? 100 : 0 }}
                  animate={{ opacity: 1, x: 0 }}
-                 exit={{ opacity: 0, x: -100 }}
+                 exit={{ opacity: 0, x: slideX ? -100 : 0 }}
                  transition={{ duration: 0.2 }}
                  className="w-full h-full"
                >
@@ -782,7 +821,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             <button
               onClick={downloadAllCards}
               disabled={isDownloading}
-              className="w-full flex justify-center items-center gap-2 bg-brand-brown hover:bg-brand-ochre text-brand-cream dark:bg-brand-tan dark:hover:bg-brand-ochre dark:text-[#2E2118] px-6 py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center gap-2 bg-brand-brown hover:bg-brand-ochre text-brand-cream dark:bg-brand-tan dark:hover:bg-brand-ochre dark:text-brand-ink px-6 py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5"
             >
               {isDownloading ? (
                 <>
