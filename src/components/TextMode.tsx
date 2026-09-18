@@ -26,7 +26,7 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
     <div 
       ref={ref} 
       id={`section-${index + 1}`}
-      className={`relative scroll-mt-24 transition-all duration-500 ease-out ${isFocusMode ? 'cursor-pointer' : ''} ${isFocusMode && !isActive ? 'opacity-40 scale-95' : 'opacity-100 scale-100'} ${isFocusMode && isActive ? 'bg-zinc-50 dark:bg-[#1c1924] shadow-[inset_0_0_0_1px_rgba(169,124,43,0.12)] rounded-3xl p-6 md:p-8 -mx-6 md:-mx-8' : ''}`}
+      className={`relative scroll-mt-24 transition-all duration-500 ease-out ${isFocusMode ? 'cursor-pointer' : ''} ${isFocusMode && !isActive ? 'opacity-40 scale-95' : 'opacity-100 scale-100'} ${isFocusMode && isActive ? 'bg-zinc-50 dark:bg-brand-yellow/5 shadow-[inset_0_0_0_1px_rgba(169,124,43,0.12)] rounded-3xl p-6 md:p-8 -mx-6 md:-mx-8' : ''}`}
       onClick={() => isFocusMode && ref.current?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' })}
     >
       {/* Timeline Line */}
@@ -35,7 +35,7 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
         {card.tag && (
           <div className={`inline-flex transition-all duration-500`}>
-            <span className={`text-brand-yellow border border-brand-yellow/50 bg-transparent px-4 py-1.5 rounded-full text-sm font-bold tracking-widest shadow-[0_0_8px_rgba(201,162,39,0.25)]`}>
+            <span className={`text-brand-ochre dark:text-brand-yellow border border-brand-yellow/50 bg-transparent px-4 py-1.5 rounded-full text-sm font-bold tracking-widest shadow-[0_0_8px_rgba(201,162,39,0.25)]`}>
               {card.tag}
             </span>
           </div>
@@ -61,8 +61,8 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
             const text = cardMatch[2];
             return (
               // 左右兩欄行高不同，用 baseline 讓小標跟內文第一行對齊
-              <div key={lineIdx} className="bg-white dark:bg-[#1a1a20] border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-baseline gap-4 md:gap-8 hover:bg-zinc-50 dark:hover:bg-[#1f1f26] transition-colors shadow-sm dark:shadow-none">
-                <div className="text-brand-ochre dark:text-brand-brown text-lg md:w-32 shrink-0 tracking-wider font-bold">
+              <div key={lineIdx} className="bg-white dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-baseline gap-4 md:gap-8 hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors shadow-sm dark:shadow-none">
+                <div className="text-brand-ochre text-lg md:w-32 shrink-0 tracking-wider font-bold">
                   {title}
                 </div>
                 <div className="text-zinc-700 dark:text-zinc-400 text-lg leading-relaxed m-0 flex-1">
@@ -77,7 +77,7 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
           if (bulletMatch) {
             return (
               <ul key={lineIdx} className="space-y-4 my-6 pl-0">
-                <li className="text-lg leading-relaxed text-zinc-700 dark:text-zinc-300 pl-6 list-disc marker:text-[#d8b4fe]">
+                <li className="text-lg leading-relaxed text-zinc-700 dark:text-zinc-300 pl-6 list-disc marker:text-brand-yellow/60">
                   {bulletMatch[1]}
                 </li>
               </ul>

@@ -15,7 +15,7 @@ const SOLID_ACCENT =
   'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink';
 /** 淡底強調，用在標籤與次要按鈕 */
 const SOFT_ACCENT =
-  'bg-brand-yellow/10 text-brand-yellow border border-brand-yellow/25';
+  'bg-brand-yellow/10 text-brand-brown dark:text-brand-yellow border border-brand-yellow/25';
 
 /* YouTube IFrame API 只用到這幾支，就不整包型別拉進來了 */
 interface YouTubePlayer {
@@ -419,7 +419,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                 即時字幕群（{groupSize} 句同步）
               </span>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-[11px] text-zinc-400">顯示句數：</span>
+                <span className="text-[13px] text-zinc-500 dark:text-zinc-400">顯示句數：</span>
                 <div className="inline-flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60">
                   {[1, 2, 3, 4, 5].map(num => (
                     <button
@@ -496,7 +496,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             </div>
 
             {/* API 連線標籤 */}
-            <div className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full ${SOFT_ACCENT}`}>
+            <div className={`flex items-center gap-1.5 text-[13px] font-medium px-2.5 py-1 rounded-full ${SOFT_ACCENT}`}>
               <span className="w-1.5 h-1.5 rounded-full bg-brand-yellow animate-pulse"></span>
               <span>{isPlayerReady ? '雙向同步連動中' : '連線播放器中...'}</span>
             </div>
@@ -545,11 +545,11 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
         <button
           type="button"
           onClick={scrollToTheaterView}
-          className="bg-white/95 dark:bg-zinc-900/95 hover:bg-brand-yellow/10 text-brand-yellow font-bold p-2.5 sm:p-3 rounded-2xl shadow-xl flex flex-col items-center gap-1.5 transition-all hover:scale-110 border border-brand-yellow/30 backdrop-blur group"
+          className="bg-white/95 dark:bg-zinc-900/95 hover:bg-brand-yellow/10 text-brand-ochre dark:text-brand-yellow font-bold p-2.5 sm:p-3 rounded-2xl shadow-xl flex flex-col items-center gap-1.5 transition-all hover:scale-110 border border-brand-yellow/30 backdrop-blur group"
           title="畫面定位：一鍵平滑滾動畫面對齊至播放器與字幕"
         >
           <Crosshair size={18} className="transition group-hover:rotate-45" />
-          <span className="text-[10px] tracking-wider [writing-mode:vertical-lr] font-bold">
+          <span className="text-[13px] tracking-wider [writing-mode:vertical-lr] font-bold">
             畫面定位
           </span>
         </button>
@@ -562,7 +562,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
           title="展開逐字稿抽屜 (支援全文搜尋)"
         >
           <FileText size={18} className="transition group-hover:rotate-6" />
-          <span className="text-[11px] tracking-wider [writing-mode:vertical-lr] font-black">
+          <span className="text-[13px] tracking-wider [writing-mode:vertical-lr] font-black">
             逐字稿抽屜
           </span>
           <span className="text-[10px] bg-black/15 dark:bg-black/20 px-1.5 py-0.5 rounded-full font-mono font-bold">
@@ -611,14 +611,14 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               onClick={() => setDrawerTab('lines')}
               className={`flex items-baseline gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border ${
                 !isSectionTab
-                  ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow border-transparent dark:border-brand-yellow/20 shadow-sm'
+                  ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-brown dark:text-brand-yellow border-transparent dark:border-brand-yellow/20 shadow-sm'
                   : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               {/* 分頁名跟句數字級不同，用 baseline 對齊，圖示另外置中 */}
               <FileText size={13} className="self-center" />
               <span>逐字稿</span>
-              <span className="font-mono text-[10px] opacity-70">{parsedLines.length}</span>
+              <span className="font-mono text-[10px]">{parsedLines.length}</span>
             </button>
             <button
               type="button"
@@ -627,13 +627,13 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               disabled={cards.length === 0}
               className={`flex items-baseline gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border disabled:opacity-40 disabled:cursor-not-allowed ${
                 isSectionTab
-                  ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow border-transparent dark:border-brand-yellow/20 shadow-sm'
+                  ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-brown dark:text-brand-yellow border-transparent dark:border-brand-yellow/20 shadow-sm'
                   : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               <LayoutList size={13} className="self-center" />
               <span>段落紀錄</span>
-              <span className="font-mono text-[10px] opacity-70">{cards.length}</span>
+              <span className="font-mono text-[10px]">{cards.length}</span>
             </button>
           </div>
 
@@ -669,7 +669,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             <button
               type="button"
               onClick={() => setIsDrawerOpen(false)}
-              className="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+              className="p-1.5 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
               title="關閉抽屜 (Esc)"
             >
               <X size={18} />
@@ -680,7 +680,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
         {/* 抽屜內搜尋框 */}
         <div className="p-4 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/30">
           <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-400" />
             <input
               type="text"
               value={searchKeyword}
@@ -696,13 +696,13 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               <button
                 type="button"
                 onClick={() => setSearchKeyword('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1"
                 title="清除搜尋"
               >
                 <X size={14} />
               </button>
             ) : (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-zinc-400 font-mono">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-zinc-500 dark:text-zinc-400 font-mono">
                 {isSectionTab ? `${filteredCards.length} 段` : `${filteredLines.length} 句`}
               </span>
             )}
@@ -717,7 +717,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               <button
                 type="button"
                 onClick={() => setSearchKeyword('')}
-                className="text-brand-yellow hover:underline"
+                className="text-brand-ochre dark:text-brand-yellow hover:underline"
               >
                 清除篩選
               </button>
@@ -730,7 +730,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
           <div className="border-b border-zinc-200 dark:border-zinc-800 border-l-[3px] border-l-brand-yellow bg-brand-yellow/[0.07] dark:bg-brand-yellow/10 px-4 py-3">
             {/* 「對照中」跟標題字級不同，文字走 baseline，右邊兩顆按鈕自己置中 */}
             <div className="flex items-baseline gap-2">
-              <span className="text-[10px] font-mono font-bold tracking-widest text-brand-yellow shrink-0">
+              <span className="text-[13px] font-mono font-bold tracking-widest text-brand-brown dark:text-brand-yellow shrink-0">
                 對照中
               </span>
               <h4 className="flex-1 min-w-0 truncate text-sm font-bold text-zinc-900 dark:text-white m-0">
@@ -877,7 +877,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
 function CardBullets({ content, keyword = '' }: { content: string[]; keyword?: string }) {
   if (content.length === 0) {
     return (
-      <p className="text-xs text-zinc-400 dark:text-zinc-500 m-0">這一段只有簡述，沒有條列重點。</p>
+      <p className="text-xs text-zinc-500 dark:text-zinc-400 m-0">這一段只有簡述，沒有條列重點。</p>
     );
   }
 
@@ -948,11 +948,11 @@ function DrawerSectionCard({
           className="flex-1 min-w-0 text-left"
         >
           <div className="flex items-baseline gap-2 flex-wrap mb-1">
-            <span className="font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500 tabular-nums">
+            <span className="font-mono text-[10px] font-bold text-zinc-500 dark:text-zinc-400 tabular-nums">
               {String(index + 1).padStart(2, '0')}
             </span>
             {card.tag && (
-              <span className={`font-bold text-[11px] px-2 py-0.5 rounded-full ${SOFT_ACCENT}`}>
+              <span className={`font-bold text-[13px] px-2 py-0.5 rounded-full ${SOFT_ACCENT}`}>
                 {highlightText(card.tag, keyword)}
               </span>
             )}
@@ -975,7 +975,7 @@ function DrawerSectionCard({
             className={`p-1.5 rounded-lg border transition ${
               isPinned
                 ? `${SOLID_ACCENT} border-transparent shadow-sm`
-                : 'border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-brand-yellow hover:border-brand-yellow/40'
+                : 'border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-brand-ochre dark:hover:text-brand-yellow hover:border-brand-yellow/40'
             }`}
             title={isPinned ? '取消釘選' : '釘選對照：切回逐字稿也看得到這一段'}
           >
@@ -986,7 +986,7 @@ function DrawerSectionCard({
             onClick={onToggle}
             aria-hidden="true"
             tabIndex={-1}
-            className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition"
+            className="p-1 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition"
           >
             <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </button>
@@ -1005,7 +1005,7 @@ function DrawerSectionCard({
 /** 說話者標籤：主持人一律走品牌金，其他人（來賓）走琥珀色區隔 */
 function speakerPill(speaker: string) {
   return speaker === HOST_NAME
-    ? 'bg-brand-yellow/10 text-brand-yellow border border-brand-yellow/25'
+    ? 'bg-brand-yellow/10 text-brand-brown dark:text-brand-yellow border border-brand-yellow/25'
     : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20';
 }
 

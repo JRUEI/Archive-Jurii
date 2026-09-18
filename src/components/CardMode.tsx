@@ -40,7 +40,9 @@ interface ExportableCardProps {
 // --- Card Style Constants (inline styles required for html-to-image export) ---
 const CARD_STYLES = {
   // Shared
-  footer: { fontSize: '30px', fontWeight: 300 as const, color: '#aaa', margin: 0, letterSpacing: '0.03em' },
+  // 這是要分享出去的圖：#aaa 在亮色卡底 #F9FAFB 上只有 2.22，手機上幾乎看不到。
+  // 深色卡底 #1a1a1a 的 7.49 沒問題，所以只換亮色那一側（#6F6961 → 5.19）
+  footer: (isDark: boolean) => ({ fontSize: '30px', fontWeight: 300 as const, color: isDark ? '#aaa' : '#6F6961', margin: 0, letterSpacing: '0.03em' }),
   footerDivider: (isDark: boolean) => ({ borderTop: `1px solid ${isDark ? '#444' : '#E5E7EB'}`, paddingTop: '32px', flexShrink: 0 as const }),
   serif: (size: number, weight: number, color: string) => ({
     fontFamily: 'var(--font-serif)', fontSize: `${size}px`, fontWeight: weight, color, lineHeight: 1.35 as const, margin: 0,
@@ -236,7 +238,8 @@ const ExportableCard = ({ card, index, isPreview = false, episode, isDark, total
           </p>
         </div>
         <div style={{ borderTop: '1px solid #2A2A2A', paddingTop: '36px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={CARD_STYLES.footer}>逢田珠里依（≒JOY）｜SHOWROOM</p>
+          {/* 封面卡底寫死 #111111，不跟主題，所以固定用深色那一套 */}
+          <p style={CARD_STYLES.footer(true)}>逢田珠里依（≒JOY）｜SHOWROOM</p>
         </div>
       </div>
     );
@@ -387,7 +390,7 @@ const ExportableCard = ({ card, index, isPreview = false, episode, isDark, total
       </div>
 
       <div style={CARD_STYLES.footerDivider(isDark)}>
-        <p className="whitespace-nowrap" style={CARD_STYLES.footer}>逢田珠里依（≒JOY）｜SHOWROOM</p>
+        <p className="whitespace-nowrap" style={CARD_STYLES.footer(isDark)}>逢田珠里依（≒JOY）｜SHOWROOM</p>
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
       {/* Header */}
       <header className="mb-6 flex flex-col items-center w-full">
         <div className="flex flex-wrap justify-center gap-3 mb-5">
-          <span className="px-6 py-2 bg-brand-yellow/10 dark:bg-zinc-800 text-brand-yellow rounded-full text-lg font-bold tracking-wider">
+          <span className="px-6 py-2 bg-brand-yellow/10 dark:bg-zinc-800 text-brand-brown dark:text-brand-yellow rounded-full text-lg font-bold tracking-wider">
             {episode.episodeLabel || `第 ${episode.episodeNumber} 回`}
           </span>
           {episode.guest && (
@@ -116,7 +116,7 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
             <button
               onClick={() => setViewType('transcript')}
               aria-pressed={viewType === 'transcript'}
-              className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${viewType === 'transcript' ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
+              className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${viewType === 'transcript' ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-brown dark:text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               逐字稿
             </button>
@@ -132,7 +132,7 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
             <button
               onClick={() => setIsCardMode(true)}
               aria-pressed={isCardMode}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${isCardMode ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${isCardMode ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-brown dark:text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               <LayoutGrid size={18} strokeWidth={2.5} className="shrink-0" />
               <span className="whitespace-nowrap">圖卡</span>
@@ -140,7 +140,7 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
             <button
               onClick={() => setIsCardMode(false)}
               aria-pressed={!isCardMode}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${!isCardMode ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${!isCardMode ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-brown dark:text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               <AlignLeft size={18} strokeWidth={2.5} className="shrink-0" />
               <span className="whitespace-nowrap">文字</span>

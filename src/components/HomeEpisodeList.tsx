@@ -59,7 +59,7 @@ function SectionTitle({ children, note }: { children: React.ReactNode; note?: st
     <h2 className="text-xl font-bold mb-4 flex items-baseline gap-2">
       <span className="w-1 h-5 bg-brand-yellow rounded-full self-center" />
       {children}
-      {note && <span className="text-sm font-medium text-zinc-400">{note}</span>}
+      {note && <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{note}</span>}
     </h2>
   );
 }
@@ -82,7 +82,7 @@ function SectionList({ sections, limit }: { sections: EpisodeSection[]; limit?: 
         </li>
       ))}
       {rest > 0 && (
-        <li className="text-[14px] leading-[1.7] text-zinc-400 dark:text-zinc-600">還有 {rest} 段</li>
+        <li className="text-[14px] leading-[1.7] text-zinc-500 dark:text-zinc-400">還有 {rest} 段</li>
       )}
     </ul>
   );
@@ -251,7 +251,7 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
         ) : (
           <div className="flex items-center gap-2 mt-2 pb-2 min-h-[38px] border-b border-zinc-100 dark:border-zinc-800">
             {pages > 1 && (
-              <div className="relative z-10 ml-auto flex items-center gap-1 text-zinc-400 dark:text-zinc-500">
+              <div className="relative z-10 ml-auto flex items-center gap-1 text-zinc-500 dark:text-zinc-400">
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -284,9 +284,9 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
             否則左側 8px 會被 overflow-hidden 切掉。px 再把內容推回原位置 */}
         <div className="[grid-area:1/1] min-h-0 overflow-hidden -mx-2 px-2">
           {!hasSections ? (
-            <p className="text-base leading-[1.85] text-zinc-400 dark:text-zinc-600 italic">
+            <p className="text-base leading-[1.85] text-zinc-500 dark:text-zinc-400 italic">
               {NO_SUMMARY}
-              <span className="block not-italic text-sm text-zinc-400 dark:text-zinc-700 mt-1">
+              <span className="block not-italic text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                 逐字稿還沒補上，點進去可以先看原片。
               </span>
             </p>
@@ -313,7 +313,7 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
         </div>
         <ArrowRight
           size={18}
-          className="shrink-0 text-zinc-300 dark:text-zinc-600 group-hover:text-brand-ochre dark:group-hover:text-brand-yellow group-hover:translate-x-0.5 transition-all"
+          className="shrink-0 text-zinc-500 dark:text-zinc-400 group-hover:text-brand-ochre dark:group-hover:text-brand-yellow group-hover:translate-x-0.5 transition-all"
         />
       </div>
     </div>
@@ -328,7 +328,7 @@ function SectionBrief({ section, index, total }: { section: EpisodeSection; inde
       <div className="flex-1 min-h-0 flex items-center">
         <p className="max-w-[34em] text-[19px] leading-[1.9] text-zinc-600 dark:text-zinc-300">{section.brief}</p>
       </div>
-      <span className="pt-3 font-mono tabular-nums text-[12px] text-zinc-400 dark:text-zinc-600">
+      <span className="pt-3 font-mono tabular-nums text-[12px] text-zinc-500 dark:text-zinc-400">
         第 {index + 1} 段 / 共 {total} 段
       </span>
     </div>
@@ -367,7 +367,9 @@ function MonthCalendar({
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
-  const stepButton = 'w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 inline-flex items-center justify-center transition-colors enabled:hover:bg-brand-brown enabled:hover:text-brand-cream dark:enabled:hover:bg-brand-tan dark:enabled:hover:text-brand-ink disabled:opacity-30';
+  // 視覺仍是 28px，但用 ::before 把可點範圍撐到 40px。這兩顆各在一列的兩端，
+  // 不像 SNS 圖示（gap 6px）或目錄翻頁（gap 4px）那樣擴大後會互相重疊
+  const stepButton = 'relative before:absolute before:-inset-1.5 before:content-[""] w-7 h-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 inline-flex items-center justify-center transition-colors enabled:hover:bg-brand-brown enabled:hover:text-brand-cream dark:enabled:hover:bg-brand-tan dark:enabled:hover:text-brand-ink disabled:opacity-30';
 
   return (
     // 格子高度跟著寬度走，卡片太寬格子就變巨大，lg 以下限成一張手機月曆的寬度
@@ -391,7 +393,7 @@ function MonthCalendar({
 
       <div className="grid grid-cols-7 gap-1 mb-1">
         {WEEKDAYS.map((weekday) => (
-          <div key={weekday} className="text-center text-xs text-zinc-400 dark:text-zinc-600">
+          <div key={weekday} className="text-center text-xs text-zinc-500 dark:text-zinc-400">
             {weekday}
           </div>
         ))}
@@ -407,7 +409,7 @@ function MonthCalendar({
             return (
               <div
                 key={day}
-                className="flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] text-zinc-300 dark:text-zinc-700"
+                className="flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] text-zinc-500 dark:text-zinc-400"
               >
                 {day}
               </div>
@@ -425,7 +427,7 @@ function MonthCalendar({
               className={`flex items-center justify-center rounded-lg font-mono tabular-nums text-[13px] font-bold transition-colors ${
                 isSelected
                   ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
-                  : 'bg-brand-yellow/10 dark:bg-brand-yellow/12 text-brand-ochre dark:text-brand-yellow hover:bg-brand-yellow/25 dark:hover:bg-brand-yellow/25'
+                  : 'bg-brand-yellow/10 dark:bg-brand-yellow/12 text-brand-brown dark:text-brand-yellow hover:bg-brand-yellow/25 dark:hover:bg-brand-yellow/25'
               }`}
             >
               {day}
@@ -436,7 +438,7 @@ function MonthCalendar({
 
       <MonthDigest group={group} selectedId={selectedId} onSelect={onSelect} maxMinutes={maxMinutes} />
 
-      <div className="mt-auto pt-3 flex items-center gap-4 text-xs text-zinc-400 dark:text-zinc-500">
+      <div className="mt-auto pt-3 flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
         <span className="inline-flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded bg-brand-yellow/25" />
           有直播
@@ -474,7 +476,7 @@ function MonthDigest({
 
   return (
     <div className="flex-1 min-h-0 flex flex-col mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-      <p className="tabular-nums text-xs leading-none text-zinc-400 dark:text-zinc-500 mb-2.5">
+      <p className="tabular-nums text-xs leading-none text-zinc-500 dark:text-zinc-400 mb-2.5">
         {[
           `${group.episodes.length} 回`,
           totalMinutes > 0 ? formatDuration(totalMinutes) : '',
@@ -567,7 +569,7 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
         >
           <span className="w-[4.2rem] shrink-0 font-mono tabular-nums text-sm font-medium text-zinc-700 dark:text-zinc-300">
             {monthDay(episode.date)}
-            <span className="ml-1 text-xs font-normal text-zinc-500 dark:text-zinc-400">
+            <span className="ml-1 text-xs font-normal text-zinc-600 dark:text-zinc-400">
               {weekdayOf(episode.date)}
             </span>
           </span>
@@ -576,19 +578,19 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
             className={`shrink-0 px-3 py-1 rounded-full text-[13px] font-bold tracking-wider ${
               isSelected
                 ? 'bg-brand-brown text-brand-cream dark:bg-brand-tan dark:text-brand-ink'
-                : 'bg-brand-yellow/10 dark:bg-zinc-800 text-brand-yellow'
+                : 'bg-brand-yellow/10 dark:bg-zinc-800 text-brand-brown dark:text-brand-yellow'
             }`}
           >
             {episode.episodeLabel || `第 ${episode.episodeNumber} 回`}
           </span>
 
           {episode.guest && (
-            <span className="shrink-0 px-3 py-1 rounded-full text-[13px] font-bold tracking-wider bg-brand-yellow/10 dark:bg-zinc-800 text-brand-ochre dark:text-brand-yellow">
+            <span className="shrink-0 px-3 py-1 rounded-full text-[13px] font-bold tracking-wider bg-brand-yellow/10 dark:bg-zinc-800 text-brand-brown dark:text-brand-yellow">
               來賓：{episode.guest}
             </span>
           )}
 
-          <span className="font-mono tabular-nums text-[13px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors">
+          <span className="font-mono tabular-nums text-[13px] text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">
             {meta || NO_SUMMARY}
           </span>
         </Link>
@@ -601,7 +603,7 @@ function EpisodeRow({ episode, isSelected }: { episode: EpisodeListItem; isSelec
             onBlur={() => setHovered(false)}
             aria-expanded={open}
             aria-label={open ? '收合段落目錄' : '展開段落目錄'}
-            className="shrink-0 w-8 h-8 mr-1 rounded-lg inline-flex items-center justify-center text-zinc-400 dark:text-zinc-600 hover:text-brand-ochre dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-zinc-800 transition-colors"
+            className="shrink-0 w-8 h-8 mr-1 rounded-lg inline-flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-brand-ochre dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-zinc-800 transition-colors"
           >
             <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
           </button>
