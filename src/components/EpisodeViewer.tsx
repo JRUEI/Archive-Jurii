@@ -101,18 +101,21 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
           <div className="flex w-full sm:w-auto bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl shrink-0 min-w-min">
             <button
               onClick={() => setViewType('summary')}
+              aria-pressed={viewType === 'summary'}
               className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${viewType === 'summary' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border-transparent dark:border-zinc-700/50' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               精簡總結
             </button>
             <button
               onClick={() => setViewType('lossless')}
+              aria-pressed={viewType === 'lossless'}
               className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${viewType === 'lossless' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border-transparent dark:border-zinc-700/50' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               段落紀錄
             </button>
             <button
               onClick={() => setViewType('transcript')}
+              aria-pressed={viewType === 'transcript'}
               className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${viewType === 'transcript' ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               逐字稿
@@ -120,9 +123,15 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
           </div>
 
           {/* Mode Toggle */}
-          <div className={`flex w-full sm:w-auto bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl shrink-0 min-w-min ${viewType === 'transcript' ? 'opacity-50 pointer-events-none' : ''}`}>
+          {/* 逐字稿沒有圖卡／文字之分，這組要停用。原本只有 pointer-events-none，
+              擋得住滑鼠擋不住鍵盤，Tab 還是進得來而且按得下去；inert 才會真的停用 */}
+          <div
+            inert={viewType === 'transcript'}
+            className={`flex w-full sm:w-auto bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl shrink-0 min-w-min ${viewType === 'transcript' ? 'opacity-50 pointer-events-none' : ''}`}
+          >
             <button
               onClick={() => setIsCardMode(true)}
+              aria-pressed={isCardMode}
               className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${isCardMode ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               <LayoutGrid size={18} strokeWidth={2.5} className="shrink-0" />
@@ -130,6 +139,7 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
             </button>
             <button
               onClick={() => setIsCardMode(false)}
+              aria-pressed={!isCardMode}
               className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-bold transition-all text-sm border ${!isCardMode ? 'bg-brand-yellow/15 dark:bg-brand-yellow/20 text-brand-yellow shadow-sm border-transparent dark:border-brand-yellow/20' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
             >
               <AlignLeft size={18} strokeWidth={2.5} className="shrink-0" />

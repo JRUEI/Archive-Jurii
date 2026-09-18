@@ -5,6 +5,7 @@ import { motion, useScroll } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFocusMode } from './FocusModeProvider';
+import { scrollBehavior } from '@/lib/motion';
 
 function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: number, isFocusMode: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -26,7 +27,7 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
       ref={ref} 
       id={`section-${index + 1}`}
       className={`relative scroll-mt-24 transition-all duration-500 ease-out ${isFocusMode ? 'cursor-pointer' : ''} ${isFocusMode && !isActive ? 'opacity-40 scale-95' : 'opacity-100 scale-100'} ${isFocusMode && isActive ? 'bg-zinc-50 dark:bg-[#1c1924] shadow-[inset_0_0_0_1px_rgba(169,124,43,0.12)] rounded-3xl p-6 md:p-8 -mx-6 md:-mx-8' : ''}`}
-      onClick={() => isFocusMode && ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+      onClick={() => isFocusMode && ref.current?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' })}
     >
       {/* Timeline Line */}
       <div className={`hidden sm:block absolute top-0 bottom-0 rounded-full transition-all duration-500 w-1.5 left-0 bg-gradient-to-b from-brand-yellow to-brand-brown shadow-[0_0_12px_rgba(201,162,39,0.45)] ${isFocusMode && isActive ? 'opacity-100' : 'opacity-0'}`} />

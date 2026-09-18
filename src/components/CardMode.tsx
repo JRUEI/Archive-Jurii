@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { EpisodeData, EpisodeCard } from '@/lib/markdown';
 import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 
 
@@ -406,6 +406,12 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
   });
   const containerRef = useRef<HTMLDivElement>(null);
   const hiddenContainerRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  // 系統設了「減少動態」就不要橫移換卡，淡入淡出保留：
+  // 會造成前庭不適的是位移，不是透明度
+  const reduceMotion = useReducedMotion();
+  const slideX = reduceMotion ? 0 : 60;
 
   // Touch swipe states
   const touchStartRef = useRef<number | null>(null);
@@ -583,11 +589,39 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
         setCurrentIndex(prev => Math.min(prev + 1, cardsToRender.length - 1));
       } else if (e.key === 'ArrowLeft') {
         setCurrentIndex(prev => Math.max(prev - 1, 0));
+      } else if (e.key === 'Tab' && isFullscreen && overlayRef.current) {
+        // 全螢幕是蓋住整頁的對話框，Tab 不該跑到底下那層看不見的頁面去
+        const focusables = overlayRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (e.shiftKey && (active === first || active === overlayRef.current)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cardsToRender.length]);
+  }, [cardsToRender.length, isFullscreen]);
+
+  // 開啟時把焦點送進對話框，關閉時還給原本那顆按鈕，
+  // 不然鍵盤使用者關掉全螢幕後焦點會掉回 body，得從頭 Tab 一次
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    overlayRef.current?.focus();
+    return () => previous?.focus?.();
+  }, [isFullscreen]);
 
 
   return (
@@ -596,10 +630,15 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
       <AnimatePresence>
         {isFullscreen && (
           <motion.div
+            ref={overlayRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`圖卡放大檢視（第 ${Math.min(currentIndex + 1, cardsToRender.length)} 張，共 ${cardsToRender.length} 張）`}
+            tabIndex={-1}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[var(--z-overlay)] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center overflow-hidden touch-none select-none"
+            className="fixed inset-0 z-[var(--z-overlay)] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center overflow-hidden touch-none select-none focus:outline-none"
             onClick={() => setIsFullscreen(false)}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -663,9 +702,9 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
-                    initial={{ opacity: 0, x: 60 }}
+                    initial={{ opacity: 0, x: slideX }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -60 }}
+                    exit={{ opacity: 0, x: -slideX }}
                     transition={{ duration: 0.18 }}
                     className="w-full h-full"
                   >
@@ -730,9 +769,9 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
              <AnimatePresence mode="wait">
                <motion.div
                  key={currentIndex}
-                 initial={{ opacity: 0, x: 100 }}
+                 initial={{ opacity: 0, x: slideX ? 100 : 0 }}
                  animate={{ opacity: 1, x: 0 }}
-                 exit={{ opacity: 0, x: -100 }}
+                 exit={{ opacity: 0, x: slideX ? -100 : 0 }}
                  transition={{ duration: 0.2 }}
                  className="w-full h-full"
                >

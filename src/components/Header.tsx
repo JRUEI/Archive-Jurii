@@ -109,7 +109,7 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-10 h-10 flex items-center justify-center rounded-full transition-all shadow-sm focus:outline-none hover:shadow-md ${isOpen ? 'bg-brand-yellow text-white shadow-brand-yellow/20' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-brand-yellow dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-brand-yellow/20'}`}
+                className={`w-10 h-10 flex items-center justify-center rounded-full transition-all shadow-sm hover:shadow-md ${isOpen ? 'bg-brand-yellow text-white shadow-brand-yellow/20' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-brand-yellow dark:hover:text-brand-yellow hover:bg-brand-yellow/10 dark:hover:bg-brand-yellow/20'}`}
                 title="設定"
                 aria-label="Toggle Settings"
               >

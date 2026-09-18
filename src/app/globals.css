@@ -67,4 +67,26 @@ body {
   h1, h2, h3, h4 {
     text-wrap-style: balance;
   }
+
+  /* 鍵盤焦點。原本全站只有 3 處 focus-visible，Header 設定鈕與逐字稿搜尋框
+     還各自寫了 focus:outline-none 卻沒補回任何提示，鍵盤使用者看不到自己在哪。
+     用 ochre：亮色 #8A6A4B 對白底 4.95、深色 #D2B48C 對近黑底更高，
+     兩邊都過非文字對比 3:1。焦點框畫在元件外側，所以比的是頁面底色 */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-ochre);
+    outline-offset: 2px;
+  }
+}
+
+/* 尊重系統的「減少動態」。站上約 100 處 transition/animate，其中字幕同步
+   指示燈的 ping 與連線狀態點的 pulse 是會一直跑的。
+   framer-motion 走 JS 不吃這段，另外用 useReducedMotion() 處理；
+   JS 的 scrollIntoView({behavior:'smooth'}) 也不吃，改用 scrollBehavior() */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

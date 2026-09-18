@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { EpisodeCard, EpisodeData } from '@/lib/markdown';
 import { readStoredNumber, useHydrated, writeStoredNumber } from '@/lib/client-state';
+import { scrollBehavior } from '@/lib/motion';
 import { Search, Play, X, FileText, Crosshair, LayoutList, Pin, ChevronDown } from 'lucide-react';
 
 const GROUP_SIZE_STORAGE_KEY = 'jurii-transcript-group-size';
@@ -118,7 +119,8 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   const playerRef = useRef<YouTubePlayer | null>(null);
   const theaterRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const drawerRef = useRef<HTMLElement>(null);
 
   // 一鍵平滑滾動畫面：底部對齊字幕群底下空白的中間，剛好露出上方影片時間軸
   const scrollToTheaterView = useCallback(() => {
@@ -155,9 +157,9 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
         }
       }
 
-      window.scrollTo({ top: Math.max(0, targetScrollY), behavior: 'smooth' });
+      window.scrollTo({ top: Math.max(0, targetScrollY), behavior: scrollBehavior() });
     } else if (playerEl) {
-      playerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      playerEl.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
     }
   }, []);
 
@@ -221,7 +223,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   // 立即平滑滾動定位至當前播放句（免手動滑動滾輪）
   const scrollToActive = useCallback(() => {
     if (activeIndex < 0) return;
-    lineRefs.current[activeIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    lineRefs.current[activeIndex]?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' });
   }, [activeIndex]);
 
   // 啟動進度輪詢器 (每 200ms)
@@ -248,19 +250,32 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   // 當 activeIndex 改變且開啟 autoScroll 時，平滑置中滾動抽屜內的逐字稿
   useEffect(() => {
     if (!autoScroll || activeIndex < 0 || !isDrawerOpen) return;
-    lineRefs.current[activeIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    lineRefs.current[activeIndex]?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' });
   }, [activeIndex, autoScroll, isDrawerOpen]);
 
   // 抽屜開啟時自動平滑置中當前句
   useEffect(() => {
     if (!isDrawerOpen || activeIndex < 0) return;
     const timer = setTimeout(() => {
-      lineRefs.current[activeIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      lineRefs.current[activeIndex]?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' });
     }, 150);
     return () => clearTimeout(timer);
   }, [isDrawerOpen, activeIndex]);
 
   // 監聽鍵盤 Escape 鍵關閉抽屜
+  // 開啟時焦點送進面板、鎖住背景捲動；關閉時還原。
+  // 原本手機上滑抽屜，底下的頁面會跟著滾
+  useEffect(() => {
+    if (!isDrawerOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    drawerRef.current?.focus();
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+      previous?.focus?.();
+    };
+  }, [isDrawerOpen]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isDrawerOpen) {
@@ -431,13 +446,14 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             {/* 無框對話流（劇本台詞風，消除多餘方框） */}
             <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80 flex flex-col">
               {currentGroupLines.map(line => (
-                <div
+                <button
                   key={line.index}
+                  type="button"
                   onClick={() => seekTo(line.seconds, line.index)}
-                  className="group py-2.5 sm:py-3 px-2 sm:px-3 flex items-baseline gap-3 sm:gap-4 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
+                  className="group w-full text-left py-2.5 sm:py-3 px-2 sm:px-3 flex items-baseline gap-3 sm:gap-4 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
                 >
                   {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊的說話者標籤同一條線 */}
-                  <div className="shrink-0">
+                  <span className="shrink-0">
                     <span
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-semibold border border-zinc-200/80 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/90 text-zinc-600 dark:text-zinc-300 shadow-sm transition-all group-hover:border-transparent group-hover:bg-brand-brown group-hover:text-brand-cream dark:group-hover:bg-brand-tan dark:group-hover:text-brand-ink"
                       title="點擊跳轉影片至此秒數"
@@ -445,20 +461,20 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                       <Play size={10} className="fill-current" />
                       <span>{line.time}</span>
                     </span>
-                  </div>
+                  </span>
 
-                  {/* 對話內文 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                  {/* 對話內文。button 裡只能放 phrasing content，所以這幾層都是 span */}
+                  <span className="flex-1 min-w-0">
+                    <span className="flex items-center gap-2 mb-1">
                       <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${speakerPill(line.speaker)}`}>
                         {line.speaker}
                       </span>
-                    </div>
-                    <p className="text-sm sm:text-base leading-relaxed m-0 text-zinc-900 dark:text-zinc-100 font-medium">
+                    </span>
+                    <span className="block text-sm sm:text-base leading-relaxed text-zinc-900 dark:text-zinc-100 font-medium">
                       {line.text}
-                    </p>
-                  </div>
-                </div>
+                    </span>
+                  </span>
+                </button>
               ))}
             </div>
           </div>
@@ -565,22 +581,33 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
 
       {/* 6. 側邊滑動抽屜面板 */}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-[500px] md:w-[540px] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 z-[var(--z-drawer)] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="逐字稿與段落紀錄"
+        tabIndex={-1}
+        /* 關閉時只用 pointer-events-none 擋得住滑鼠，擋不住鍵盤：裡面的搜尋框、
+           分頁鈕與上百句逐字稿全都還在 Tab 順序裡，鍵盤使用者會掉進一個看不見
+           的面板。inert 才會把整棵子樹移出焦點順序與輔助技術樹 */
+        inert={!isDrawerOpen}
+        className={`fixed top-0 right-0 h-full w-full sm:w-[500px] md:w-[540px] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 z-[var(--z-drawer)] shadow-2xl flex flex-col transition-transform duration-300 ease-out focus:outline-none ${
           isDrawerOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
         }`}
       >
         {/* 抽屜頂部 Header */}
         <div className="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3">
           {/* 分頁切換：逐字稿 ↔ 段落紀錄 */}
+          {/* 原本掛 role=tablist/tab 但沒有 aria-controls、沒有 tabpanel、方向鍵也不會切，
+              報讀器宣告成分頁、使用者按左右鍵卻沒反應。這裡並沒有真正的 tabpanel
+              結構，與其補成半套不如誠實用一組 aria-pressed 切換鈕 */}
           <div
-            role="tablist"
+            role="group"
             aria-label="抽屜內容"
             className="flex bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl shrink-0"
           >
             <button
               type="button"
-              role="tab"
-              aria-selected={!isSectionTab}
+              aria-pressed={!isSectionTab}
               onClick={() => setDrawerTab('lines')}
               className={`flex items-baseline gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border ${
                 !isSectionTab
@@ -595,8 +622,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             </button>
             <button
               type="button"
-              role="tab"
-              aria-selected={isSectionTab}
+              aria-pressed={isSectionTab}
               onClick={() => setDrawerTab('sections')}
               disabled={cards.length === 0}
               className={`flex items-baseline gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg font-bold text-xs transition-all border disabled:opacity-40 disabled:cursor-not-allowed ${
@@ -664,7 +690,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                   ? '搜尋段落標題、簡述與重點...'
                   : '搜尋逐字稿關鍵字（如：生誕祭、禮物、點歌）...'
               }
-              className="w-full pl-10 pr-20 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-brand-yellow shadow-sm transition"
+              className="w-full pl-10 pr-20 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:border-brand-yellow shadow-sm transition"
             />
             {searchKeyword ? (
               <button
@@ -771,20 +797,21 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               activeIndex >= 0 && line.index >= startGroupIdx && line.index < startGroupIdx + groupSize;
 
             return (
-              <div
+              <button
                 key={line.index}
+                type="button"
                 ref={el => {
                   lineRefs.current[line.index] = el;
                 }}
                 onClick={() => seekTo(line.seconds, line.index)}
-                className={`group flex items-baseline gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
+                className={`group w-full text-left flex items-baseline gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
                   isActive
                     ? 'border-brand-yellow bg-brand-yellow/10 shadow-[0_0_16px_rgba(169,124,43,0.12)] dark:shadow-[0_0_16px_rgba(232,201,122,0.10)]'
                     : 'border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40'
                 }`}
               >
                 {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊的說話者標籤同一條線 */}
-                <div className="shrink-0">
+                <span className="shrink-0">
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all ${
                       isActive
@@ -796,26 +823,26 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                     <Play size={10} className="fill-current" />
                     <span>{line.time}</span>
                   </span>
-                </div>
+                </span>
 
-                {/* 對話內文 */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                {/* 對話內文。button 裡只能放 phrasing content，所以這幾層都是 span */}
+                <span className="flex-1 min-w-0">
+                  <span className="flex items-center gap-2 mb-1">
                     <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${speakerPill(line.speaker)}`}>
                       {line.speaker}
                     </span>
-                  </div>
-                  <p
-                    className={`text-sm sm:text-base leading-relaxed m-0 transition-colors ${
+                  </span>
+                  <span
+                    className={`block text-sm sm:text-base leading-relaxed transition-colors ${
                       isActive
                         ? 'text-zinc-950 dark:text-zinc-50 font-medium'
                         : 'text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100'
                     }`}
                   >
                     {searchKeyword ? highlightText(line.text, searchKeyword) : line.text}
-                  </p>
-                </div>
-              </div>
+                  </span>
+                </span>
+              </button>
             );
           })}
 
