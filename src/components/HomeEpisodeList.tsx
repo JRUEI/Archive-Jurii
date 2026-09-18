@@ -149,7 +149,9 @@ function SectionIndex({
               <button
                 type="button"
                 onClick={() => onSelect(absolute)}
-                className="group/row relative z-10 flex-1 min-w-0 flex items-center gap-2.5 text-left px-2 -mx-2 rounded-md hover:bg-brand-yellow/10 dark:hover:bg-zinc-800/60 transition-colors"
+                // 底色原本整片貼滿兩條分隔線之間（上下各 0px），看起來是一條頂到底的色塊。
+                // my-1 讓它上下各內縮 4px，跟水平的 px-2 -mx-2 一樣留出呼吸空間，成為一塊圓角區塊
+                className="group/row relative z-10 flex-1 min-w-0 flex items-center gap-2.5 text-left px-2 -mx-2 my-1 rounded-md hover:bg-brand-yellow/10 dark:hover:bg-zinc-800/60 transition-colors"
               >
                 {body}
                 <ChevronRight
@@ -279,7 +281,9 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
         ))}
 
       {/* 這一格的高度由 flex-1 決定，跟裝什麼無關：目錄、單段簡述、沒逐字稿的告示都吃同一個框 */}
-      <div className="flex-1 min-h-0 grid [grid-template-rows:minmax(0,1fr)] pt-4">
+      {/* 上下留白要對稱：原本只有 pt-4，最後一列會緊貼著底部的分隔線，
+          hover 底色的下緣圓角也剛好壓在裁切邊界上，看起來像被切掉 */}
+      <div className="flex-1 min-h-0 grid [grid-template-rows:minmax(0,1fr)] py-4">
         {/* 裡面的列用 px-2 -mx-2 讓底色往外長，裁切框要跟著讓開同樣寬度，
             否則左側 8px 會被 overflow-hidden 切掉。px 再把內容推回原位置 */}
         <div className="[grid-area:1/1] min-h-0 overflow-hidden -mx-2 px-2">
