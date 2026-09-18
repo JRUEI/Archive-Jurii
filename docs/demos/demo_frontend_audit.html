@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jurii 站前端體檢</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --paper:#F7F5F2; --surface:#FFFFFF; --surface-2:#FBFAF8;
+  --ink:#1E1B19; --ink-2:#57514B; --ink-3:#8B847C;
+  --rule:#E3DED7; --rule-soft:#EFEBE5;
+  --accent:#8A6A4B; --accent-ink:#5C4433; --accent-soft:rgba(169,124,43,.10);
+  --crit:#AE2A20; --crit-soft:rgba(174,42,32,.09);
+  --warn:#8A5A00; --warn-soft:rgba(138,90,0,.10);
+  --ok:#2E6B45;   --ok-soft:rgba(46,107,69,.10);
+  --shadow:0 1px 2px rgba(30,27,25,.05), 0 8px 24px -16px rgba(30,27,25,.25);
+  --sans:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --serif:"Noto Serif TC","Songti TC",Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141210; --surface:#1C1917; --surface-2:#221E1B;
+    --ink:#F4F1EC; --ink-2:#B9B1A7; --ink-3:#8B837A;
+    --rule:#302A25; --rule-soft:#26211D;
+    --accent:#E8C97A; --accent-ink:#E8C97A; --accent-soft:rgba(232,201,122,.12);
+    --crit:#F0897F; --crit-soft:rgba(240,137,127,.12);
+    --warn:#E5B354; --warn-soft:rgba(229,179,84,.12);
+    --ok:#74C495;   --ok-soft:rgba(116,196,149,.12);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141210; --surface:#1C1917; --surface-2:#221E1B;
+  --ink:#F4F1EC; --ink-2:#B9B1A7; --ink-3:#8B837A;
+  --rule:#302A25; --rule-soft:#26211D;
+  --accent:#E8C97A; --accent-ink:#E8C97A; --accent-soft:rgba(232,201,122,.12);
+  --crit:#F0897F; --crit-soft:rgba(240,137,127,.12);
+  --warn:#E5B354; --warn-soft:rgba(229,179,84,.12);
+  --ok:#74C495;   --ok-soft:rgba(116,196,149,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:62rem; margin:0 auto; padding-inline:16px; padding-block:clamp(32px,6vw,64px) 96px}
+h1,h2,h3{text-wrap:balance; margin:0}
+p{margin:0}
+a{color:var(--accent-ink); text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+/* ── masthead ───────────────────────────── */
+.eyebrow{
+  font-family:var(--mono); font-size:11.5px; font-weight:400;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);
+  display:flex; flex-wrap:wrap; gap:6px 14px; margin-bottom:20px;
+}
+h1{font-family:var(--serif); font-weight:700; font-size:clamp(30px,5.4vw,46px); line-height:1.25; letter-spacing:-.01em}
+.thesis{margin-top:16px; max-width:40em; color:var(--ink-2); font-size:16.5px}
+.thesis strong{color:var(--ink); font-weight:700}
+
+/* ── tally strip ────────────────────────── */
+.tally{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:1px;
+  margin-top:40px; background:var(--rule); border:1px solid var(--rule); border-radius:10px; overflow:hidden;
+}
+.tally div{background:var(--surface); padding:16px 18px}
+.tally b{
+  display:block; font-family:var(--mono); font-weight:700; font-size:26px;
+  line-height:1.1; font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+}
+.tally span{display:block; font-size:13px; color:var(--ink-2); margin-top:5px}
+.t-crit b{color:var(--crit)} .t-warn b{color:var(--warn)} .t-note b{color:var(--ink-3)}
+
+/* ── sections ───────────────────────────── */
+section{margin-top:clamp(48px,7vw,76px)}
+h2{
+  font-family:var(--serif); font-weight:700; font-size:22px; line-height:1.4;
+  padding-bottom:12px; border-bottom:2px solid var(--ink); display:flex;
+  flex-wrap:wrap; align-items:baseline; gap:10px;
+}
+h2 em{font-style:normal; font-family:var(--mono); font-size:12px; font-weight:400; color:var(--ink-3); letter-spacing:.04em}
+.lede{margin-top:16px; color:var(--ink-2); max-width:44em}
+
+/* ── finding rows ───────────────────────── */
+.findings{margin-top:22px; border:1px solid var(--rule); border-radius:10px; background:var(--surface); overflow:hidden}
+.f{display:grid; grid-template-columns:3px 1fr; border-top:1px solid var(--rule-soft)}
+.f:first-child{border-top:0}
+.f-bar{background:var(--ink-3)}
+.crit .f-bar{background:var(--crit)} .warn .f-bar{background:var(--warn)} .note .f-bar{background:var(--ink-3)}
+.f-body{padding:18px 20px; min-width:0}
+.f-head{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 12px}
+.f-head h3{font-size:16px; font-weight:700; line-height:1.5}
+.chip{
+  font-family:var(--mono); font-size:10.5px; font-weight:700; letter-spacing:.06em;
+  padding:2px 8px; border-radius:4px; white-space:nowrap; flex-shrink:0;
+}
+.crit .chip{background:var(--crit-soft); color:var(--crit)}
+.warn .chip{background:var(--warn-soft); color:var(--warn)}
+.note .chip{background:var(--accent-soft); color:var(--accent-ink)}
+.f-body p{margin-top:8px; color:var(--ink-2); font-size:14.5px}
+.where{
+  margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3);
+  line-height:1.9; overflow-wrap:anywhere;
+}
+.where s{text-decoration:none; color:var(--accent-ink); font-weight:700}
+.fix{
+  margin-top:12px; padding:10px 14px; border-radius:7px;
+  background:var(--surface-2); border:1px solid var(--rule-soft);
+  font-size:14px; color:var(--ink-2);
+}
+.fix b{color:var(--ink); font-weight:700}
+code{font-family:var(--mono); font-size:.88em; background:var(--accent-soft); color:var(--accent-ink); padding:1px 5px; border-radius:4px; overflow-wrap:anywhere}
+.fix code,.where code{background:none; padding:0; color:inherit}
+
+/* ── contrast table ─────────────────────── */
+.scroller{margin-top:22px; overflow-x:auto; border:1px solid var(--rule); border-radius:10px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:44rem; font-size:14px}
+th,td{text-align:left; padding:12px 16px; border-top:1px solid var(--rule-soft); vertical-align:middle}
+thead th{
+  border-top:0; border-bottom:1px solid var(--rule); background:var(--surface-2);
+  font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.ratio{font-family:var(--mono); font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap}
+.verdict{font-family:var(--mono); font-size:11.5px; font-weight:700; white-space:nowrap}
+.v-fail{color:var(--crit)} .v-large{color:var(--warn)} .v-pass{color:var(--ok)}
+.swatch{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:6.5rem; padding:7px 12px; border-radius:6px;
+  border:1px solid rgba(128,120,110,.35); font-size:13px; font-weight:700; white-space:nowrap;
+}
+td small{display:block; color:var(--ink-3); font-size:12px; line-height:1.6; margin-top:2px}
+.tnote{margin-top:12px; font-size:13px; color:var(--ink-3)}
+
+/* ── batches ────────────────────────────── */
+.batch{
+  margin-top:20px; border:1px solid var(--rule); border-left:3px solid var(--accent);
+  border-radius:8px; background:var(--surface); padding:20px 22px;
+}
+.batch h3{font-size:16.5px; font-weight:700; display:flex; flex-wrap:wrap; align-items:baseline; gap:10px}
+.batch h3 em{font-style:normal; font-family:var(--mono); font-size:11.5px; font-weight:400; color:var(--ink-3)}
+.batch > p{margin-top:8px; color:var(--ink-2); font-size:14.5px}
+.batch ul{margin:12px 0 0; padding-left:1.15em; color:var(--ink-2); font-size:14.5px}
+.batch li{margin-top:5px}
+.flag{
+  margin-top:14px; padding:10px 14px; border-radius:7px; font-size:13.5px;
+  background:var(--warn-soft); color:var(--warn); font-weight:500;
+}
+.flag.ok{background:var(--ok-soft); color:var(--ok)}
+
+/* ── keep list ──────────────────────────── */
+.keep{
+  margin-top:22px; border:1px solid var(--rule); border-radius:10px;
+  background:var(--surface); padding:20px 22px;
+}
+.keep ul{margin:0; padding-left:1.15em; color:var(--ink-2); font-size:14.5px}
+.keep li{margin-top:7px}
+.keep li b{color:var(--ink)}
+
+footer{
+  margin-top:clamp(48px,7vw,76px); padding-top:24px; border-top:1px solid var(--rule);
+  font-size:13px; color:var(--ink-3); display:flex; flex-wrap:wrap; gap:6px 20px;
+}
+footer span{font-family:var(--mono); font-size:11.5px}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">
+  <span>jruei/Archive-Jurii</span>
+  <span>claude/blissful-babbage-aexviq</span>
+  <span>next 16.2.12 · tailwind 4 · react 19</span>
+  <span>2026-09-18</span>
+</div>
+
+<h1>前端體檢：26 件可修的事</h1>
+
+<p class="thesis">
+  掃過 <strong>24 個檔案、4,057 行</strong>。排版邏輯本身寫得很紮實——固定卡高避免換面跳動、mono 標籤與內文走 baseline 對齊、中文 <code>text-wrap-style</code>，這些都不用動。
+  問題不在版面判斷，而在<strong>設計系統沒收斂</strong>：有 class 根本沒生效、有顏色是改版前的殘留、鍵盤使用者有幾處走不過去。
+  以下每一條都附實際檔案行號與實測值，沒有「建議加強」這種話。
+</p>
+
+<div class="tally">
+  <div class="t-crit"><b>4</b><span>寫了但不會生效</span></div>
+  <div class="t-crit"><b>6</b><span>鍵盤／報讀器擋路</span></div>
+  <div class="t-warn"><b>7</b><span>對比實測未達 AA</span></div>
+  <div class="t-warn"><b>5</b><span>token 缺口</span></div>
+  <div class="t-note"><b>4</b><span>版面細節</span></div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>一、寫了但不會生效 <em>dead styles</em></h2>
+<p class="lede">這四條是純粹的 bug：程式碼讀起來像有作用，實際上沒有。修掉不會改變任何你現在看得到的畫面，除了第 1 條會讓齒輪真的開始轉。</p>
+
+<div class="findings">
+
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>設定齒輪不會轉</h3><span class="chip">壞掉</span></div>
+      <p><code>animate-spin-slow</code> 在 Tailwind v4 需要 <code>@theme</code> 裡有對應的 <code>--animate-spin-slow</code> 與 keyframes。<code>globals.css</code> 兩者都沒有，所以這個 class 編不出任何 CSS——點開設定選單，齒輪是靜止的。</p>
+      <div class="where"><s>src/components/Header.tsx:116</s> · 對照 <s>src/app/globals.css</s>（全檔無 <code>@keyframes</code>）</div>
+      <div class="fix"><b>改法</b>　在 <code>globals.css</code> 的 <code>@theme inline</code> 補 <code>--animate-spin-slow: spin 2.4s linear infinite;</code>。</div>
+    </div>
+  </div>
+
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>「精簡總結」的 Markdown 是裸的</h3><span class="chip">壞掉</span></div>
+      <p><code>prose dark:prose-invert prose-brand</code> 需要 <code>@tailwindcss/typography</code>，但它不在 <code>package.json</code>，<code>globals.css</code> 也沒有 <code>@plugin</code> 註冊。結果是 <code>&lt;ReactMarkdown&gt;</code> 吐出來的連結、粗體、斜體、巢狀清單<strong>完全沒有樣式</strong>——連結甚至不會變色或加底線。</p>
+      <div class="where"><s>src/components/TextMode.tsx:104</s>（總結）· <s>:123</s>（全紀錄）</div>
+      <div class="fix"><b>兩條路</b>　(a) 裝 <code>@tailwindcss/typography</code> 並在 CSS 加 <code>@plugin</code>；(b) 這個站幾乎所有文字都是手動上 class，不如直接刪掉這三個失效 class，改在 <code>ReactMarkdown</code> 的 <code>components</code> 指定 <code>a</code> / <code>strong</code> 的樣式。<b>(b) 較符合現況</b>，也少一個相依。</div>
+    </div>
+  </div>
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>404 的「返回首頁」按鈕 hover 沒反應</h3><span class="chip">壞掉</span></div>
+      <p><code>bg-brand-brown</code> 後面接 <code>hover:bg-brand-brown</code>——hover 色跟原色同一個，滑過去毫無變化。深色模式的 <code>dark:bg-brand-tan</code> 則根本沒有對應 hover。</p>
+      <div class="where"><s>src/app/not-found.tsx:14</s></div>
+      <div class="fix"><b>改法</b>　換成實際會變的色階，或照站上既有的實心強調寫法（<code>SOLID_ACCENT</code>）統一。</div>
+    </div>
+  </div>
+
+  <div class="f note">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3><code>HeroGlow.tsx</code> 沒有任何地方 import</h3><span class="chip">死碼</span></div>
+      <p>整支元件是孤兒。設定選單裡的「發光特效」開關本身是有用的（它驅動 <code>TextMode</code> 的段落聚焦），但 <code>HeroGlow</code> 這顆背景光暈從沒被掛上去。</p>
+      <div class="where"><s>src/components/HeroGlow.tsx</s> · <code>grep -rn HeroGlow src/</code> 只有它自己</div>
+      <div class="fix"><b>要決定的事</b>　這顆光暈是本來就打算放在單集頁的嗎？<b>是</b> → 掛回 <code>EpisodeViewer</code>；<b>不是</b> → 刪檔。</div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>二、對比實測 <em>WCAG 2.1 · 實際算過，非目測</em></h2>
+<p class="lede">
+  下表每一列都是用站上真實的前景／背景色算出來的對比值，半透明底（例如 <code>bg-brand-yellow/10</code>）已先疊到實際底色再計算。
+  <strong>樣本欄是照網站當時的主題渲染</strong>，所以亮色模式的列在深色主題下也會顯示成白底——那正是使用者實際看到的樣子。
+</p>
+
+<div class="scroller">
+<table>
+<thead>
+<tr><th>樣本</th><th>實測</th><th>判定</th><th>出現在哪</th></tr>
+</thead>
+<tbody>
+
+<tr>
+  <td><span class="swatch" style="background:#ffffff;color:#d8b4fe">舊紫殘留</span></td>
+  <td class="ratio">1.77</td>
+  <td class="verdict v-fail">FAIL</td>
+  <td><code>marker:text-[#d8b4fe]</code><small>TextMode.tsx:79 — 這是改版前紫羅蘭品牌的殘留色，既不在現行色票內，白底上也幾乎看不見。條列項目的圓點等於消失。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#ffffff;color:#d4d4d8">15</span></td>
+  <td class="ratio">1.48</td>
+  <td class="verdict v-fail">FAIL</td>
+  <td>月曆沒有直播的日期<small>HomeEpisodeList.tsx — <code>text-zinc-300</code>／深色 <code>text-zinc-700</code>（1.91）。日期是內容不是裝飾，現在幾乎讀不到。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#18181b;color:#52525b">逐字稿還沒補上</span></td>
+  <td class="ratio">2.29</td>
+  <td class="verdict v-fail">FAIL</td>
+  <td>首頁卡片「尚未整理摘要」的說明<small>HomeEpisodeList.tsx — <code>dark:text-zinc-600</code>。同一段的「還有 N 段」亮色模式是 2.56，一樣未達標。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#ffffff;color:#aaaaaa">EP.12 · 2026.09.18</span></td>
+  <td class="ratio">2.32</td>
+  <td class="verdict v-fail">FAIL</td>
+  <td>圖卡匯出的頁尾<small>CardMode.tsx:42 — 硬寫 <code>#aaa</code>。這是<strong>要分享出去的圖</strong>；亮色主題匯出的卡片頁尾在手機上基本讀不到（深色卡則是 6.51，沒問題）。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#ffffff;color:#a1a1aa">共 12 回</span></td>
+  <td class="ratio">2.56</td>
+  <td class="verdict v-fail">FAIL</td>
+  <td><code>text-zinc-400</code>，全站次要文字<small>SectionTitle 的計數、成員頁註腳、搜尋框 placeholder、「還有 N 段」。改成 <code>zinc-500</code> 就是 4.83（AA），視覺幾乎沒差。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#f6f2ea;color:#A97C2B">第 12 回</span></td>
+  <td class="ratio">3.36</td>
+  <td class="verdict v-large">僅大字</td>
+  <td>回次膠囊、<code>SOFT_ACCENT</code> 標籤<small>亮色 <code>text-brand-yellow</code>(#A97C2B) 疊在自己的 10% 底上。被用在 13px bold 膠囊與 <code>text-[10px]</code> 計數——這些都不算大字。深色模式反而是 9.27，很好。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#1a1a20;color:#8A6647">小標題</span></td>
+  <td class="ratio">3.36</td>
+  <td class="verdict v-large">僅大字</td>
+  <td>段落紀錄的左欄小標<small>TextMode.tsx:66 — <code>dark:text-brand-brown</code>。它是 <code>text-lg</code> bold 剛好踩在大字門檻上，但底色 <code>#1a1a20</code> 本身就是下一節要談的問題。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#5C4433;color:#F3E3A6">選取中</span></td>
+  <td class="ratio">7.02</td>
+  <td class="verdict v-pass">AAA</td>
+  <td>實心強調（棕底奶油字）<small>這組很好，不用動。深色的 tan 底配 #2E2118 是 6.65，也過。</small></td>
+</tr>
+
+<tr>
+  <td><span class="swatch" style="background:#09090b;color:#E8C97A">深色主色</span></td>
+  <td class="ratio">12.38</td>
+  <td class="verdict v-pass">AAA</td>
+  <td>深色模式的 <code>brand-yellow</code><small>深色模式的色票整體都很健康。所有對比問題幾乎都集中在亮色模式。</small></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+<p class="tnote">AA 門檻：一般文字 4.5、18.66px 以上或 14px 粗體 3.0。判定「僅大字」= 只有當成大字用才合格。</p>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>三、token 缺口 <em>改一個值，改不動全站</em></h2>
+<p class="lede">這節不改任何視覺，但決定了往後每一次改色要花五分鐘還是半小時。AGENTS.md §3 規定品牌色需你明確指示才能動——<strong>以下沒有一條會改動色相</strong>，只是把散落的字面值收回 <code>globals.css</code>。</p>
+
+<div class="findings">
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3><code>#2E2118</code> 在 9 個檔案裡各寫一次</h3><span class="chip">重複</span></div>
+      <p>它是「tan 底上的文字色」，語意明確卻沒有名字。現在散在 12 處，哪天要調深淺得逐檔 grep。</p>
+      <div class="where"><s>Header.tsx:15,84</s> · <s>HomeEpisodeList.tsx:368,425,576</s> · <s>TranscriptMode.tsx:14,442</s> · <s>CardMode.tsx:785</s> · <s>OfficialLinks.tsx:15</s> · <s>MemberSnsLinks.tsx:6</s> · <s>members/page.tsx</s>（×2）· <s>not-found.tsx:14</s></div>
+      <div class="fix"><b>改法</b>　在 <code>globals.css</code> 加 <code>--color-brand-ink: #2E2118</code>（值不變），全部換成 <code>text-brand-ink</code>。純機械替換。</div>
+    </div>
+  </div>
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>三個自創深色底，而且帶紫調</h3><span class="chip">不一致</span></div>
+      <p>全站深色卡片是 <code>dark:bg-zinc-900</code>(#18181b)，但 <code>TextMode</code> 自己用了 <code>#1c1924</code>、<code>#1a1a20</code>、<code>#1f1f26</code> 三個近似色。三個都偏紫——跟上面那顆 <code>#d8b4fe</code> 同源，是改版前紫羅蘭主題的殘留。現在的棕金色系放在紫調底上，色溫是打架的。</p>
+      <div class="where"><s>TextMode.tsx:28</s>（聚焦底）· <s>:63</s>（卡片底＋hover）</div>
+      <div class="fix"><b>改法</b>　三個都收斂到 <code>zinc-900</code> / <code>zinc-800</code>，或若確實需要比卡片再深一階，定義一個 <code>--color-surface-sunken</code> 並取暖色偏移（配合棕金），不要留紫。</div>
+    </div>
+  </div>
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>圖卡匯出有一份平行色表</h3><span class="chip">會漂移</span></div>
+      <p><code>CARD_STYLES</code> 因為 <code>html-to-image</code> 必須用 inline style，這個取捨沒問題——但裡面把 <code>#8A6A4B</code>、<code>#E8C97A</code>、<code>#5C4433</code> 又手抄了一次。改 <code>globals.css</code> 的品牌色，匯出的圖<strong>不會跟著變</strong>，兩邊會慢慢漂開。</p>
+      <div class="where"><s>CardMode.tsx:41–80</s>（<code>CARD_STYLES</code> / <code>getTagStyle</code>）</div>
+      <div class="fix"><b>改法</b>　從 JS 匯出一份 <code>BRAND</code> 常數物件當唯一真相，<code>globals.css</code> 與 <code>CARD_STYLES</code> 都從它取值；或在 CSS 讀取 <code>getComputedStyle</code> 拿 custom property。前者簡單得多。</div>
+    </div>
+  </div>
+
+  <div class="f note">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>z-index 沒有級距</h3><span class="chip">疊序</span></div>
+      <p>目前用到 <code>z-10 / 20 / 30 / 40 / 50 / z-[100] / z-[9999] / z-[10000]</code>。Header 是 <code>z-50</code>，逐字稿抽屜跟它的遮罩也都是 <code>z-50</code>——同層，靠 DOM 順序決勝負，很脆。<code>TextMode</code> 的捲動進度條是 <code>z-[100]</code>，會蓋過 Header 上緣。</p>
+      <div class="where"><s>Header.tsx:62,120</s> · <s>TranscriptMode.tsx:527,562,568</s> · <s>CardMode.tsx:602,610</s> · <s>TextMode.tsx:120</s></div>
+      <div class="fix"><b>改法</b>　在 <code>@theme</code> 定四層就夠：<code>--z-sticky:50 / --z-drawer:60 / --z-overlay:70 / --z-toast:80</code>，把 <code>z-[9999]</code> 這類數字全部換掉。</div>
+    </div>
+  </div>
+
+  <div class="f note">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>localStorage key 前綴不一致</h3><span class="chip">殘留</span></div>
+      <p><code>harumatope-focus-mode</code> 是上一個專案名的殘留，其他三個都是 <code>jurii-</code>。</p>
+      <div class="where"><s>FocusModeProvider.tsx:12</s>　vs　<s>HomeLayoutProvider.tsx:12</s> · <s>HomeEpisodeList.tsx:618</s> · <s>TranscriptMode.tsx:8</s></div>
+      <div class="fix"><b>注意</b>　直接改名會讓老訪客的偏好被重設一次。要嘛接受（這只是個開關），要嘛寫一段一次性遷移。<b>建議直接改，成本不值得。</b></div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>四、鍵盤與報讀器 <em>這節是我最建議先修的</em></h2>
+<p class="lede">全站 4,057 行裡 <code>focus-visible</code> 只出現 3 次，其中 2 次還是 hover 展開動畫的附帶效果。對只用鍵盤的人來說，現在有幾處是真的走不過去。</p>
+
+<div class="findings">
+
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>關起來的抽屜還在 Tab 順序裡</h3><span class="chip">最該先修</span></div>
+      <p>逐字稿側邊抽屜關閉時只有 <code>translate-x-full pointer-events-none</code>。<code>pointer-events-none</code> 擋滑鼠，<strong>不擋鍵盤</strong>——裡面的搜尋框、兩個分頁鈕、上百句逐字稿全部還在焦點順序中。鍵盤使用者從頁面往下 Tab，會掉進一個看不見的面板裡出不來。</p>
+      <div class="where"><s>TranscriptMode.tsx:566–570</s></div>
+      <div class="fix"><b>改法</b>　加 <code>inert={!isDrawerOpen}</code>（React 19 原生支援）。一行，成本最低、影響最大的一條。</div>
+    </div>
+  </div>
+
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>逐字稿每一句是 <code>&lt;div onClick&gt;</code>，不是按鈕</h3><span class="chip">操作不到</span></div>
+      <p>點時間戳跳轉是逐字稿模式的<strong>核心操作</strong>，但它掛在 div 上配 <code>cursor-pointer</code>：鍵盤 Tab 不到、Enter 沒反應、報讀器不會說這是可點的。字幕群卡片與抽屜清單兩處都是。</p>
+      <div class="where"><s>TranscriptMode.tsx:437</s>（字幕群）· <s>:~795</s>（抽屜清單）· 全站共 4 處 <code>div onClick</code></div>
+      <div class="fix"><b>改法</b>　外層換成 <code>&lt;button type="button"&gt;</code>，配 <code>text-left w-full</code> 保持現有版面，再補 <code>aria-label="跳至 12:34"</code>。</div>
+    </div>
+  </div>
+
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>焦點框被關掉，沒有補回來</h3><span class="chip">看不見</span></div>
+      <p>Header 設定鈕寫了 <code>focus:outline-none</code> 但沒有任何 ring；逐字稿搜尋框同樣 <code>focus:outline-none</code>，只換邊框顏色（<code>zinc-200</code> → <code>#A97C2B</code>，兩者在白底上差異很弱）。鍵盤走到這兩個元件時，看不出焦點在哪。</p>
+      <div class="where"><s>Header.tsx:112</s> · <s>TranscriptMode.tsx:667</s></div>
+      <div class="fix"><b>改法</b>　在 <code>globals.css</code> 的 <code>@layer base</code> 統一定一條 <code>:focus-visible</code> 的 ring（用 <code>brand-ochre</code>／深色用 <code>brand-yellow</code>），然後刪掉這兩處的 <code>focus:outline-none</code>。一次修完全站。</div>
+    </div>
+  </div>
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>兩個 overlay 都不是正式的 dialog</h3><span class="chip">語意</span></div>
+      <p>圖卡全螢幕已經做了 ESC 與 <code>body</code> 捲動鎖（做得不錯），但缺 <code>role="dialog"</code> / <code>aria-modal</code>、沒有 focus trap、關閉後焦點不會回到「放大」鈕。左右翻頁靠兩塊看不見的 <code>&lt;div class="w-1/4"&gt;</code>，鍵盤完全操作不了。<br>抽屜則相反：有 ESC，但<strong>沒有捲動鎖</strong>——手機上滑動時背景會跟著滾。</p>
+      <div class="where"><s>CardMode.tsx:449,580,602,656</s> · <s>TranscriptMode.tsx:263,566</s></div>
+      <div class="fix"><b>改法</b>　兩者都補 <code>role="dialog" aria-modal="true"</code>＋開啟時把焦點送進面板、關閉時還回觸發鈕；抽屜補上 <code>CardMode</code> 已經寫好的捲動鎖；全螢幕的左右鍵翻頁補 <code>ArrowLeft/ArrowRight</code>（ESC 的 handler 就在旁邊，順手）。</div>
+    </div>
+  </div>
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>tab 語意做一半</h3><span class="chip">半套</span></div>
+      <p>抽屜的分頁有 <code>role="tablist"</code>、<code>role="tab"</code>、<code>aria-selected</code>，但沒有 <code>aria-controls</code>、沒有 <code>role="tabpanel"</code>、沒有方向鍵切換。報讀器會宣告成「分頁」，使用者照 tab 的習慣按左右鍵卻沒反應——<strong>宣告了卻不履行，比不宣告更容易誤導</strong>。反過來，單集頁最主要的三分頁（精簡總結／段落紀錄／逐字稿）完全沒有 tab 語意。</p>
+      <div class="where"><s>TranscriptMode.tsx:576–610</s>（半套）· <s>EpisodeViewer.tsx:104–128</s>（完全沒有）</div>
+      <div class="fix"><b>兩條路</b>　(a) 兩處都補完整（<code>aria-controls</code> + <code>tabpanel</code> + 方向鍵 + roving tabindex）；(b) 都退回單純的 <code>&lt;button aria-pressed&gt;</code>。<b>(b) 更誠實也更省</b>，因為這些分頁並沒有真正的 tabpanel 結構。</div>
+    </div>
+  </div>
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>完全沒有 <code>prefers-reduced-motion</code></h3><span class="chip">前庭不適</span></div>
+      <p>全站約 100 處 transition／animate，零處尊重系統的「減少動態」設定。其中兩個是<strong>持續性</strong>動畫：字幕同步指示燈的 <code>animate-ping</code>（不停擴散）與 API 狀態點的 <code>animate-pulse</code>。加上 framer-motion 的進出場位移、<code>hover:scale-105</code>、段落聚焦的 <code>scale-95 → scale-100</code>。</p>
+      <div class="where"><s>TranscriptMode.tsx:403,484</s>（持續動畫）· <s>TextMode.tsx:28</s> · <s>CardMode</s>（framer-motion）</div>
+      <div class="fix"><b>改法</b>　<code>globals.css</code> 加一段全域 <code>@media (prefers-reduced-motion:reduce)</code> 收掉 transition/animation，framer-motion 另外用 <code>useReducedMotion()</code> 把位移改成純淡入。</div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>五、版面細節 <em>小，但會被碰到</em></h2>
+
+<div class="findings">
+
+  <div class="f warn">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>手機上跳段落會被 header 蓋住</h3><span class="chip">會撞到</span></div>
+      <p>從首頁卡片的簡述點進去會帶 <code>#section-N</code>。但 <code>scroll-mt</code> 兩處不一致（<code>scroll-mt-24</code>=96px、<code>scroll-mt-20</code>=80px），而 sticky header 是 <code>h-16</code>=64px——<strong>手機上還多一條 SNS bar</strong>（<code>md:hidden</code>，約 56px），完全沒被算進去。窄螢幕跳過去，段落標題會被擋掉。</p>
+      <div class="where"><s>TextMode.tsx:28</s>（24）· <s>TranscriptMode.tsx:389</s>（20）· <s>Header.tsx:62,165</s>（h-16 ＋ 手機 SNS bar）</div>
+      <div class="fix"><b>改法</b>　定一個 <code>--header-offset</code>，手機值含 SNS bar 高度，兩處 <code>scroll-mt</code> 都吃它。</div>
+    </div>
+  </div>
+
+  <div class="f note">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>觸控目標偏小</h3><span class="chip">手機</span></div>
+      <p>月曆翻月鈕與成員 SNS 圖示是 <code>w-7 h-7</code>（28px），卡片目錄翻頁是 <code>p-1</code>（約 24px）。過得了 WCAG 2.2 的 24px 最低標，但低於一般 44px 的舒適值；月曆格子本身 <code>aspect-[16/15]</code> 在窄螢幕也偏小。</p>
+      <div class="where"><s>HomeEpisodeList.tsx:260,272,368</s> · <s>MemberSnsLinks.tsx:6</s></div>
+      <div class="fix"><b>改法</b>　視覺大小不變，用 <code>before:absolute before:-inset-1.5</code> 把可點範圍撐到 40px＋。不動版面。</div>
+    </div>
+  </div>
+
+  <div class="f note">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>逐字稿控制列小字密度偏高</h3><span class="chip">易讀性</span></div>
+      <p><code>TranscriptMode</code> 有 30 處 <code>text-xs</code> / <code>text-[10px]</code> / <code>text-[11px]</code>。整條控制列幾乎都是 11–12px 的<strong>中文</strong>——中文筆劃密度比拉丁字母高，同樣級數更難讀。「顯示句數：」那組 <code>text-[11px]</code> 加上 <code>px-2 py-0.5</code> 的數字鈕尤其吃力。</p>
+      <div class="where"><s>TranscriptMode.tsx</s>（30 處）· 最密集在 <s>:409–470</s> 控制列</div>
+      <div class="fix"><b>改法</b>　不需要全改。把中文標籤的地板拉到 <code>text-[13px]</code>，純數字／時間戳可以留在 <code>text-xs</code>（<code>tabular-nums</code> 的數字小一點沒問題）。</div>
+    </div>
+  </div>
+
+  <div class="f note">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3>字體載入值得量一次</h3><span class="chip">待確認</span></div>
+      <p><code>layout.tsx</code> 載了 4 個家族：Geist、Geist Mono、Noto Serif TC（400/700/900）、Noto Sans TC（400/500/700）。但 <code>globals.css</code> 的 <code>--font-sans</code> 把 <code>-apple-system, PingFang TC</code> 排在 <code>var(--font-noto-sans-tc)</code> <strong>前面</strong>——Apple 裝置永遠用系統字，Noto Sans TC 的三個字重只服務 Windows／Android，preload 卻照發。</p>
+      <div class="where"><s>src/app/layout.tsx:10–29</s> · <s>globals.css</s> 的 <code>--font-sans</code> 順序</div>
+      <div class="fix"><b>先量再動</b>　這台機器沒有 <code>node_modules</code>，我沒辦法跑 build 給你實際數字。動手前先 <code>npm run build</code> 看 <code>out/</code> 裡實際產出的字檔，確認 Serif TC 的 900 與 Sans TC 的 500 是否真的有人用到——<strong>CJK 字檔很大，但我不想憑印象砍。</strong></div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>六、規則檔本身過時了 <em>這條解釋了前面好幾個殘留</em></h2>
+
+<div class="findings">
+  <div class="f crit">
+    <div class="f-bar"></div>
+    <div class="f-body">
+      <div class="f-head"><h3><code>.agents/AGENTS.md</code> 寫的品牌色是舊的</h3><span class="chip">會誤導</span></div>
+      <p>§3 寫著「本站的核心主色為<strong>紫羅蘭 #B39DDB</strong> 與<strong>青蘋果綠 #B2FF59</strong>，非經使用者明確指示不得修改」。但 <code>globals.css</code> 現在整套是制服取色的棕／金／奶油（<code>#A97C2B</code>、<code>#8A6A4B</code>、<code>#5C4433</code>、<code>#F3E3A6</code>、<code>#D9B48F</code>）。檔頭甚至還叫「Harumatope Wiki」。</p>
+      <p>這不是小事：規則檔是<strong>給下一個代理看的</strong>。照著它改，會往紫綠方向走。前面那顆 <code>#d8b4fe</code>、那三個帶紫的深色底、那個 <code>harumatope-</code> 前綴，都是同一次改版沒清乾淨的尾巴。</p>
+      <div class="where"><s>.agents/AGENTS.md</s> §3 · 對照 <s>src/app/globals.css:6–28</s></div>
+      <div class="fix"><b>改法</b>　把 §3 的色票更新成現行的制服色系，順便把標題從「Harumatope Wiki」改成本站名稱。<b>這條應該最先做</b>——它便宜，而且會擋掉未來的錯誤方向。</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>建議的動工順序 <em>三批，可以只做前兩批</em></h2>
+
+<div class="batch">
+  <h3>第一批：外觀零變動 <em>安全 · 建議直接做</em></h3>
+  <p>做完之後截圖比對應該<strong>一個像素都不會變</strong>（唯一例外是齒輪開始轉）。但之後每一次改色、改層級都會輕鬆很多。</p>
+  <ul>
+    <li>修 <code>AGENTS.md</code> 的品牌色與專案名</li>
+    <li>補 <code>--animate-spin-slow</code>；刪掉失效的 <code>prose</code> 三兄弟</li>
+    <li><code>#2E2118</code> → <code>--color-brand-ink</code>（12 處機械替換）</li>
+    <li>z-index 收成四層 token</li>
+    <li><code>harumatope-</code> → <code>jurii-</code> 前綴</li>
+    <li>決定 <code>HeroGlow</code> 掛回去還是刪掉 ← <strong>這個需要你回答</strong></li>
+  </ul>
+  <div class="flag ok">不動任何品牌色相，符合 AGENTS.md §3。</div>
+</div>
+
+<div class="batch">
+  <h3>第二批：鍵盤與輔助技術 <em>視覺幾乎不變 · 效益最大</em></h3>
+  <p>除了新增的焦點框（只在鍵盤操作時出現，滑鼠使用者看不到），其他都是行為修正。</p>
+  <ul>
+    <li>抽屜加 <code>inert</code>（一行，最划算）</li>
+    <li>全站統一 <code>:focus-visible</code> ring，移除兩處 <code>focus:outline-none</code></li>
+    <li>逐字稿的 <code>div onClick</code> → <code>&lt;button&gt;</code></li>
+    <li>兩個 overlay 補 dialog 語意＋焦點歸位；抽屜補捲動鎖；全螢幕補方向鍵</li>
+    <li>tab 語意收斂（建議退回 <code>aria-pressed</code>）</li>
+    <li>全域 <code>prefers-reduced-motion</code></li>
+  </ul>
+  <div class="flag ok">不動色彩，不動版面。</div>
+</div>
+
+<div class="batch">
+  <h3>第三批：對比與版面 <em>會改變外觀 · 需要你逐條點頭</em></h3>
+  <p>這批看得出差別，所以照 AGENTS.md §2 的人工審核點，我會等你確認再動。</p>
+  <ul>
+    <li><code>text-zinc-400</code> → <code>zinc-500</code>（次要文字，差異很小但過 AA）</li>
+    <li>月曆無直播日、「尚未整理摘要」說明文字提亮</li>
+    <li>拿掉 <code>#d8b4fe</code>，三個紫調深色底收斂到 zinc 系</li>
+    <li>匯出卡頁尾 <code>#aaa</code> 在亮色主題下加深 ← <strong>分享出去的圖，我建議優先</strong></li>
+    <li>亮色 <code>brand-yellow</code> 在小字膠囊上換成 <code>brand-ochre</code>（4.95，過 AA；色相不變，只是深一階）</li>
+    <li><code>scroll-mt</code> 統一並計入手機 SNS bar</li>
+    <li>觸控目標用 <code>::before</code> 擴大（視覺不變）</li>
+    <li>中文小字地板拉到 13px</li>
+  </ul>
+  <div class="flag">這批唯一碰到品牌色的是最後一項：<code>brand-yellow</code> → <code>brand-ochre</code>。兩個都是現有色票裡的顏色，不新增色相，但視覺上會深一點——這條特別需要你點頭。</div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════ -->
+<section>
+<h2>已經做對的，不要動 <em>免得下次有人「順手優化」掉</em></h2>
+<div class="keep">
+<ul>
+  <li><b>卡片高度寫死、目錄與簡述在同框換面</b>——換集數時框不跳。這是刻意的，不是沒做 responsive。</li>
+  <li><b>mono 標籤與中文標題走 <code>items-baseline</code> 而非 <code>items-center</code></b>——兩者行高不同，置中會錯位。註解已經寫明原因。</li>
+  <li><b>月曆一律補滿 6 週、格子壓成 <code>aspect-[16/15]</code></b>——正方形視覺上會偏高，壓 6% 才像方的。這是真的懂排版的人才會做的調整。</li>
+  <li><b><code>text-wrap-style: pretty</code> ＋ 標題 <code>balance</code></b>——中文每字可斷行，這兩條直接解掉「最後一行只剩一個字」。</li>
+  <li><b><code>useHydrated()</code> 的 SSR 一律回預設值</b>——localStorage 偏好不會造成 hydration 不一致。這個坑很多人踩。</li>
+  <li><b>全站 <code>tabular-nums</code>＋ mono 處理日期與時長</b>——數字對齊得很乾淨。</li>
+  <li><b>圖卡匯出用 inline style</b>——<code>html-to-image</code> 讀不到 Tailwind class，這是必要的取捨。要修的只是它那份色表該跟 token 同源，不是改寫法。</li>
+</ul>
+</div>
+</section>
+
+<footer>
+  <span>掃描範圍 src/ 24 檔 4,057 行</span>
+  <span>對比值以 WCAG 2.1 相對亮度公式實算</span>
+  <span>未執行 build（此環境無 node_modules）</span>
+</footer>
+
+</div>
+</body>
+</html>
