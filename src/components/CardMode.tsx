@@ -84,11 +84,12 @@ const getTagStyle = (isDark: boolean) => {
 // 導致一張 1920px 的卡只放 1~2 條，下半部整片留白。
 const CARD_CONTENT_WIDTH = 920; // 1080 - 卡片左右內距 80*2
 const BODY_BOX_WIDTH = 808;     // 920 - 內文框左右內距 56*2
-const BODY_FONT = 36;
+const BODY_FONT = 42;
 const BODY_LH = 1.8;
-const QUOTE_FONT = 34;
+const QUOTE_FONT = 40;
 const QUOTE_LH = 1.65;
 const TITLE_FONT = 64;
+const SUMMARY_FONT = 37;
 
 // 全形字寬算 1，半形（ASCII、半形假名）約 0.55
 function widthInChars(text: string) {
@@ -97,28 +98,41 @@ function widthInChars(text: string) {
   return w;
 }
 
+// 一行只排得下整數個字；標點不能放行首（禁則）時會把前一字擠到下一行，
+// 平均每行再扣半字才不會低估（36～44px 實測）
 function lineCount(text: string, fontSize: number, boxWidth: number) {
-  return Math.max(1, Math.ceil(widthInChars(text) / (boxWidth / fontSize)));
+  return Math.max(1, Math.ceil(widthInChars(text) / (Math.floor(boxWidth / fontSize) - 0.5)));
 }
 
 function stripMarks(p: string) {
   return p.replace(/^QUOTE:\s*/, '').replace(/^>\s*/, '').replace(/^\*\s+/, '').replace(/\*\*/g, '');
 }
 
-// 單一段落實際佔用的高度（含下方 margin）
-function blockHeight(p: string) {
+// 單一段落實際佔用的高度（含下方 margin）；scale 是字級縮放，margin 不跟著縮。
+// 字級照渲染端的 px() 四捨五入，差 0.5px 就可能讓每行少排一個字
+function blockHeight(p: string, scale = 1) {
   const plain = stripMarks(p);
   if (p.startsWith('QUOTE:') || p.startsWith('>')) {
     // 引用框：內距 28*2 + 上下 margin 24*2 = 104
-    return lineCount(`「${plain}」`, QUOTE_FONT, BODY_BOX_WIDTH - 78) * QUOTE_FONT * QUOTE_LH + 104;
+    const fs = Math.round(QUOTE_FONT * scale);
+    return lineCount(`「${plain}」`, fs, BODY_BOX_WIDTH - 78) * fs * QUOTE_LH + 104;
   }
+  const fs = Math.round(BODY_FONT * scale);
   if (p.startsWith('* ')) {
-    // 條列：ul 左縮排 40 + 項目符號約 20。loose list 的 li 內層多一包 <p>，
+    // 條列：ul 左縮排 40，項目符號掛在縮排裡（實測欄寬 768）。loose list 的 li 內層多一包 <p>，
     // li 自己的 margin 16 會跟 <p> 的 28 合併取大，所以條目間距是 28 不是 44（實測）。
     // ul 自己的 margin-bottom 32 整串只算一次，併在 bodyBudget 的安全邊界裡。
-    return lineCount(plain, BODY_FONT, BODY_BOX_WIDTH - 60) * BODY_FONT * BODY_LH + 28;
+    return lineCount(plain, fs, BODY_BOX_WIDTH - 40) * fs * BODY_LH + 28;
   }
-  return lineCount(plain, BODY_FONT, BODY_BOX_WIDTH) * BODY_FONT * BODY_LH + 28;
+  return lineCount(plain, fs, BODY_BOX_WIDTH) * fs * BODY_LH + 28;
+}
+
+// 字級每次縮 1%，縮到估算高度放得進預算為止。不能用平方根一次算：
+// 行數是整數，縮完常還多一行，精簡總結會因此上下被裁
+function fitScale(heightAt: (s: number) => number, budget: number, min: number) {
+  let s = 1;
+  while (s > min && heightAt(s) > budget) s -= 0.01;
+  return Math.max(min, s);
 }
 
 // 內文框可用高度：1920 - 卡片上下內距 144 - 標籤列 141 - 標題 - 金線 56
@@ -148,15 +162,15 @@ function packChunks(blocks: { text: string; height: number }[], budget: number) 
 }
 
 // 精簡總結只有一張卡、不能分頁，條目多時會被 1920px 裁掉，所以照估算高度縮字級。
-// 可用高度：1920 - 上下內距 160 - 標籤列 108 - 標題 - 卡框內距 128 - 頁尾 94 - 安全邊界 120
+// 可用高度：1920 - 上下內距 160 - 標籤列 118 - 標題 - 卡框內距與框線 130 - 頁尾 102 - 安全邊界 24（各區塊皆實測）。
+// 長的總結要縮到 18px 左右才放得下，下限因此設 0.45
 function summaryScale(title: string, points: string[]) {
   const titleLines = lineCount(title, 64, 840);
-  const budget = 1920 - 160 - 108 - (titleLines * 64 * 1.4 + 60) - 128 - 94 - 120;
-  const height = points.reduce(
-    (sum, point, i) => sum + lineCount(point, 32, 748) * 32 * 1.65 + (i === points.length - 1 ? 0 : 36),
-    0,
-  );
-  return height > budget ? Math.max(0.6, Math.sqrt(budget / height)) : 1;
+  const budget = 1920 - 160 - 118 - (titleLines * 64 * 1.4 + 60) - 130 - 102 - 24;
+  return fitScale(s => {
+    const fs = Math.round(SUMMARY_FONT * s); // 同 spx() 四捨五入
+    return points.reduce((sum, point, i) => sum + lineCount(point, fs, 748) * fs * 1.65 + (i === points.length - 1 ? 0 : 36 * s), 0);
+  }, budget, 0.45);
 }
 
 function paginateCards(cards: EpisodeCard[]) {
@@ -182,9 +196,7 @@ function paginateCards(cards: EpisodeCard[]) {
     }
 
     chunks.forEach(chunk => {
-      // 高度大致與字級平方成正比（字小 → 每行字多、行高也小），所以用開根號回推
-      const height = chunk.reduce((sum, text) => sum + blockHeight(text), 0);
-      const scale = height > budget ? Math.max(0.7, Math.sqrt(budget / height)) : 1;
+      const scale = fitScale(s => chunk.reduce((sum, text) => sum + blockHeight(text, s), 0), budget, 0.7);
       paginated.push({ ...card, contentChunk: chunk, displayTitle: '', scale });
     });
   });
@@ -210,6 +222,18 @@ function paginateCards(cards: EpisodeCard[]) {
   }
 
   return paginated;
+}
+
+// 全螢幕檢視的縮放。手機（< sm）左右不留白；頂列按鈕底緣在 53px，讓出 56px（遮罩的 pt-14）、底部留 8px。
+// 桌機維持左右 48、上下 140 的留白。
+// 手機多半比 9:16 細長、寬度先頂到，這時貼齊兩側拿掉圓角（容差 2px）；
+// 高度先頂到（如 Safari 工具列展開）就留著圓角，免得兩側剩幾 px 細縫像跑版
+function fullscreenFit() {
+  const isPhone = window.innerWidth < 640;
+  const availW = window.innerWidth - (isPhone ? 0 : 48);
+  const availH = window.innerHeight - (isPhone ? 56 + 8 : 140);
+  const scale = Math.max(0.1, Math.min(availW / 1080, availH / 1920));
+  return { scale, fullBleed: isPhone && 1080 * scale > availW - 2 };
 }
 
 // --- Reusable Component for 1080x1920 Card ---
@@ -285,7 +309,7 @@ const ExportableCard = ({ card, index, isPreview = false, episode, isDark, total
           <div style={{ background: isDark ? '#222' : '#FFFFFF', borderRadius: '24px', padding: '64px 56px', border: isDark ? '1px solid #333' : '1px solid #E5E7EB', boxShadow: isDark ? '0 20px 40px rgba(0,0,0,0.4)' : '0 20px 40px rgba(0,0,0,0.05)' }}>
             <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
               {(card.contentChunk || []).map((point: string, i: number) => (
-                <li key={i} style={{ fontSize: spx(32), color: isDark ? '#EBEBEB' : '#333333', lineHeight: 1.65, marginBottom: i === (card.contentChunk || []).length - 1 ? 0 : spx(36), display: 'flex', gap: spx(24) }}>
+                <li key={i} style={{ fontSize: spx(SUMMARY_FONT), color: isDark ? '#EBEBEB' : '#333333', lineHeight: 1.65, marginBottom: i === (card.contentChunk || []).length - 1 ? 0 : spx(36), display: 'flex', gap: spx(24) }}>
                   <span style={{ color: isDark ? '#E8C97A' : '#A97C2B', fontSize: spx(36), lineHeight: 1.4, flexShrink: 0 }}>✦</span>
                   <div>{point}</div>
                 </li>
@@ -400,10 +424,8 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
   const [downloadProgress, setDownloadProgress] = useState({ current: 0, total: 0 });
   const [scale, setScale] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [fullScale, setFullScale] = useState(() => {
-    if (typeof window === 'undefined') return 0.4;
-    return Math.max(0.1, Math.min((window.innerWidth - 48) / 1080, (window.innerHeight - 140) / 1920));
-  });
+  const [{ scale: fullScale, fullBleed }, setFullFit] = useState(() =>
+    typeof window === 'undefined' ? { scale: 0.4, fullBleed: false } : fullscreenFit());
   const containerRef = useRef<HTMLDivElement>(null);
   const hiddenContainerRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -442,12 +464,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
 
   useEffect(() => {
     if (isFullscreen) {
-      const updateFullScale = () => {
-        // 扣掉左右留白與上下（關閉鈕 / 頁碼）的空間，避免圖卡被裁切
-        const scaleX = (window.innerWidth - 48) / 1080;
-        const scaleY = (window.innerHeight - 140) / 1920;
-        setFullScale(Math.max(0.1, Math.min(scaleX, scaleY)));
-      };
+      const updateFullScale = () => setFullFit(fullscreenFit());
       updateFullScale();
       window.addEventListener('resize', updateFullScale);
 
@@ -638,7 +655,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[var(--z-overlay)] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center overflow-hidden touch-none select-none focus:outline-none"
+            className="fixed inset-0 z-[var(--z-overlay)] bg-zinc-950/98 backdrop-blur-2xl flex flex-col justify-center items-center pt-14 sm:pt-0 overflow-hidden touch-none select-none focus:outline-none"
             onClick={() => setIsFullscreen(false)}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -687,7 +704,7 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
 
             {/* Scaled Container for Fullscreen - 100% Mathematically Centered */}
             <div
-              className="relative rounded-2xl sm:rounded-[36px] overflow-hidden shadow-2xl border border-zinc-800/80 bg-zinc-950 flex-shrink-0"
+              className={`relative overflow-hidden shadow-2xl bg-zinc-950 flex-shrink-0 ${fullBleed ? '' : 'rounded-2xl sm:rounded-[36px] border border-zinc-800/80'}`}
               style={{ width: `${Math.round(1080 * fullScale)}px`, height: `${Math.round(1920 * fullScale)}px` }}
               onClick={(e) => e.stopPropagation()}
             >
