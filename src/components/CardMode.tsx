@@ -100,6 +100,8 @@ function widthInChars(text: string) {
 
 // 一行只排得下整數個字；標點不能放行首（禁則）時會把前一字擠到下一行，
 // 平均每行再扣半字才不會低估（36～44px 實測）
+// ponytail: 英文字不能拆，SHOWROOM 這種長字整個掉到下一行時會少估一行（808 欄寬實測 3 條，
+// 所在的卡都還空 260px 以上）。真的撐破卡片再改成逐字模擬換行
 function lineCount(text: string, fontSize: number, boxWidth: number) {
   return Math.max(1, Math.ceil(widthInChars(text) / (Math.floor(boxWidth / fontSize) - 0.5)));
 }
@@ -117,13 +119,10 @@ function blockHeight(p: string, scale = 1) {
     const fs = Math.round(QUOTE_FONT * scale);
     return lineCount(`「${plain}」`, fs, BODY_BOX_WIDTH - 78) * fs * QUOTE_LH + 104;
   }
+  // 條列沒有項目符號也不縮排，算法同段落。loose list 的 li 內層多一包 <p>，
+  // li 自己的 margin 16 會跟 <p> 的 28 合併取大，所以條目間距也是 28 不是 44（實測）。
+  // ul 自己的 margin-bottom 32 整串只算一次，併在 bodyBudget 的安全邊界裡。
   const fs = Math.round(BODY_FONT * scale);
-  if (p.startsWith('* ')) {
-    // 條列：ul 左縮排 40，項目符號掛在縮排裡（實測欄寬 768）。loose list 的 li 內層多一包 <p>，
-    // li 自己的 margin 16 會跟 <p> 的 28 合併取大，所以條目間距是 28 不是 44（實測）。
-    // ul 自己的 margin-bottom 32 整串只算一次，併在 bodyBudget 的安全邊界裡。
-    return lineCount(plain, fs, BODY_BOX_WIDTH - 40) * fs * BODY_LH + 28;
-  }
   return lineCount(plain, fs, BODY_BOX_WIDTH) * fs * BODY_LH + 28;
 }
 
@@ -382,15 +381,17 @@ const ExportableCard = ({ card, index, isPreview = false, episode, isDark, total
               },
               strong: ({node, ...props}) => {
                 void node;
-                return <strong style={{ color: isDark ? '#E8C97A' : '#8A6A4B', fontWeight: 900 }} {...props} />;
+                // 標題已有顏色區分，900 在手機上太粗；用 500（layout.tsx 有載 Noto Sans TC 500）
+                return <strong style={{ color: isDark ? '#E8C97A' : '#8A6A4B', fontWeight: 500 }} {...props} />;
               },
               ul: ({node, ...props}) => {
                 void node;
-                return <ul className={isDark ? "marker:text-[#E8C97A]" : "marker:text-[#A97C2B]"} style={{ margin: '0 0 32px 40px', padding: 0 }} {...props} />;
+                // 每條開頭都有金色標題，不再加項目符號
+                return <ul style={{ margin: '0 0 32px', padding: 0 }} {...props} />;
               },
               li: ({node, ...props}) => {
                 void node;
-                return <li style={{ fontSize: px(BODY_FONT), color: textColor, lineHeight: 1.8, marginBottom: '16px', listStyleType: 'disc' }} {...props} />;
+                return <li style={{ fontSize: px(BODY_FONT), color: textColor, lineHeight: 1.8, marginBottom: '16px', listStyleType: 'none' }} {...props} />;
               },
               blockquote: ({node, ...props}) => {
                 void node;
