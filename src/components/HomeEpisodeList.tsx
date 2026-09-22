@@ -243,10 +243,10 @@ function EpisodePreview({ episode }: { episode: EpisodeListItem }) {
               <span className="shrink-0 flex text-brand-ochre dark:text-brand-yellow">
                 <ChevronLeft size={16} />
               </span>
-              {/* 標籤是 mono、標題是內文字體，行高不同，置中會錯位，改用 baseline 對齊 */}
+              {/* 標籤是 mono、標題是內文字體，行高不同，置中會錯位，改用 baseline 對齊。標籤都是中文字，跟標題同一套字體，字級也要一樣，差 1px 上緣就會高低不齊 */}
               <span className="min-w-0 flex items-baseline gap-2">
                 {openSection.tag && (
-                  <span className="shrink-0 font-mono text-[14px] text-brand-ochre dark:text-brand-yellow">
+                  <span className="shrink-0 font-mono text-[15px] text-brand-ochre dark:text-brand-yellow">
                     {openSection.tag}
                   </span>
                 )}
