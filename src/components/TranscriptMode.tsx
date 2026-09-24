@@ -766,7 +766,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
           </div>
         )}
 
-        {/* 抽屜內滾動段落紀錄列表（對照用，段落沒有時間碼所以不做跳轉） */}
+        {/* 抽屜內滾動段落紀錄列表（對照用，點時間碼跳到該段開始的地方） */}
         {isSectionTab ? (
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
             {filteredCards.map(({ card, index }) => (
@@ -779,6 +779,10 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                 keyword={searchKeyword}
                 onToggle={() => toggleCard(index)}
                 onPin={() => togglePin(index)}
+                onSeek={() => {
+                  const seconds = timeToSeconds(card.time ?? '');
+                  seekTo(seconds, findActiveIndex(seconds));
+                }}
               />
             ))}
 
@@ -914,7 +918,7 @@ function CardBullets({ content, keyword = '' }: { content: string[]; keyword?: s
   );
 }
 
-/** 抽屜裡的段落卡：點標題展開重點，點圖釘把它釘到逐字稿分頁上對照 */
+/** 抽屜裡的段落卡：點時間碼跳到這一段開始的地方，點標題展開重點，點圖釘把它釘到逐字稿分頁上對照 */
 function DrawerSectionCard({
   card,
   index,
@@ -923,6 +927,7 @@ function DrawerSectionCard({
   keyword,
   onToggle,
   onPin,
+  onSeek,
 }: {
   card: EpisodeCard;
   index: number;
@@ -931,6 +936,7 @@ function DrawerSectionCard({
   keyword: string;
   onToggle: () => void;
   onPin: () => void;
+  onSeek: () => void;
 }) {
   return (
     <div
@@ -941,6 +947,17 @@ function DrawerSectionCard({
       }`}
     >
       <div className="flex items-start gap-3 p-3.5">
+        {card.time && (
+          <button
+            type="button"
+            onClick={onSeek}
+            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-brand-ochre dark:hover:text-brand-yellow transition"
+            title="影片跳到這一段開始的地方"
+          >
+            <Play size={10} className="fill-current" />
+            <span>{card.time}</span>
+          </button>
+        )}
         <button
           type="button"
           onClick={onToggle}

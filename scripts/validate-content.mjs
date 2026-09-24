@@ -83,12 +83,25 @@ function validateEpisode(fileName) {
   const losslessHeading = lines.findIndex((line) =>
     /^##\s*【無損還原】\s*$/.test(line),
   );
+  const sectionStarts = [];
   if (losslessHeading !== -1) {
     for (let index = losslessHeading + 1; index < lines.length; index += 1) {
       if (/^##\s/.test(lines[index])) break;
       if (!/^###\s/.test(lines[index])) continue;
 
       const heading = lines[index].replace(/^###\s*/, "").trim();
+
+      // 段落照播出順序切，標題開頭記這一段開始的時間碼（切段規則見 docs/episode-workflow.md）
+      const start = /^\[(\d{1,3}:\d{2}(?::\d{2})?)\]/.exec(heading);
+      const seconds = start && timestampToSeconds(start[1]);
+      if (seconds === null) {
+        report(errors, relativePath, `段落「${heading}」缺少開始時間碼，標題要寫成 ### [mm:ss] [標籤] 標題`);
+      } else if (sectionStarts.length && seconds <= sectionStarts.at(-1).seconds) {
+        report(errors, relativePath, `段落「${heading}」的時間碼沒有比上一段晚：段落照播出順序切，不跨時間合併`);
+      } else {
+        sectionStarts.push({ heading, seconds });
+      }
+
       let cursor = index + 1;
       while (cursor < lines.length && lines[cursor].trim() === "") cursor += 1;
       const brief = cursor < lines.length ? lines[cursor].trim() : "";
@@ -117,6 +130,7 @@ function validateEpisode(fileName) {
     /^\[(\d{1,3}:\d{2}(?::\d{2})?)\]\s*\[([^\]]+)\]\s*(.*)$/;
   const speakerlessPattern = /^\[(\d{1,3}:\d{2}(?::\d{2})?)\]\s*(.+)$/;
   const seen = new Set();
+  const lineSeconds = new Set();
   const suspiciousSpeakers = new Set();
   let previousSeconds = -1;
   let parsedLines = 0;
@@ -144,6 +158,7 @@ function validateEpisode(fileName) {
     } else {
       if (seconds < previousSeconds) backwardsTimestamps += 1;
       previousSeconds = seconds;
+      lineSeconds.add(seconds);
     }
 
     if (!match) {
@@ -203,6 +218,21 @@ function validateEpisode(fileName) {
       `可疑 speaker：${[...suspiciousSpeakers].join("、")}`,
     );
   }
+
+  sectionStarts.forEach(({ heading, seconds }, index) => {
+    if (!lineSeconds.has(seconds)) {
+      report(errors, relativePath, `段落「${heading}」的時間碼對不到逐字稿任何一列`);
+    }
+    // 開場、結尾不受 60 秒限制；最後一段也量不到結束時間
+    const next = sectionStarts[index + 1];
+    if (next && next.seconds - seconds < 60 && !/\[(開場|結尾)\]/.test(heading)) {
+      report(
+        warnings,
+        relativePath,
+        `段落「${heading}」只有 ${next.seconds - seconds} 秒，不到 60 秒的話題不自成一段`,
+      );
+    }
+  });
 
   return parsedLines;
 }

@@ -11,6 +11,8 @@ export type EpisodeSummary = string[];
 export interface EpisodeCard {
   tag: string;
   title: string;
+  /** 這一段開始的時間碼，mm:ss；超過一小時分鐘繼續往上數（[62:00]） */
+  time?: string;
   /** 標題底下、條列之前的那一段白話，卡片上點開這一段時就顯示它 */
   brief?: string;
   content: string[];
@@ -104,7 +106,9 @@ export function getEpisodeData(id: string): EpisodeData | null {
   const cardSections = cardsText.split('### ').map(s => s.trim()).filter(Boolean);
   const cards: EpisodeCard[] = cardSections.map(section => {
     const lines = section.split('\n');
-    const headerLine = lines[0].trim();
+    // 標題開頭的 [mm:ss] 是這一段在逐字稿裡開始的位置
+    const timeMatch = lines[0].trim().match(/^\[(\d{1,3}:\d{2}(?::\d{2})?)\]\s*/);
+    const headerLine = lines[0].trim().slice(timeMatch?.[0].length ?? 0);
     // Parse tag and title from "一般話題 1人的廣播，不一樣的節奏"
     // Assuming format is "[Tag] Title" separated by space
     const firstSpaceIndex = headerLine.indexOf(' ');
@@ -143,7 +147,7 @@ export function getEpisodeData(id: string): EpisodeData | null {
       }
     }
 
-    return { tag, title, brief, content: bodyContent };
+    return { tag, title, time: timeMatch?.[1], brief, content: bodyContent };
   });
 
   // Extract Transcript

@@ -13,6 +13,7 @@
 * **高風險修改**：若涉及大規模重構核心架構（如更改 Next.js App Router 路由結構），AI 必須先提交 `implementation_plan.md` 供使用者審查，核准後才可修改。
 
 ## 3. 網站維護邊界
+* **段落格式與切段規則**：製作或重切集數檔一律照 `docs/episode-workflow.md`，每段標題帶開始時間碼，話題講滿 60 秒才開新段。
 * **不可隨意覆蓋**：更新 `content/episodes/` 內的 Markdown 廣播紀錄時，若檔案已存在，AI 必須先使用 `view_file` 讀取內容，並徵求使用者同意是否覆寫。
 * **設計系統鎖定**：本站色票取自制服視覺（卡其米棕外套 + 奶油黃緞帶 + 金釦 + 膚棕背景），以 `--color-brand-yellow`／`ochre`／`brown`／`cream`／`tan`／`gold`／`ink` 七個 token 表示，亮暗兩套實際色值**一律以 `src/app/globals.css` 為準**，不要在其他檔案另抄一份。非經使用者明確指示，AI 不得擅自修改這些 token 的色值。
 * **不要在元件裡寫死色碼**：需要品牌色一律用 token（例如 `text-brand-ink`，而不是 `text-[#2E2118]`）。唯一的例外是 `CardMode.tsx` 的圖卡匯出——`html-to-image` 讀不到 Tailwind class，必須用 inline style，但那份色表應該與 token 同源，不得各自演化。
