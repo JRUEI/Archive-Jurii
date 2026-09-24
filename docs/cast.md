@@ -35,7 +35,7 @@
 修正規則寫在 [`content/glossary.json`](../content/glossary.json)，跑 dry-run 檢查：
 
 ```powershell
-npm run glossary:dry-run -- --input .\content\ep01.ja.vtt --episode 1
+npm run glossary:dry-run -- --input .\content\260805.ja.vtt --episode 1
 ```
 
 `global` 放跨集通用、加了前後文錨點的安全規則；只在單集成立的（例如 ep01 慶生段的 `あいちゃん`／`あーちゃん`）放在 `episodes.<n>`，避免誤傷同樣叫「あいちゃん」的小澤愛実。
