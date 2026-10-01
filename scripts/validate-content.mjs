@@ -7,6 +7,8 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const episodesDirectory = path.join(projectRoot, "content", "episodes");
 const glossaryPath = path.join(projectRoot, "content", "glossary.json");
 const strict = process.argv.includes("--strict");
+// 逐字稿單列口語字數上限（不含 [音效] 標記），斷句規則見 docs/episode-workflow.md
+const maxSpokenChars = 60;
 const errors = [];
 const warnings = [];
 
@@ -138,6 +140,8 @@ function validateEpisode(fileName) {
   let emptyTextLines = 0;
   let duplicateLines = 0;
   let backwardsTimestamps = 0;
+  let sameSecondLines = 0;
+  let longLines = 0;
   let hasHost = false;
 
   for (let index = transcriptHeading + 1; index < lines.length; index += 1) {
@@ -157,6 +161,7 @@ function validateEpisode(fileName) {
       report(errors, relativePath, `第 ${index + 1} 行的時間碼無效：${timestamp}`);
     } else {
       if (seconds < previousSeconds) backwardsTimestamps += 1;
+      if (seconds === previousSeconds) sameSecondLines += 1;
       previousSeconds = seconds;
       lineSeconds.add(seconds);
     }
@@ -171,6 +176,7 @@ function validateEpisode(fileName) {
     if (!text.trim()) {
       emptyTextLines += 1;
     }
+    if (text.replace(/\[[^\]]*\]|\s/g, "").length > maxSpokenChars) longLines += 1;
     if (speaker === "逢田珠里依") hasHost = true;
     if (
       speaker.includes("？") ||
@@ -210,6 +216,12 @@ function validateEpisode(fileName) {
   }
   if (backwardsTimestamps) {
     report(warnings, relativePath, `${backwardsTimestamps} 次時間倒退`);
+  }
+  if (sameSecondLines) {
+    report(warnings, relativePath, `${sameSecondLines} 列和上一列同一秒，同一秒的句子要併成一列`);
+  }
+  if (longLines) {
+    report(warnings, relativePath, `${longLines} 列超過 ${maxSpokenChars} 字，太長的要在逗號處切開`);
   }
   if (suspiciousSpeakers.size) {
     report(
