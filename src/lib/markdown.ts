@@ -19,7 +19,10 @@ export interface EpisodeCard {
 }
 
 export interface TranscriptLine {
+  /** 列表上顯示的時間，整秒（mm:ss），不帶小數 */
   time: string;
+  /** 這一列第一個字開口的精確時間（秒）。檔案寫到 0.1 秒（[13:32.4]），沒寫小數就是整秒 */
+  seconds: number;
   speaker: string;
   text: string;
 }
@@ -156,17 +159,20 @@ export function getEpisodeData(id: string): EpisodeData | null {
     if (transcriptMatch) {
       const transcriptText = transcriptMatch[1];
       const lines = transcriptText.split('\n');
-      const lineRegex = /^\[(\d{1,3}:\d{2}(?::\d{2})?)\]\s*\[(.*?)\]\s*(.*)$/;
-      
+      // [mm:ss] 或 [mm:ss.d]；時間碼後面的小數只影響 seconds，time 一律是整秒
+      const lineRegex = /^\[(\d{1,3}:\d{2}(?::\d{2})?)(?:\.(\d+))?\]\s*\[(.*?)\]\s*(.*)$/;
+
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
         const match = trimmed.match(lineRegex);
         if (match) {
+          const whole = match[1].split(':').reduce((acc, part) => acc * 60 + Number(part), 0);
           transcript.push({
             time: match[1],
-            speaker: match[2],
-            text: match[3]
+            seconds: whole + (match[2] ? Number(`0.${match[2]}`) : 0),
+            speaker: match[3],
+            text: match[4]
           });
         }
       }

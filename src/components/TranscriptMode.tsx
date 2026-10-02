@@ -1,14 +1,28 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback, type CSSProperties } from 'react';
 import { EpisodeCard, EpisodeData } from '@/lib/markdown';
-import { readStoredNumber, useHydrated, writeStoredNumber } from '@/lib/client-state';
+import {
+  readStoredNumber,
+  readStoredString,
+  useHydrated,
+  writeStoredNumber,
+  writeStoredString,
+} from '@/lib/client-state';
 import { scrollBehavior } from '@/lib/motion';
+import {
+  buildSubtitleRows,
+  DEFAULT_SUBTITLE_STATE,
+  parseSubtitleState,
+  SUBTITLE_STORAGE_KEY,
+  type SubtitleState,
+} from '@/lib/subtitle';
 import { Search, Play, X, FileText, Crosshair, LayoutList, Pin, ChevronDown } from 'lucide-react';
+import SubtitleOverlay from './SubtitleOverlay';
+import SubtitleToolbar from './SubtitleToolbar';
 
 const GROUP_SIZE_STORAGE_KEY = 'jurii-transcript-group-size';
 const DEFAULT_GROUP_SIZE = 4;
-const HOST_NAME = '逢田珠里依';
 
 /** 站上的實心強調色，跟月曆翻頁鈕同一套 */
 const SOLID_ACCENT =
@@ -77,7 +91,8 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
 
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const [autoScroll, setAutoScroll] = useState<boolean>(true);
-  const [showOverlay, setShowOverlay] = useState<boolean>(true);
+  // 影片下方「即時字幕群」卡片的開關，跟影片上的字幕（subtitle）是兩回事
+  const [showGroupCard, setShowGroupCard] = useState<boolean>(true);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
@@ -115,6 +130,17 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
     setStoredGroupSize(num);
     writeStoredNumber(GROUP_SIZE_STORAGE_KEY, num);
   }, []);
+
+  // 影片上的字幕：開關、樣式、快捷、延遲整包存在同一個 key。水合前一律用預設（預設是關）
+  const [storedSubtitle, setStoredSubtitle] = useState(() =>
+    parseSubtitleState(readStoredString(SUBTITLE_STORAGE_KEY)),
+  );
+  const subtitle = hydrated ? storedSubtitle : DEFAULT_SUBTITLE_STATE;
+  const handleSubtitleChange = (patch: Partial<SubtitleState>) => {
+    const next = { ...subtitle, ...patch };
+    setStoredSubtitle(next);
+    writeStoredString(SUBTITLE_STORAGE_KEY, JSON.stringify(next));
+  };
 
   const playerRef = useRef<YouTubePlayer | null>(null);
   const theaterRef = useRef<HTMLDivElement | null>(null);
@@ -163,14 +189,12 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
     }
   }, []);
 
-  // 預先計算並快取包含秒數的逐字稿
+  // 加上列序號。seconds 在 markdown.ts 就解析好了（含 0.1 秒小數），這裡不能拿 time 重算：time 是整秒，會把小數洗掉
   const parsedLines = useMemo(() => {
-    return (episode.transcript || []).map((line, idx) => ({
-      ...line,
-      index: idx,
-      seconds: timeToSeconds(line.time),
-    }));
+    return (episode.transcript || []).map((line, idx) => ({ ...line, index: idx }));
   }, [episode.transcript]);
+
+  const subtitleRows = useMemo(() => buildSubtitleRows(parsedLines), [parsedLines]);
 
   // 正下方顯示的即時字幕群（預設 4 句，目前 timecode 對應第二句，容錯時間延遲並方便提前預讀）
   const currentGroupLines = useMemo(() => {
@@ -179,6 +203,9 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
     const baseIdx = Math.max(0, activeIndex >= 0 ? activeIndex - offset : 0);
     return parsedLines.slice(baseIdx, baseIdx + groupSize);
   }, [parsedLines, activeIndex, groupSize]);
+
+  // 字幕群時間欄寬（ch）：時間遞增，最後一列字最多；整集固定寬，播放中不會跳動
+  const timeCh = parsedLines.at(-1)?.time.length ?? 5;
 
   // 二分查找當前秒數落在哪一句話
   const findActiveIndex = useCallback(
@@ -372,7 +399,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   const filteredLines = parsedLines.filter(line => {
     if (!searchKeyword.trim()) return true;
     const kw = searchKeyword.toLowerCase();
-    return line.text.toLowerCase().includes(kw) || line.speaker.toLowerCase().includes(kw);
+    return line.text.toLowerCase().includes(kw);
   });
 
   const cards = episode.cards || [];
@@ -396,19 +423,33 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
       {/* 劇院居中主容器 */}
       <div className="max-w-4xl mx-auto flex flex-col gap-5">
 
-        {/* 1. 居中 YouTube 播放器 (16:9) - 保持純淨，無任何覆蓋層，時間軸 100% 原生流暢 */}
+        {/* 1. 居中 YouTube 播放器 (16:9)，底下接字幕設定列。
+            字幕疊層預設關閉；開了也是 pointer-events-none，影片上的操作與時間軸都不受影響。
+            疊層放在 YouTube 取代掉的那個 div 後面，React 往它前面插節點會找不到參照 */}
         {videoId && (
-          <div
-            id="transcript-player-stage"
-            ref={theaterRef}
-            className="scroll-mt-20 relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl"
-          >
-            <div id="transcript-yt-player" className="w-full h-full"></div>
+          <div className="flex flex-col gap-2">
+            <div
+              id="transcript-player-stage"
+              ref={theaterRef}
+              className="@container scroll-mt-20 relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl [&:fullscreen]:rounded-none [&:fullscreen]:border-0"
+            >
+              <div id="transcript-yt-player" className="w-full h-full"></div>
+              {subtitle.on && (
+                <SubtitleOverlay
+                  playerRef={playerRef}
+                  stageRef={theaterRef}
+                  rows={subtitleRows}
+                  style={subtitle.cur}
+                  offsetMs={subtitle.offset}
+                />
+              )}
+            </div>
+            <SubtitleToolbar state={subtitle} onChange={handleSubtitleChange} />
           </div>
         )}
 
         {/* 2. 影片正下方「即時字幕群卡片」（可自訂 1~5 句） */}
-        {showOverlay && currentGroupLines.length > 0 && (
+        {showGroupCard && currentGroupLines.length > 0 && (
           <div
             id="transcript-subtitle-group"
             className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 sm:p-5 shadow-lg flex flex-col gap-2.5"
@@ -416,10 +457,11 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
               <span className="flex items-center gap-1.5 font-bold text-zinc-700 dark:text-zinc-200">
                 <span className="w-2 h-2 rounded-full bg-brand-yellow animate-ping"></span>
-                即時字幕群（{groupSize} 句同步）
+                即時字幕群<span className="max-sm:hidden">（{groupSize} 句同步）</span>
               </span>
+              {/* 手機只留標題和按鈕一排；句數按鈕本身就看得出目前幾句 */}
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-[13px] text-zinc-500 dark:text-zinc-400">顯示句數：</span>
+                <span className="max-sm:hidden text-[13px] text-zinc-500 dark:text-zinc-400">顯示句數：</span>
                 <div className="inline-flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60">
                   {[1, 2, 3, 4, 5].map(num => (
                     <button
@@ -450,26 +492,23 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                   key={line.index}
                   type="button"
                   onClick={() => seekTo(line.seconds, line.index)}
-                  className="group w-full text-left py-2.5 sm:py-3 px-2 sm:px-3 flex items-baseline gap-3 sm:gap-4 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
+                  className="group w-full text-left py-2.5 sm:py-3 px-2 sm:px-3 flex items-start sm:gap-3 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
+                  title="點擊跳轉影片至此秒數"
                 >
-                  {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊的說話者標籤同一條線 */}
-                  <span className="shrink-0">
-                    <span
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-semibold border border-zinc-200/80 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/90 text-zinc-600 dark:text-zinc-300 shadow-sm transition-all group-hover:border-transparent group-hover:bg-brand-brown group-hover:text-brand-cream dark:group-hover:bg-brand-tan dark:group-hover:text-brand-ink"
-                      title="點擊跳轉影片至此秒數"
-                    >
-                      <Play size={10} className="fill-current" />
-                      <span>{line.time}</span>
-                    </span>
+                  {/* 時間：桌面是純數字欄，手機只留給螢幕閱讀器（max-sm:sr-only）省下 72px 寬。
+                      欄寬 = 這組最長的時間字數（ch），各列文字左緣才切齊。
+                      高度 = 內文行高（sm:text-base × leading-relaxed = 26px），時間在裡面置中，
+                      對到內文第一行；sm:top-[…] 是字型字面中心的校正值，換字型或字級要重量 */}
+                  <span
+                    className="max-sm:sr-only sm:flex sm:h-[26px] sm:w-(--time-w) sm:shrink-0 sm:items-center sm:relative sm:top-[1px] font-mono text-xs tabular-nums text-zinc-400 dark:text-zinc-500 transition-colors group-hover:text-brand-brown dark:group-hover:text-brand-tan"
+                    style={{ '--time-w': `${timeCh}ch` } as CSSProperties}
+                  >
+                    {line.time}
                   </span>
 
-                  {/* 對話內文。button 裡只能放 phrasing content，所以這幾層都是 span */}
+                  {/* 對話內文。全站都是單人直播，這張卡片不顯示說話者（抽屜裡仍有）。
+                      button 裡只能放 phrasing content，所以這幾層都是 span */}
                   <span className="flex-1 min-w-0">
-                    <span className="flex items-center gap-2 mb-1">
-                      <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${speakerPill(line.speaker)}`}>
-                        {line.speaker}
-                      </span>
-                    </span>
                     <span className="block text-sm sm:text-base leading-relaxed text-zinc-900 dark:text-zinc-100 font-medium">
                       {line.text}
                     </span>
@@ -519,8 +558,8 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white">
               <input
                 type="checkbox"
-                checked={showOverlay}
-                onChange={e => setShowOverlay(e.target.checked)}
+                checked={showGroupCard}
+                onChange={e => setShowGroupCard(e.target.checked)}
                 className="w-4 h-4 rounded accent-brand-brown dark:accent-brand-tan bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
               />
               <span>即時字幕群（{groupSize} 句）</span>
@@ -814,7 +853,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                     : 'border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40'
                 }`}
               >
-                {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊的說話者標籤同一條線 */}
+                {/* 時間戳播放按鈕：外層 baseline 對齊，跟右邊內文第一行同一條線 */}
                 <span className="shrink-0">
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg font-mono text-xs font-bold transition-all ${
@@ -831,11 +870,6 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
 
                 {/* 對話內文。button 裡只能放 phrasing content，所以這幾層都是 span */}
                 <span className="flex-1 min-w-0">
-                  <span className="flex items-center gap-2 mb-1">
-                    <span className={`font-bold text-xs px-2 py-0.5 rounded-full ${speakerPill(line.speaker)}`}>
-                      {line.speaker}
-                    </span>
-                  </span>
                   <span
                     className={`block text-sm sm:text-base leading-relaxed transition-colors ${
                       isActive
@@ -1017,13 +1051,6 @@ function DrawerSectionCard({
       )}
     </div>
   );
-}
-
-/** 說話者標籤：主持人一律走品牌金，其他人（來賓）走琥珀色區隔 */
-function speakerPill(speaker: string) {
-  return speaker === HOST_NAME
-    ? 'bg-brand-yellow/10 text-brand-brown dark:text-brand-yellow border border-brand-yellow/25'
-    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20';
 }
 
 // 關鍵字高亮輔助函式
