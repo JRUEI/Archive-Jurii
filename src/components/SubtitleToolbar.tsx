@@ -7,6 +7,7 @@ import {
   CaseSensitive,
   Circle,
   Info,
+  LayoutList,
   MoveVertical,
   RotateCcw,
   Star,
@@ -51,11 +52,22 @@ const describeOffset = (ms: number) => `${ms > 0 ? '提前' : '延後'} ${(Math.
 const formatOffset = (ms: number) => (ms === 0 ? '0 秒' : describeOffset(ms));
 
 /**
- * 影片下面的字幕設定列：開關、六個設定鈕、摘要、還原一排。
+ * 影片下面的字幕設定列：字幕開關、字幕群開關、六個設定鈕、摘要、還原一排。
  * 設定鈕各開一個小浮層（absolute，不推擠頁面）；一次只開一個。
  * 狀態與存檔都在上層，這裡只負責畫面。
  */
-export default function SubtitleToolbar({ state, onChange }: { state: SubtitleState; onChange: Change }) {
+export default function SubtitleToolbar({
+  state,
+  onChange,
+  groupOn,
+  onGroupChange,
+}: {
+  state: SubtitleState;
+  onChange: Change;
+  /** 影片下方「即時字幕群」卡片的開關，狀態在上層 */
+  groupOn: boolean;
+  onGroupChange: (on: boolean) => void;
+}) {
   const { on, cur, offset, summary } = state;
   const uid = useId();
   const [open, setOpen] = useState<Tool | null>(null);
@@ -176,6 +188,18 @@ export default function SubtitleToolbar({ state, onChange }: { state: SubtitleSt
                 }`}
               />
             </span>
+          </button>
+          {/* 影片下方卡片的開關：跟「目前設定」一樣是按下去亮底的圖示鈕，手機放得下（再加一個滑動開關會擠出工具列） */}
+          <button
+            type="button"
+            aria-pressed={groupOn}
+            aria-label="即時字幕群"
+            title="顯示／隱藏影片下方的即時字幕群"
+            onClick={() => onGroupChange(!groupOn)}
+            className={BAR_BTN}
+          >
+            <LayoutList size={16} aria-hidden="true" className="shrink-0" />
+            <span className={LABEL}>字幕群</span>
           </button>
 
           {TOOLS.map(({ id, name, Icon, strokeWidth }) => (

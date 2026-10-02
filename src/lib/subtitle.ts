@@ -20,7 +20,7 @@ export interface SubtitleState {
   v: 1;
   on: boolean;
   cur: SubtitleStyle;
-  /** 描邊快捷色：前兩個固定，之後是使用者存的，最多 6 個 */
+  /** 描邊快捷色：前三個固定（藍、酒紅、深綠，都不是黑），之後是使用者存的，最多 6 個 */
   saved: string[];
   /** 整組樣式快捷，三格，空的是 null */
   slots: (SubtitleStyle | null)[];
@@ -33,7 +33,7 @@ export interface SubtitleState {
 export const SUBTITLE_STORAGE_KEY = 'jurii-transcript-subtitle';
 export const SUBTITLE_SLOT_COUNT = 3;
 export const SUBTITLE_MAX_COLORS = 6;
-export const SUBTITLE_FIXED_COLORS: readonly string[] = ['#14247a', '#7b1226'];
+export const SUBTITLE_FIXED_COLORS: readonly string[] = ['#14247a', '#7b1226', '#14532d'];
 export const SUBTITLE_DEFAULT_STYLE: SubtitleStyle = { c: '#14247a', sb: 13, sf: 4.4, sw: 700, ss: 0.9 };
 
 /** [最小, 最大, 間距]：滑桿與讀回存檔時的夾限共用同一份 */

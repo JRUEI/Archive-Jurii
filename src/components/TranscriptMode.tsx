@@ -23,6 +23,7 @@ import SubtitleToolbar from './SubtitleToolbar';
 
 const GROUP_SIZE_STORAGE_KEY = 'jurii-transcript-group-size';
 const DEFAULT_GROUP_SIZE = 4;
+const GROUP_CARD_STORAGE_KEY = 'jurii-transcript-group-card';
 
 /** 站上的實心強調色，跟月曆翻頁鈕同一套 */
 const SOLID_ACCENT =
@@ -37,6 +38,8 @@ interface YouTubePlayer {
   playVideo: () => void;
   getCurrentTime: () => number;
   destroy: () => void;
+  /** 沒有文件、但嵌入播放器有：關掉原生字幕模組。缺了就當沒這個功能 */
+  unloadModule?: (name: string) => void;
 }
 
 interface YouTubePlayerOptions {
@@ -91,8 +94,6 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
 
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const [autoScroll, setAutoScroll] = useState<boolean>(true);
-  // 影片下方「即時字幕群」卡片的開關，跟影片上的字幕（subtitle）是兩回事
-  const [showGroupCard, setShowGroupCard] = useState<boolean>(true);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
@@ -130,6 +131,16 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
     setStoredGroupSize(num);
     writeStoredNumber(GROUP_SIZE_STORAGE_KEY, num);
   }, []);
+
+  // 影片下方「即時字幕群」卡片的開關（跟影片上的字幕是兩回事），預設開，記住上次選擇
+  const [storedShowGroupCard, setStoredShowGroupCard] = useState(
+    () => readStoredString(GROUP_CARD_STORAGE_KEY) !== '0',
+  );
+  const showGroupCard = hydrated ? storedShowGroupCard : true;
+  const handleGroupCardChange = (on: boolean) => {
+    setStoredShowGroupCard(on);
+    writeStoredString(GROUP_CARD_STORAGE_KEY, on ? '1' : '0');
+  };
 
   // 影片上的字幕：開關、樣式、快捷、延遲整包存在同一個 key。水合前一律用預設（預設是關）
   const [storedSubtitle, setStoredSubtitle] = useState(() =>
@@ -319,6 +330,15 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
 
     let isMounted = true;
 
+    // 站上有自己的字幕（疊層與字幕群），YouTube 原生 CC 一律關掉，不然帳號或瀏覽器開了 CC 就會兩層字幕疊在一起
+    function closeNativeCaptions() {
+      try {
+        playerRef.current?.unloadModule?.('captions');
+      } catch {
+        // 播放器還沒準備好或這支沒有該方法，下次狀態變化再試
+      }
+    }
+
     function initPlayer() {
       if (!window.YT?.Player) return;
       if (playerRef.current) return;
@@ -332,18 +352,21 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             modestbranding: 1,
             rel: 0,
             enablejsapi: 1,
-            cc_load_policy: 0, // 預設關閉 YouTube 原生字幕，防止干擾
+            cc_load_policy: 0, // 0 是「照觀看者自己的 YouTube 設定」，不是強制關；真正關掉靠 closeNativeCaptions
             iv_load_policy: 3, // 關閉註解
           },
           events: {
             onReady: () => {
               if (!isMounted) return;
+              closeNativeCaptions();
               setIsPlayerReady(true);
               startProgressLoopRef.current();
             },
             onStateChange: event => {
               if (!isMounted) return;
               if (event.data === window.YT?.PlayerState.PLAYING) {
+                // 字幕模組常在第一次播放才載入，ready 時關過一次還不夠
+                closeNativeCaptions();
                 startProgressLoopRef.current();
               }
             },
@@ -444,7 +467,12 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                 />
               )}
             </div>
-            <SubtitleToolbar state={subtitle} onChange={handleSubtitleChange} />
+            <SubtitleToolbar
+              state={subtitle}
+              onChange={handleSubtitleChange}
+              groupOn={showGroupCard}
+              onGroupChange={handleGroupCardChange}
+            />
           </div>
         )}
 
@@ -554,18 +582,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
 
           {/* 手機寬度放不下兩個，換行比讓字斷成「（4 / 句）」好看 */}
           <div className="flex flex-wrap items-center gap-3">
-            {/* 字幕群開關 */}
-            <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white">
-              <input
-                type="checkbox"
-                checked={showGroupCard}
-                onChange={e => setShowGroupCard(e.target.checked)}
-                className="w-4 h-4 rounded accent-brand-brown dark:accent-brand-tan bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700"
-              />
-              <span>即時字幕群（{groupSize} 句）</span>
-            </label>
-
-            {/* 展開抽屜主按鈕 */}
+            {/* 展開抽屜主按鈕（字幕群開關在影片下的字幕工具列） */}
             <button
               type="button"
               onClick={() => setIsDrawerOpen(true)}
