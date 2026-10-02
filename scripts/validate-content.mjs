@@ -9,6 +9,9 @@ const glossaryPath = path.join(projectRoot, "content", "glossary.json");
 const strict = process.argv.includes("--strict");
 // 逐字稿單列口語字數上限（不含 [音效] 標記），斷句規則見 docs/episode-workflow.md
 const maxSpokenChars = 60;
+// 一段「」引述最多橫跨幾列、幾秒，超過多半是漏了」
+const maxQuoteRows = 8;
+const maxQuoteSeconds = 40;
 const errors = [];
 const warnings = [];
 
@@ -31,7 +34,8 @@ function timestampToSeconds(timestamp) {
 function validateEpisode(fileName) {
   const relativePath = path.join("content", "episodes", fileName);
   const fullPath = path.join(episodesDirectory, fileName);
-  const parsed = matter(fs.readFileSync(fullPath, "utf8"));
+  const raw = fs.readFileSync(fullPath, "utf8");
+  const parsed = matter(raw);
   const id = fileName.replace(/\.md$/, "");
 
   if (!parsed.data.title || typeof parsed.data.title !== "string") {
@@ -80,6 +84,9 @@ function validateEpisode(fileName) {
   }
 
   const lines = parsed.content.split(/\r?\n/);
+  // parsed.content 已去掉 front matter，回報行號時加回去才是檔案裡看到的那一行
+  const lineOffset = raw.split(/\r?\n/).length - lines.length;
+  const fileLine = (index) => index + 1 + lineOffset;
 
   // 每一段【無損還原】的標題底下、條列之前要有一段白話簡述，首頁卡片點開目錄那一面顯示的就是它
   const losslessHeading = lines.findIndex((line) =>
@@ -128,14 +135,17 @@ function validateEpisode(fileName) {
   );
   if (transcriptHeading === -1) return 0;
 
+  // [mm:ss] 或 [mm:ss.d]：整秒用來對段落起點與判斷同一秒，小數（只准一位 = 0.1 秒）用來排先後
   const transcriptPattern =
-    /^\[(\d{1,3}:\d{2}(?::\d{2})?)\]\s*\[([^\]]+)\]\s*(.*)$/;
-  const speakerlessPattern = /^\[(\d{1,3}:\d{2}(?::\d{2})?)\]\s*(.+)$/;
+    /^\[(\d{1,3}:\d{2}(?::\d{2})?)(?:\.(\d))?\]\s*\[([^\]]+)\]\s*(.*)$/;
+  const speakerlessPattern = /^\[(\d{1,3}:\d{2}(?::\d{2})?)(?:\.(\d))?\]\s*(.+)$/;
   const seen = new Set();
   const lineSeconds = new Set();
   const suspiciousSpeakers = new Set();
   let previousSeconds = -1;
+  let previousExact = -1;
   let parsedLines = 0;
+  let decimalLines = 0;
   let speakerlessLines = 0;
   let emptyTextLines = 0;
   let duplicateLines = 0;
@@ -143,6 +153,11 @@ function validateEpisode(fileName) {
   let sameSecondLines = 0;
   let longLines = 0;
   let hasHost = false;
+  // 「」跨列時網站在顯示端逐列補成對，檔案裡的括號本身要對，否則補出來的括號會一路錯下去
+  let openQuote = null;
+  const strayCloses = [];
+  const doubleOpens = [];
+  const longQuotes = [];
 
   for (let index = transcriptHeading + 1; index < lines.length; index += 1) {
     const line = lines[index].trim();
@@ -151,18 +166,22 @@ function validateEpisode(fileName) {
     const match = line.match(transcriptPattern);
     const speakerlessMatch = line.match(speakerlessPattern);
     if (!match && !speakerlessMatch) {
-      report(errors, relativePath, `第 ${index + 1} 行不是可解析的逐字稿列`);
+      report(errors, relativePath, `第 ${fileLine(index)} 行不是可解析的逐字稿列`);
       continue;
     }
 
-    const timestamp = (match || speakerlessMatch)[1];
+    const [, timestamp, tenth] = match || speakerlessMatch;
     const seconds = timestampToSeconds(timestamp);
+    let exact = previousExact;
     if (seconds === null) {
-      report(errors, relativePath, `第 ${index + 1} 行的時間碼無效：${timestamp}`);
+      report(errors, relativePath, `第 ${fileLine(index)} 行的時間碼無效：${timestamp}`);
     } else {
-      if (seconds < previousSeconds) backwardsTimestamps += 1;
+      exact = seconds + (tenth ? Number(tenth) / 10 : 0);
+      if (exact < previousExact) backwardsTimestamps += 1;
       if (seconds === previousSeconds) sameSecondLines += 1;
+      if (tenth !== undefined) decimalLines += 1;
       previousSeconds = seconds;
+      previousExact = exact;
       lineSeconds.add(seconds);
     }
 
@@ -172,9 +191,25 @@ function validateEpisode(fileName) {
     }
 
     parsedLines += 1;
-    const [, , speaker, text] = match;
+    const [, , , speaker, text] = match;
     if (!text.trim()) {
       emptyTextLines += 1;
+    }
+    for (const char of text) {
+      if (char === "「") {
+        if (openQuote) doubleOpens.push(fileLine(index));
+        openQuote = { line: fileLine(index), row: parsedLines, exact };
+      } else if (char === "」") {
+        if (!openQuote) {
+          strayCloses.push(fileLine(index));
+        } else if (
+          parsedLines - openQuote.row + 1 > maxQuoteRows ||
+          exact - openQuote.exact > maxQuoteSeconds
+        ) {
+          longQuotes.push(openQuote.line);
+        }
+        openQuote = null;
+      }
     }
     if (text.replace(/\[[^\]]*\]|\s/g, "").length > maxSpokenChars) longLines += 1;
     if (speaker === "逢田珠里依") hasHost = true;
@@ -229,6 +264,31 @@ function validateEpisode(fileName) {
       relativePath,
       `可疑 speaker：${[...suspiciousSpeakers].join("、")}`,
     );
+  }
+  if (parsedLines && decimalLines === 0) {
+    report(
+      warnings,
+      relativePath,
+      `逐字稿時間碼都是整秒，字幕疊層會比開口早出現最多近 1 秒；補上 0.1 秒：node scripts/stamp-times.mjs ${id}`,
+    );
+  }
+  const lineList = (numbers) =>
+    numbers.slice(0, 5).join("、") + (numbers.length > 5 ? "…" : "");
+  if (strayCloses.length) {
+    report(warnings, relativePath, `第 ${lineList(strayCloses)} 行有落單的」，前面沒有對應的「`);
+  }
+  if (doubleOpens.length) {
+    report(warnings, relativePath, `第 ${lineList(doubleOpens)} 行又出現「，但前一個「還沒關`);
+  }
+  if (longQuotes.length) {
+    report(
+      warnings,
+      relativePath,
+      `第 ${lineList(longQuotes)} 行開頭的引述撐了超過 ${maxQuoteRows} 列或 ${maxQuoteSeconds} 秒才關，字幕上會一直掛著括號，確認是不是漏了」`,
+    );
+  }
+  if (openQuote) {
+    report(warnings, relativePath, `第 ${openQuote.line} 行的「到整集結束都沒有關`);
   }
 
   sectionStarts.forEach(({ heading, seconds }, index) => {
