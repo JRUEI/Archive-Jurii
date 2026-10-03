@@ -323,6 +323,11 @@ export default function TranscriptMode({
   useEffect(() => {
     if (!landscape) return;
     document.body.style.overflow = 'hidden';
+    // 實體橫拿時 iPhone 預設把頁面限制在瀏海／Home 條以內，影片左右兩側的黑區是系統留的、網頁收不到點擊。
+    // 臨時加 viewport-fit=cover 讓頁面鋪滿整個螢幕（100dvw 變成全螢幕寬），退出再還原，其他頁面不受影響
+    const viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+    const viewportBefore = viewportMeta?.content;
+    if (viewportMeta) viewportMeta.content = `${viewportBefore}, viewport-fit=cover`;
     // 墊一筆歷史：手機的返回手勢／返回鍵（左右邊緣滑都算）會退出橫向，而不是離開整個頁面
     window.history.pushState({ landscape: true }, '');
     const onKeyDown = (e: KeyboardEvent) => {
@@ -333,6 +338,7 @@ export default function TranscriptMode({
     window.addEventListener('popstate', onPopState);
     return () => {
       document.body.style.overflow = '';
+      if (viewportMeta && viewportBefore !== undefined) viewportMeta.content = viewportBefore;
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('popstate', onPopState);
       // 不是被返回手勢退出的（按 X、Esc）就把墊的那筆歷史收掉，免得返回鍵要多按一次
@@ -546,7 +552,7 @@ export default function TranscriptMode({
                         else setExitSide(side);
                       }}
                       aria-label="顯示退出鈕"
-                      className={`landscape-edge absolute inset-y-0 z-10 touch-none ${side === 'left' ? 'left-0' : 'right-0'}`}
+                      className={`landscape-edge absolute inset-y-0 z-10 touch-none focus:outline-none ${side === 'left' ? 'left-0' : 'right-0'}`}
                     />
                   ))}
                   {exitSide && (
