@@ -61,6 +61,29 @@
   100% { transform: scale(1); }
 }
 
+/* 手機橫向放大：iPhone 的瀏覽器沒有元素全螢幕，只能自己把播放器鋪滿視窗。
+   沒套 @layer，所以壓得過播放器上的 aspect-video／圓角／邊框。
+   直拿時寬高對調再轉 90°（左上角為軸、右移一個視窗寬），橫拿時直接鋪滿；實體轉動手機時 media query 自己切換 */
+.stage-landscape {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-overlay);
+  width: 100dvw;
+  height: 100dvh;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+@media (orientation: portrait) {
+  .stage-landscape {
+    width: 100dvh;
+    height: 100dvw;
+    transform-origin: top left;
+    transform: translateX(100dvw) rotate(90deg);
+  }
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);

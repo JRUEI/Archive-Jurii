@@ -17,7 +17,7 @@ import {
   SUBTITLE_STORAGE_KEY,
   type SubtitleState,
 } from '@/lib/subtitle';
-import { Search, Play, X, FileText, Crosshair, LayoutList, Pin, ChevronDown } from 'lucide-react';
+import { Search, Play, X, FileText, Crosshair, LayoutList, Pin, ChevronDown, RectangleHorizontal } from 'lucide-react';
 import SubtitleOverlay from './SubtitleOverlay';
 import SubtitleToolbar, { BAR_BTN, LABEL } from './SubtitleToolbar';
 
@@ -99,6 +99,7 @@ export default function TranscriptMode({
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [, setIsPlayerReady] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [landscape, setLandscape] = useState<boolean>(false);
 
   // 抽屜分頁：逐字稿 ↔ 段落紀錄（段落沒有時間碼，只能對照，不能跳轉）
   const [drawerTab, setDrawerTab] = useState<'lines' | 'sections'>('lines');
@@ -307,6 +308,20 @@ export default function TranscriptMode({
     return () => clearTimeout(timer);
   }, [isDrawerOpen, activeIndex]);
 
+  // 手機橫向放大：播放器鋪滿視窗（樣式在 globals.css 的 .stage-landscape）。只切 class、不動 iframe，播放不會斷
+  useEffect(() => {
+    if (!landscape) return;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLandscape(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [landscape]);
+
   // 監聽鍵盤 Escape 鍵關閉抽屜
   // 開啟時焦點送進面板、鎖住背景捲動；關閉時還原。
   // 原本手機上滑抽屜，底下的頁面會跟著滾
@@ -465,7 +480,7 @@ export default function TranscriptMode({
             <div
               id="transcript-player-stage"
               ref={theaterRef}
-              className={`@container scroll-mt-20 relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl [&:fullscreen]:rounded-none [&:fullscreen]:border-0`}
+              className={`@container scroll-mt-20 relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl [&:fullscreen]:rounded-none [&:fullscreen]:border-0 ${landscape ? 'stage-landscape' : ''}`}
             >
               <div id="transcript-yt-player" className="w-full h-full"></div>
               {subtitle.on && (
@@ -475,6 +490,17 @@ export default function TranscriptMode({
                   style={subtitle.cur}
                   offsetMs={subtitle.offset}
                 />
+              )}
+              {landscape && (
+                <button
+                  type="button"
+                  onClick={() => setLandscape(false)}
+                  aria-label="退出橫向放大"
+                  title="退出橫向放大 (Esc)"
+                  className="absolute right-2 top-2 z-10 inline-flex size-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
               )}
             </div>
             <SubtitleToolbar
@@ -505,6 +531,17 @@ export default function TranscriptMode({
               >
                 <Search size={16} aria-hidden="true" className="shrink-0" />
                 <span className={LABEL}>完整字幕</span>
+              </button>
+              {/* 只給觸控裝置：iPhone 的瀏覽器沒有元素全螢幕（上面那顆全螢幕鈕不會出現），這顆自己鋪滿並轉橫 */}
+              <button
+                type="button"
+                onClick={() => setLandscape(true)}
+                aria-label="橫向放大"
+                title="橫向放大：播放器鋪滿畫面並轉成橫的"
+                className={`${BAR_BTN} pointer-fine:hidden`}
+              >
+                <RectangleHorizontal size={16} aria-hidden="true" className="shrink-0" />
+                <span className={LABEL}>橫向放大</span>
               </button>
             </SubtitleToolbar>
           </div>
