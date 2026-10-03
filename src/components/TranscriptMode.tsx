@@ -569,8 +569,8 @@ export default function TranscriptMode({
                     />
                   ))}
                   {hint && (
-                    <p className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-xs text-white backdrop-blur">
-                      輕點兩側黑區顯示退出鈕，或從邊緣往內滑退出
+                    <p className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/55 px-4 py-1.5 text-base text-white backdrop-blur">
+                      輕點影片兩側邊緣顯示退出鈕，或於邊緣向內滑動退出
                     </p>
                   )}
                   {exitSide && (
