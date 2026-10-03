@@ -128,11 +128,9 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
           </div>
 
           {/* Mode Toggle */}
-          {/* 逐字稿沒有圖卡／文字之分，這組要停用。原本只有 pointer-events-none，
-              擋得住滑鼠擋不住鍵盤，Tab 還是進得來而且按得下去；inert 才會真的停用 */}
+          {/* 逐字稿沒有圖卡／文字之分，整組直接藏起來（display:none 連 Tab 順序也一併拿掉） */}
           <div
-            inert={viewType === 'transcript'}
-            className={`flex w-full sm:w-auto bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl shrink-0 min-w-min ${viewType === 'transcript' ? 'opacity-50 pointer-events-none' : ''}`}
+            className={`w-full sm:w-auto bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl shrink-0 min-w-min ${viewType === 'transcript' ? 'hidden' : 'flex'}`}
           >
             <button
               onClick={() => setIsCardMode(true)}
