@@ -155,9 +155,11 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
       {/* Content Area */}
       <div className="w-full flex justify-center">
         {transcriptVisited && (
-          <div className={viewType === 'transcript' ? 'w-full' : 'hidden'}>
-            <TranscriptMode episode={episode} />
-          </div>
+          <TranscriptMode
+            episode={episode}
+            active={viewType === 'transcript'}
+            onReturn={() => setViewType('transcript')}
+          />
         )}
         {viewType !== 'transcript' &&
           (isCardMode ? (

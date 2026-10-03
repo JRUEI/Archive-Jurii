@@ -82,7 +82,16 @@ function extractYouTubeId(url?: string): string | null {
   return match ? match[1] : null;
 }
 
-export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
+export default function TranscriptMode({
+  episode,
+  active = true,
+  onReturn,
+}: {
+  episode: EpisodeData;
+  /** 不在逐字稿分頁時為 false：整塊藏起來但不卸載（卸載會銷毀播放器、聲音就斷了），並在角落浮出「回逐字稿」鈕 */
+  active?: boolean;
+  onReturn?: () => void;
+}) {
   const videoId = extractYouTubeId(episode.youtubeUrl);
 
   const [activeIndex, setActiveIndex] = useState<number>(-1);
@@ -182,6 +191,13 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
       playerEl.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
     }
   }, []);
+
+  // 從別的分頁切回來（頂端分頁鈕或角落的「回逐字稿」鈕）時，落在播放器與字幕群：別的分頁捲得很深，回來頁面變短，視窗不一定剛好對到播放器
+  const wasActive = useRef(active);
+  useEffect(() => {
+    if (active && !wasActive.current) scrollToTheaterView();
+    wasActive.current = active;
+  }, [active, scrollToTheaterView]);
 
   // 加上列序號。seconds 在 markdown.ts 就解析好了（含 0.1 秒小數），這裡不能拿 time 重算：time 是整秒，會把小數洗掉
   const parsedLines = useMemo(() => {
@@ -402,6 +418,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   }, [videoId]);
 
   if (!episode.transcript || episode.transcript.length === 0) {
+    if (!active) return null;
     return (
       <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 md:p-12 shadow-xl flex items-center justify-center min-h-[300px]">
         <p className="text-zinc-500 text-lg">目前此集數尚未提供逐字稿。</p>
@@ -433,7 +450,8 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   const pinned = pinnedCard !== null ? cards[pinnedCard] : undefined;
 
   return (
-    <div className="w-full">
+    <>
+    <div className={active ? 'w-full' : 'hidden'}>
       {/* 劇院居中主容器 */}
       {/* 有影片時整塊（播放器起算）至少撐到視窗高：捲到最底時影片剛好能貼在固定列正下方。
           72px＝固定列 65px＋7px 空隙，112px＝72px＋EpisodeViewer 的 py-10 底距；lvh 取最大視窗高，行動版網址列收起時也不會差一截 */}
@@ -447,7 +465,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             <div
               id="transcript-player-stage"
               ref={theaterRef}
-              className="@container scroll-mt-20 relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl [&:fullscreen]:rounded-none [&:fullscreen]:border-0"
+              className={`@container scroll-mt-20 relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-2xl [&:fullscreen]:rounded-none [&:fullscreen]:border-0`}
             >
               <div id="transcript-yt-player" className="w-full h-full"></div>
               {subtitle.on && (
@@ -897,6 +915,23 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
         )}
       </aside>
     </div>
+
+    {/* 在別的分頁時浮在角落：顯示目前播到哪，按下去切回逐字稿。放在隱藏容器外面，fixed 才不會跟著被藏掉 */}
+    {!active && (
+      <button
+        type="button"
+        onClick={onReturn}
+        className={`fixed bottom-5 right-4 sm:right-5 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full font-bold text-xs shadow-2xl transition-all hover:scale-105 active:scale-95 ${SOLID_ACCENT}`}
+        title="回到逐字稿與播放器"
+      >
+        <FileText size={14} className="shrink-0" />
+        {activeIndex >= 0 && (
+          <span className="font-mono tabular-nums">{parsedLines[activeIndex]?.time}</span>
+        )}
+        <span>回逐字稿</span>
+      </button>
+    )}
+    </>
   );
 }
 
