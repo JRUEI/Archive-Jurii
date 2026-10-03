@@ -573,8 +573,9 @@ export default function TranscriptMode({
                       onClick={() => setLandscape(false)}
                       aria-label="退出橫向放大"
                       title="退出橫向放大 (Esc)"
-                      // 放在影片裡面、離影片外緣 1rem（--bar 是黑區寬，見 globals.css）
-                      style={{ [exitSide]: 'calc(max(var(--bar), 0px) + 1rem)' }}
+                      // 以影片外緣為鏡面，把黑區的中心線映射進影片：X 中心離螢幕邊 1.5 倍黑區寬（--bar，見 globals.css），size-9 的一半是 1.125rem；
+                      // 黑區太窄或沒有時退回離邊 0.5rem
+                      style={{ [exitSide]: 'max(calc(var(--bar) * 1.5 - 1.125rem), 0.5rem)' }}
                       className="absolute top-1/2 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur"
                     >
                       <X size={18} aria-hidden="true" />
