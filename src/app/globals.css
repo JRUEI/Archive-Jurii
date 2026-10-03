@@ -97,13 +97,16 @@
 
 /* 橫向放大時兩側的點擊感應區：寬度＝影片左右黑邊（舞台寬 − 高×16/9 再除以 2），整塊黑邊都點得到；最少 7rem，黑邊很窄時仍避得開狀態列。
    舞台直拿時寬高對調（見上面 .stage-landscape），所以 dvw／dvh 也對調 */
-.landscape-edge {
-  width: max(7rem, calc((100dvw - 100dvh * 16 / 9) / 2));
+.stage-landscape {
+  --bar: calc((100dvw - 100dvh * 16 / 9) / 2);
 }
 @media (orientation: portrait) {
-  .landscape-edge {
-    width: max(7rem, calc((100dvh - 100dvw * 16 / 9) / 2));
+  .stage-landscape {
+    --bar: calc((100dvh - 100dvw * 16 / 9) / 2);
   }
+}
+.landscape-edge {
+  width: max(7rem, var(--bar));
 }
 
 body {

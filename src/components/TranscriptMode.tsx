@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo, useCallback, type CSSProperties } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback, useSyncExternalStore, type CSSProperties } from 'react';
 import { EpisodeCard, EpisodeData } from '@/lib/markdown';
 import {
   readStoredNumber,
@@ -19,7 +19,15 @@ import {
 } from '@/lib/subtitle';
 import { Search, Play, X, Clock, FileText, Crosshair, LayoutList, Pin, ChevronDown, RectangleHorizontal } from 'lucide-react';
 import SubtitleOverlay from './SubtitleOverlay';
-import SubtitleToolbar, { BAR_BTN, LABEL } from './SubtitleToolbar';
+import SubtitleToolbar, { BAR_BTN, LABEL, SwitchTrack } from './SubtitleToolbar';
+
+// Tailwind 的 sm 斷點（640px），給「沒存過選擇時時間欄要不要顯示」當預設
+const subscribeWide = (cb: () => void) => {
+  const mq = window.matchMedia('(min-width: 640px)');
+  mq.addEventListener('change', cb);
+  return () => mq.removeEventListener('change', cb);
+};
+const getWide = () => window.matchMedia('(min-width: 640px)').matches;
 
 const GROUP_SIZE_STORAGE_KEY = 'jurii-transcript-group-size';
 const DEFAULT_GROUP_SIZE = 4;
@@ -145,14 +153,14 @@ export default function TranscriptMode({
     writeStoredString(GROUP_CARD_STORAGE_KEY, on ? '1' : '0');
   };
 
-  // 字幕群每列前面的時間欄（桌面才有），預設顯示，記住上次選擇
-  const [storedShowGroupTime, setStoredShowGroupTime] = useState(
-    () => readStoredString(GROUP_TIME_STORAGE_KEY) !== '0',
-  );
-  const showGroupTime = hydrated ? storedShowGroupTime : true;
+  // 字幕群每列前面的時間欄，記住上次選擇。沒選過時桌面顯示、手機不顯示（手機窄，省下一欄寬度）
+  const [storedShowGroupTime, setStoredShowGroupTime] = useState(() => readStoredString(GROUP_TIME_STORAGE_KEY));
+  const isWide = useSyncExternalStore(subscribeWide, getWide, () => true);
+  const showGroupTime = hydrated && storedShowGroupTime !== null ? storedShowGroupTime === '1' : isWide;
   const handleGroupTimeToggle = () => {
-    setStoredShowGroupTime(!showGroupTime);
-    writeStoredString(GROUP_TIME_STORAGE_KEY, showGroupTime ? '0' : '1');
+    const next = showGroupTime ? '0' : '1';
+    setStoredShowGroupTime(next);
+    writeStoredString(GROUP_TIME_STORAGE_KEY, next);
   };
 
   // 影片上的字幕：開關、樣式、快捷、延遲整包存在同一個 key。水合前一律用預設（預設是關）
@@ -341,8 +349,12 @@ export default function TranscriptMode({
       if (viewportMeta && viewportBefore !== undefined) viewportMeta.content = viewportBefore;
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('popstate', onPopState);
-      // 不是被返回手勢退出的（按 X、Esc）就把墊的那筆歷史收掉，免得返回鍵要多按一次
-      if (window.history.state?.landscape) window.history.back();
+      // 不是被返回手勢退出的（按 X、Esc、滑動）就把墊的那筆歷史收掉，免得返回鍵要多按一次。
+      // 要等一下再看：左緣往右滑時系統的返回手勢跟自己的滑動偵測會同時觸發，立刻 back() 會連退兩步回到上一頁；
+      // 等系統那一步先退掉，墊的那筆已經不在了就不用再退
+      setTimeout(() => {
+        if (window.history.state?.landscape && !document.querySelector('.stage-landscape')) window.history.back();
+      }, 300);
     };
   }, [landscape]);
 
@@ -561,7 +573,9 @@ export default function TranscriptMode({
                       onClick={() => setLandscape(false)}
                       aria-label="退出橫向放大"
                       title="退出橫向放大 (Esc)"
-                      className={`absolute top-1/2 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur ${exitSide === 'left' ? 'left-16' : 'right-16'}`}
+                      // 放在影片裡面、離影片外緣 1rem（--bar 是黑區寬，見 globals.css）
+                      style={{ [exitSide]: 'calc(max(var(--bar), 0px) + 1rem)' }}
+                      className="absolute top-1/2 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur"
                     >
                       <X size={18} aria-hidden="true" />
                     </button>
@@ -629,25 +643,21 @@ export default function TranscriptMode({
                 即時字幕群<span className="max-sm:hidden">（{groupSize} 句同步）</span>
               </span>
               {/* 手機只留標題和按鈕一排；句數按鈕本身就看得出目前幾句 */}
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                {/* 時間開關：外框與右邊句數鈕同一款（p-0.5 的灰底框），開著就是實心強調色。手機本來就不顯示時間，所以只在桌面出現 */}
-                <div className="max-sm:hidden inline-flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60 mr-1.5">
-                  <button
-                    type="button"
-                    aria-pressed={showGroupTime}
-                    onClick={handleGroupTimeToggle}
-                    title="顯示／隱藏每句前面的時間"
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold transition-all ${
-                      showGroupTime
-                        ? `${SOLID_ACCENT} shadow-sm`
-                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                    }`}
-                  >
-                    <Clock size={12} aria-hidden="true" className="shrink-0" />
-                    時間
-                  </button>
-                </div>
-                <span className="max-sm:hidden text-[13px] text-zinc-500 dark:text-zinc-400">顯示句數：</span>
+              <div className="flex items-center gap-2.5 sm:gap-2">
+                {/* 時間開關：跟字幕工具列的開關同一款（圖示＋滑動開關），手機只留圖示與開關 */}
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showGroupTime}
+                  aria-label="顯示時間"
+                  title="顯示／隱藏每句前面的時間"
+                  onClick={handleGroupTimeToggle}
+                  className="inline-flex h-7 shrink-0 items-center gap-1 rounded-[10px] px-0.5 text-[13px] font-bold text-zinc-700 transition hover:bg-brand-yellow/10 dark:text-zinc-200 sm:gap-1.5 sm:px-2"
+                >
+                  <Clock size={16} aria-hidden="true" />
+                  <span className="max-sm:hidden">時間</span>
+                  <SwitchTrack on={showGroupTime} />
+                </button>
                 <div className="inline-flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60">
                   {[1, 2, 3, 4, 5].map(num => (
                     <button
@@ -657,7 +667,7 @@ export default function TranscriptMode({
                         e.stopPropagation();
                         handleSetGroupSize(num);
                       }}
-                      className={`px-2 py-0.5 rounded-md font-mono text-xs font-bold transition-all ${
+                      className={`px-1.5 sm:px-2 py-0.5 rounded-md font-mono text-xs font-bold transition-all ${
                         groupSize === num
                           ? `${SOLID_ACCENT} shadow-sm`
                           : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
@@ -678,15 +688,15 @@ export default function TranscriptMode({
                   key={line.index}
                   type="button"
                   onClick={() => seekTo(line.seconds, line.index)}
-                  className="group w-full text-left py-2.5 sm:py-3 px-2 sm:px-3 flex items-start sm:gap-3 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-[background-color] duration-200"
+                  className="group w-full text-left py-2.5 sm:py-3 px-2 sm:px-3 flex items-start gap-2 sm:gap-3 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-[background-color] duration-200"
                   title="點擊跳轉影片至此秒數"
                 >
-                  {/* 時間：桌面是純數字欄，手機只留給螢幕閱讀器（max-sm:sr-only）省下 72px 寬。
+                  {/* 時間：純數字欄，關掉時只留給螢幕閱讀器（sr-only）。
                       欄寬 = 這組最長的時間字數（ch），各列文字左緣才切齊。
-                      高度 = 內文行高（sm:text-base × leading-relaxed = 26px），時間在裡面置中，
-                      對到內文第一行；sm:top-[…] 是字型字面中心的校正值，換字型或字級要重量 */}
+                      高度 = 內文行高（text-sm / sm:text-base × leading-relaxed = 22.75px / 26px），時間在裡面置中，
+                      對到內文第一行；top-[…] 是字型字面中心的校正值，換字型或字級要重量 */}
                   <span
-                    className={`${showGroupTime ? 'max-sm:sr-only sm:flex sm:h-[26px] sm:w-(--time-w) sm:shrink-0 sm:items-center sm:relative sm:top-[1px]' : 'sr-only'} font-mono text-xs tabular-nums text-zinc-400 dark:text-zinc-500 transition-colors group-hover:text-brand-brown dark:group-hover:text-brand-tan`}
+                    className={`${showGroupTime ? 'flex h-[22.75px] sm:h-[26px] w-(--time-w) shrink-0 items-center relative sm:top-[1px]' : 'sr-only'} font-mono text-xs tabular-nums text-zinc-400 dark:text-zinc-500 transition-colors group-hover:text-brand-brown dark:group-hover:text-brand-tan`}
                     style={{ '--time-w': `${timeCh}ch` } as CSSProperties}
                   >
                     {line.time}
