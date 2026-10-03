@@ -3,13 +3,15 @@
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
-import { Settings, PlayCircle, Radio, Users } from 'lucide-react';
+import { Settings, PlayCircle, Radio, Users, Link2 } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { useFocusMode } from './FocusModeProvider';
 import { useHomeLayout } from './HomeLayoutProvider';
 import { useHydrated } from '@/lib/client-state';
-import { InstagramIcon, TikTokIcon, XIcon } from './BrandIcons';
+import { InstagramIcon, TikTokIcon, XIcon, YouTubeIcon } from './BrandIcons';
 import type { MemberSns } from '@/lib/members';
+
+const PLAYLIST_URL = 'https://www.youtube.com/playlist?list=PLlymhAaiVUgSg8_nmjqRDYykXz0x5SFcV';
 
 const SNS_CLASS =
   'w-10 h-10 shrink-0 inline-flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-brand-cream hover:bg-brand-brown dark:hover:text-brand-ink dark:hover:bg-brand-tan transition-colors';
@@ -24,38 +26,34 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
   
   const mounted = useHydrated();
   const [isOpen, setIsOpen] = useState(false);
+  const [linksOpen, setLinksOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const linksRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Close dropdown on outside click
+    // 點到選單外面就收起來（設定、連結兩個選單各管各的）
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) setIsOpen(false);
+      if (linksRef.current && !linksRef.current.contains(target)) setLinksOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 主持人 SNS：桌機塞在右上，手機放不下（標題跟右邊按鈕已經 0px 間隙）就移到 bar 下方
-  const snsLinks = hostSns && (
-    <>
-      <a href={hostSns.x} target="_blank" rel="noopener noreferrer" title="逢田珠里依 X" aria-label="逢田珠里依 X" className={SNS_CLASS}>
-        <XIcon size={16} />
-      </a>
-      <a href={hostSns.instagram} target="_blank" rel="noopener noreferrer" title="逢田珠里依 Instagram" aria-label="逢田珠里依 Instagram" className={SNS_CLASS}>
-        <InstagramIcon size={16} />
-      </a>
-      {hostSns.tiktok && (
-        <a href={hostSns.tiktok} target="_blank" rel="noopener noreferrer" title="逢田珠里依 TikTok" aria-label="逢田珠里依 TikTok" className={SNS_CLASS}>
-          <TikTokIcon size={16} />
-        </a>
-      )}
-      <a href={hostSns.showroom} target="_blank" rel="noopener noreferrer" title="逢田珠里依 SHOWROOM" aria-label="逢田珠里依 SHOWROOM" className={SNS_CLASS}>
-        <Radio size={16} />
-      </a>
-    </>
-  );
+  // 主持人 SNS：桌機塞在右上的圓鈕；手機放不下，跟影片清單一起收進「連結」選單
+  const snsItems = hostSns
+    ? [
+        { href: hostSns.x, label: 'X', icon: <XIcon size={16} /> },
+        { href: hostSns.instagram, label: 'Instagram', icon: <InstagramIcon size={16} /> },
+        ...(hostSns.tiktok ? [{ href: hostSns.tiktok, label: 'TikTok', icon: <TikTokIcon size={16} /> }] : []),
+        { href: hostSns.showroom, label: 'SHOWROOM', icon: <Radio size={16} /> },
+      ]
+    : [];
+  const menuLinks = [
+    { href: PLAYLIST_URL, label: '影片清單', icon: <YouTubeIcon size={16} /> },
+    ...snsItems,
+  ];
 
   return (
     <>
@@ -76,7 +74,15 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
           </p>
         )}
         <div className="flex gap-1.5 sm:gap-2 items-center font-medium text-sm">
-          {snsLinks && <div className="hidden md:flex items-center gap-1 mr-1">{snsLinks}</div>}
+          {snsItems.length > 0 && (
+            <div className="hidden md:flex items-center gap-1 mr-1">
+              {snsItems.map((item) => (
+                <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" title={`逢田珠里依 ${item.label}`} aria-label={`逢田珠里依 ${item.label}`} className={SNS_CLASS}>
+                  {item.icon}
+                </a>
+              ))}
+            </div>
+          )}
           <Link
             href="/members"
             className={`group h-10 inline-flex items-center justify-center px-3 rounded-full font-bold transition-all shadow-sm hover:shadow-md hover:shadow-brand-yellow/10 ${
@@ -92,11 +98,11 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
               </span>
             </span>
           </Link>
-          <a 
-            href="https://www.youtube.com/playlist?list=PLlymhAaiVUgSg8_nmjqRDYykXz0x5SFcV" 
-            target="_blank" 
+          <a
+            href={PLAYLIST_URL}
+            target="_blank"
             rel="noopener noreferrer"
-            className="group h-10 inline-flex items-center justify-center px-3 bg-red-100 text-red-800 dark:bg-red-500/30 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-500/40 rounded-full font-bold transition-all shadow-sm hover:shadow-md hover:shadow-red-500/10"
+            className="group h-10 hidden md:inline-flex items-center justify-center px-3 bg-red-100 text-red-800 dark:bg-red-500/30 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-500/40 rounded-full font-bold transition-all shadow-sm hover:shadow-md hover:shadow-red-500/10"
           >
             <PlayCircle size={16} className="shrink-0" />
             <span className="grid grid-cols-[0fr] group-hover:grid-cols-[1fr] group-focus-visible:grid-cols-[1fr] transition-[grid-template-columns] duration-300 ease-out">
@@ -105,6 +111,36 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
               </span>
             </span>
           </a>
+          {/* 手機：影片清單換成「連結」鈕，點開由上到下列出 YouTube 清單與主持人的 SNS */}
+          <div className="relative md:hidden" ref={linksRef}>
+            <button
+              type="button"
+              onClick={() => setLinksOpen(!linksOpen)}
+              aria-expanded={linksOpen}
+              aria-label="連結"
+              title="連結"
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all shadow-sm ${linksOpen ? 'bg-red-200 text-red-900 dark:bg-red-500/50 dark:text-red-200' : 'bg-red-100 text-red-800 dark:bg-red-500/30 dark:text-red-300'}`}
+            >
+              <Link2 size={18} />
+            </button>
+            <div className={`absolute top-full right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl z-50 origin-top-right transition-all duration-200 p-2 ${linksOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
+              <div className="flex flex-col gap-1">
+                {menuLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setLinksOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-lg text-sm font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 hover:text-brand-ochre dark:hover:text-brand-yellow transition-colors"
+                  >
+                    <span className="w-5 shrink-0 inline-flex justify-center">{item.icon}</span>
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
           {mounted && (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -161,11 +197,6 @@ export default function Header({ hostSns }: { hostSns?: MemberSns }) {
         </div>
       </div>
     </nav>
-    {snsLinks && (
-      <div className="md:hidden flex justify-center gap-2 py-2 border-b border-zinc-200 dark:border-zinc-800">
-        {snsLinks}
-      </div>
-    )}
     </>
   );
 }

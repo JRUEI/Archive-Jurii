@@ -483,21 +483,34 @@ function MonthDigest({
 }) {
   const totalMinutes = group.episodes.reduce((sum, episode) => sum + (episode.durationMinutes ?? 0), 0);
   const totalSections = group.episodes.reduce((sum, episode) => sum + episode.sections.length, 0);
+  // 手機預設收起來，免得要多滑一大段才看得到預覽
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex-1 min-h-0 flex flex-col mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-      <p className="tabular-nums text-xs leading-none text-zinc-500 dark:text-zinc-400 mb-2.5">
-        {[
-          `${group.episodes.length} 回`,
-          totalMinutes > 0 ? formatDuration(totalMinutes) : '',
-          totalSections > 0 ? `${totalSections} 段` : '',
-        ]
-          .filter(Boolean)
-          .join(' · ')}
-      </p>
+      {/* lg 以下卡片不定高，月曆底下再接一整串長條會把預覽推出螢幕，所以這一列當成收折鈕；lg 以上永遠展開 */}
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        className={`w-full flex items-center justify-between gap-2 text-left tabular-nums text-xs leading-none text-zinc-500 dark:text-zinc-400 lg:pointer-events-none lg:mb-2.5 ${
+          open ? 'mb-2.5' : ''
+        }`}
+      >
+        <span>
+          {[
+            `${group.episodes.length} 回`,
+            totalMinutes > 0 ? formatDuration(totalMinutes) : '',
+            totalSections > 0 ? `${totalSections} 段` : '',
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </span>
+        <ChevronDown size={14} className={`shrink-0 lg:hidden transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
 
       {/* 長條想要 28px，位置不夠就一起壓扁；回數少的月份則置中，空白平均分在上下 */}
-      <div className="flex-1 min-h-0 overflow-y-auto -mr-1 pr-1 flex flex-col justify-center">
+      <div className={`flex-1 min-h-0 overflow-y-auto -mr-1 pr-1 flex-col justify-center lg:flex ${open ? 'flex' : 'hidden'}`}>
         {[...group.episodes].reverse().map((episode) => {
           const minutes = episode.durationMinutes ?? 0;
           const isSelected = episode.id === selectedId;
