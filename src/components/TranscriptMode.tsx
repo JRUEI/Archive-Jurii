@@ -331,38 +331,16 @@ export default function TranscriptMode({
   useEffect(() => {
     if (!landscape) return;
     document.body.style.overflow = 'hidden';
-    // 實體橫拿時 iPhone 預設把頁面限制在瀏海／Home 條以內，影片左右兩側的黑區是系統留的、網頁收不到點擊。
-    // 臨時加 viewport-fit=cover 讓頁面鋪滿整個螢幕（100dvw 變成全螢幕寬），退出再還原，其他頁面不受影響
-    const viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
-    const viewportBefore = viewportMeta?.content;
-    if (viewportMeta) viewportMeta.content = `${viewportBefore}, viewport-fit=cover`;
     // 墊一筆歷史：手機的返回手勢／返回鍵（左右邊緣滑都算）會退出橫向，而不是離開整個頁面
     window.history.pushState({ landscape: true }, '');
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setLandscape(false);
     };
     const onPopState = () => setLandscape(false);
-    // YouTube 在 iframe 裡量一次尺寸就排好影片；進出橫向時安全區跟視窗還在變，它可能剛好量到變動中的值，
-    // 之後尺寸沒再變就不重排，影片畫面就整個偏一邊（介面還是對的）。畫面穩定後把 iframe 寬度臨時縮 1px 再還原，逼它重排
-    let nudgeTimer: ReturnType<typeof setTimeout>;
-    const nudge = () => {
-      clearTimeout(nudgeTimer);
-      nudgeTimer = setTimeout(() => {
-        const frame = document.getElementById('transcript-yt-player');
-        if (!frame) return;
-        frame.style.width = 'calc(100% - 1px)';
-        setTimeout(() => (frame.style.width = ''), 60); // 不用 rAF：分頁被節流時它不會回來，寬度就卡在少 1px
-      }, 400);
-    };
-    nudge();
-    window.addEventListener('resize', nudge);
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('popstate', onPopState);
     return () => {
-      window.removeEventListener('resize', nudge);
-      nudge(); // 退出時安全區又變一次，同樣推一下（clearTimeout 後重排一個，不會被這個 cleanup 吃掉）
       document.body.style.overflow = '';
-      if (viewportMeta && viewportBefore !== undefined) viewportMeta.content = viewportBefore;
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('popstate', onPopState);
       // 不是被返回手勢退出的（按 X、Esc、滑動）就把墊的那筆歷史收掉，免得返回鍵要多按一次。

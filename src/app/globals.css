@@ -66,16 +66,14 @@
    直拿時寬高對調再轉 90°（左上角為軸、右移一個視窗寬），橫拿時直接鋪滿；實體轉動手機時 media query 自己切換 */
 .stage-landscape {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: var(--z-overlay);
-  width: auto;
-  height: auto;
+  width: 100dvw;
+  height: 100dvh;
   aspect-ratio: auto;
   border: 0;
   border-radius: 0;
-  /* 舞台自己當尺寸容器，下面黑區寬度用 cqw／cqh 算：不靠 dvw／dvh，
-     因為臨時加 viewport-fit=cover 後 dvw 跟瀏覽器實際可視區不一定一致，影片就會被擠偏 */
-  container-type: size;
 }
 @media (orientation: portrait) {
   .stage-landscape {
@@ -86,13 +84,17 @@
   }
 }
 
-/* iframe 維持鋪滿舞台，黑區是 YouTube 在 iframe 裡自己留的。曾經把 iframe 縮成 16:9 置中，
-   結果 YouTube 內部算影片位置跟實際尺寸對不上（影片被擠偏、一側被切掉），所以不要再縮 iframe。
-   橫向放大時兩側的點擊感應區：寬度＝影片左右黑區（舞台寬 − 高×16/9 再除以 2），整塊黑區都點得到；最少 7rem，黑區很窄時仍避得開狀態列。
-   cqw／cqh 量的是舞台自己（旋轉前的座標），直拿轉 90° 也不用另外處理。
-   --bar 在子元素上才解開單位（自訂屬性存的是字串），所以它指的是舞台而不是舞台的外層 */
+/* iframe 維持鋪滿舞台，黑區是 YouTube 在 iframe 裡自己留的，不要縮 iframe 也不要臨時改 viewport-fit：
+   兩者都試過，YouTube 內部算影片位置會跟實際尺寸對不上，影片整個偏一邊。
+   橫向放大時兩側的點擊感應區：寬度＝影片左右黑區（舞台寬 − 高×16/9 再除以 2）；最少 7rem，黑區很窄時仍避得開狀態列。
+   舞台直拿時寬高對調（見上面 .stage-landscape），所以 dvw／dvh 也對調 */
 .stage-landscape {
-  --bar: calc((100cqw - 100cqh * 16 / 9) / 2);
+  --bar: calc((100dvw - 100dvh * 16 / 9) / 2);
+}
+@media (orientation: portrait) {
+  .stage-landscape {
+    --bar: calc((100dvh - 100dvw * 16 / 9) / 2);
+  }
 }
 .landscape-edge {
   width: max(7rem, var(--bar));
