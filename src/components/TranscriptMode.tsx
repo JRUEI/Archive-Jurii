@@ -542,7 +542,9 @@ export default function TranscriptMode({
                 <>
                   {/* 左右各一條看不見的感應區（螢幕可能轉向，缺口那側不固定）。
                       直拿轉 90° 時這兩條落在螢幕最上、最下，最外 ~50px 是狀態列／Home 條，點了會被系統吃掉，
-                      所以寬度＝整塊黑邊（globals.css 的 .landscape-edge），最少 112px 讓有效的點擊落在 50px 之後；黑邊比這窄會蓋到影片邊緣，那裡通常沒有控制項。
+                      所以寬度＝整塊黑邊（globals.css 的 .landscape-edge），最少 112px 讓有效的點擊落在 50px 之後，這樣會蓋進影片邊緣。
+                      YouTube 的標題列、進度條起點、分享鈕、全螢幕鈕都貼著影片左右邊，全高會擋住它們（進度條紅點拖不動），
+                      所以只留畫面中段 20%～60%（top-[20%] bottom-[40%]）：實測避得開上下兩排控制項，窄的橫向舞台（320px 高）下排最高約 64%。
                       輕點＝浮出退出鈕，往任何方向滑 40px 以上＝直接退出（右緣往左滑沒有系統手勢可靠，只能自己偵測）；touch-none 避免被瀏覽器接走 */}
                   {(['left', 'right'] as const).map((side) => (
                     <button
@@ -565,7 +567,7 @@ export default function TranscriptMode({
                         else setExitSide(side);
                       }}
                       aria-label="顯示退出鈕"
-                      className={`landscape-edge absolute inset-y-0 z-10 touch-none focus:outline-none ${side === 'left' ? 'left-0' : 'right-0'}`}
+                      className={`landscape-edge absolute top-[20%] bottom-[40%] z-10 touch-none focus:outline-none ${side === 'left' ? 'left-0' : 'right-0'}`}
                     />
                   ))}
                   {hint && (
