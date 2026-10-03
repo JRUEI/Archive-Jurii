@@ -312,15 +312,30 @@ export default function TranscriptMode({
   useEffect(() => {
     if (!landscape) return;
     document.body.style.overflow = 'hidden';
+    // 墊一筆歷史：手機的返回手勢／返回鍵（左右邊緣滑都算）會退出橫向，而不是離開整個頁面
+    window.history.pushState({ landscape: true }, '');
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setLandscape(false);
     };
+    const onPopState = () => setLandscape(false);
     window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('popstate', onPopState);
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('popstate', onPopState);
+      // 不是被返回手勢退出的（按 X、Esc）就把墊的那筆歷史收掉，免得返回鍵要多按一次
+      if (window.history.state?.landscape) window.history.back();
     };
   }, [landscape]);
+
+  // 退出鈕平常藏著：點黑邊上看不見的感應區才浮出來（影片 iframe 吃掉點擊，感應區只能放在它外面的黑邊），3 秒後自己收起
+  const [exitSide, setExitSide] = useState<'left' | 'right' | null>(null);
+  useEffect(() => {
+    if (!exitSide) return;
+    const timer = setTimeout(() => setExitSide(null), 3000);
+    return () => clearTimeout(timer);
+  }, [exitSide]);
 
   // 監聽鍵盤 Escape 鍵關閉抽屜
   // 開啟時焦點送進面板、鎖住背景捲動；關閉時還原。
@@ -492,15 +507,29 @@ export default function TranscriptMode({
                 />
               )}
               {landscape && (
-                <button
-                  type="button"
-                  onClick={() => setLandscape(false)}
-                  aria-label="退出橫向放大"
-                  title="退出橫向放大 (Esc)"
-                  className="absolute right-2 top-2 z-10 inline-flex size-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur"
-                >
-                  <X size={18} aria-hidden="true" />
-                </button>
+                <>
+                  {/* 左右各一條看不見的感應區（螢幕可能轉向，缺口那側不固定）；寬度固定 48px，黑邊比這窄的機型會蓋到影片邊緣一點點 */}
+                  {(['left', 'right'] as const).map((side) => (
+                    <button
+                      key={side}
+                      type="button"
+                      onClick={() => setExitSide(side)}
+                      aria-label="顯示退出鈕"
+                      className={`absolute inset-y-0 z-10 w-12 ${side === 'left' ? 'left-0' : 'right-0'}`}
+                    />
+                  ))}
+                  {exitSide && (
+                    <button
+                      type="button"
+                      onClick={() => setLandscape(false)}
+                      aria-label="退出橫向放大"
+                      title="退出橫向放大 (Esc)"
+                      className={`absolute top-1/2 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur ${exitSide === 'left' ? 'left-1.5' : 'right-1.5'}`}
+                    >
+                      <X size={18} aria-hidden="true" />
+                    </button>
+                  )}
+                </>
               )}
             </div>
             <SubtitleToolbar
