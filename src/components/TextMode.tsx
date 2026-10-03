@@ -32,15 +32,21 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
       {/* Timeline Line */}
       <div className={`hidden sm:block absolute top-0 bottom-0 rounded-full transition-all duration-500 w-1.5 left-0 bg-gradient-to-b from-brand-yellow to-brand-brown shadow-[0_0_12px_rgba(201,162,39,0.45)] ${isFocusMode && isActive ? 'opacity-100' : 'opacity-0'}`} />
       
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+      {/* 時間碼緊貼標籤右邊。窄版標籤＋時間碼一列、標題另起一行；寬版三者排成一列 */}
+      <div className="mb-8 grid grid-cols-[auto_auto_1fr] items-center gap-4 sm:flex">
         {card.tag && (
-          <div className={`inline-flex transition-all duration-500`}>
-            <span className={`text-brand-ochre dark:text-brand-yellow border border-brand-yellow/50 bg-transparent px-4 py-1.5 rounded-full text-sm font-bold tracking-widest shadow-[0_0_8px_rgba(201,162,39,0.25)]`}>
+          <div className="inline-flex justify-self-start transition-all duration-500">
+            <span className="text-brand-ochre dark:text-brand-yellow border border-brand-yellow/50 bg-transparent px-4 py-1.5 rounded-full text-sm font-bold tracking-widest shadow-[0_0_8px_rgba(201,162,39,0.25)]">
               {card.tag}
             </span>
           </div>
         )}
-        <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 m-0 tracking-tight">
+        {card.time && (
+          <span className="shrink-0 px-3 py-1 rounded-lg font-mono text-sm font-bold tabular-nums bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+            {card.time}
+          </span>
+        )}
+        <h3 className="col-span-3 min-w-0 text-2xl font-bold text-zinc-900 dark:text-zinc-100 m-0 tracking-tight">
           {card.title}
         </h3>
       </div>

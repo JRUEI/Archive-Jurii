@@ -19,7 +19,7 @@ import {
 } from '@/lib/subtitle';
 import { Search, Play, X, FileText, Crosshair, LayoutList, Pin, ChevronDown } from 'lucide-react';
 import SubtitleOverlay from './SubtitleOverlay';
-import SubtitleToolbar from './SubtitleToolbar';
+import SubtitleToolbar, { BAR_BTN, LABEL } from './SubtitleToolbar';
 
 const GROUP_SIZE_STORAGE_KEY = 'jurii-transcript-group-size';
 const DEFAULT_GROUP_SIZE = 4;
@@ -73,13 +73,6 @@ function timeToSeconds(timeStr: string): number {
   return 0;
 }
 
-// 格式化秒數為 MM:SS
-function formatSeconds(sec: number): string {
-  const mins = Math.floor(sec / 60);
-  const secs = Math.floor(sec % 60);
-  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-}
-
 // 從 YouTube URL 提取 videoId
 function extractYouTubeId(url?: string): string | null {
   if (!url) return null;
@@ -95,8 +88,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const [autoScroll, setAutoScroll] = useState<boolean>(true);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
+  const [, setIsPlayerReady] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   // 抽屜分頁：逐字稿 ↔ 段落紀錄（段落沒有時間碼，只能對照，不能跳轉）
@@ -162,23 +154,14 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   // 一鍵平滑滾動畫面：底部對齊字幕群底下空白的中間，剛好露出上方影片時間軸
   const scrollToTheaterView = useCallback(() => {
     const subtitleEl = document.getElementById('transcript-subtitle-group');
-    const controlsEl = document.getElementById('transcript-controls');
     const playerEl = document.getElementById('transcript-player-stage');
 
     if (subtitleEl) {
       const subtitleRect = subtitleEl.getBoundingClientRect();
       const subtitleBottom = window.scrollY + subtitleRect.bottom;
 
-      // 計算字幕群底下留白區域的中間點
-      let midBlankY = subtitleBottom + 10;
-      if (controlsEl) {
-        const controlsRect = controlsEl.getBoundingClientRect();
-        const controlsTop = window.scrollY + controlsRect.top;
-        const gap = controlsTop - subtitleBottom;
-        if (gap > 0) {
-          midBlankY = subtitleBottom + gap / 2;
-        }
-      }
+      // 字幕群底下留 10px 再對齊
+      const midBlankY = subtitleBottom + 10;
 
       // 定位後的底部對齊字幕群底下空白的中間 (window.scrollY + window.innerHeight = midBlankY)
       let targetScrollY = midBlankY - window.innerHeight;
@@ -252,10 +235,19 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
       player.seekTo(sec, true);
       player.playVideo();
     }
-    setCurrentTime(sec);
     if (typeof targetIdx === 'number') {
       setActiveIndex(targetIdx);
     }
+  }, []);
+
+  // 相對目前進度前後跳（不改播放／暫停狀態）
+  const skipBy = useCallback((delta: number) => {
+    const player = playerRef.current;
+    if (!player) return;
+    const sec = Math.max(0, player.getCurrentTime() + delta);
+    player.seekTo(sec, true);
+    const idx = findActiveIndexRef.current(sec);
+    if (idx !== -1) setActiveIndex(idx);
   }, []);
 
   // 立即平滑滾動定位至當前播放句（免手動滑動滾輪）
@@ -272,7 +264,6 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
       if (!player) return;
       const time = player.getCurrentTime();
       if (typeof time !== 'number') return;
-      setCurrentTime(time);
       const idx = findActiveIndexRef.current(time);
       if (idx !== -1) {
         setActiveIndex(prev => (prev !== idx ? idx : prev));
@@ -444,13 +435,15 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
   return (
     <div className="w-full">
       {/* 劇院居中主容器 */}
-      <div className="max-w-4xl mx-auto flex flex-col gap-5">
+      {/* 有影片時整塊（播放器起算）至少撐到視窗高：捲到最底時影片剛好能貼在固定列正下方。
+          72px＝固定列 65px＋7px 空隙，112px＝72px＋EpisodeViewer 的 py-10 底距；lvh 取最大視窗高，行動版網址列收起時也不會差一截 */}
+      <div className={`max-w-4xl mx-auto flex flex-col gap-4 ${videoId ? 'min-h-[calc(100lvh-112px)]' : ''}`}>
 
         {/* 1. 居中 YouTube 播放器 (16:9)，底下接字幕設定列。
             字幕疊層預設關閉；開了也是 pointer-events-none，影片上的操作與時間軸都不受影響。
             疊層放在 YouTube 取代掉的那個 div 後面，React 往它前面插節點會找不到參照 */}
         {videoId && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             <div
               id="transcript-player-stage"
               ref={theaterRef}
@@ -460,7 +453,6 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
               {subtitle.on && (
                 <SubtitleOverlay
                   playerRef={playerRef}
-                  stageRef={theaterRef}
                   rows={subtitleRows}
                   style={subtitle.cur}
                   offsetMs={subtitle.offset}
@@ -469,10 +461,34 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             </div>
             <SubtitleToolbar
               state={subtitle}
+              stageRef={theaterRef}
               onChange={handleSubtitleChange}
               groupOn={showGroupCard}
               onGroupChange={handleGroupCardChange}
-            />
+              onSkip={skipBy}
+            >
+              {/* 進度與導航：併進字幕工具列同一排（右側，全螢幕之前） */}
+              <button
+                type="button"
+                onClick={scrollToTheaterView}
+                aria-label="畫面定位"
+                title="畫面定位：一鍵將畫面視角平滑置中對齊至播放器與字幕"
+                className={BAR_BTN}
+              >
+                <Crosshair size={16} aria-hidden="true" className="shrink-0" />
+                <span className={LABEL}>畫面定位</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsDrawerOpen(true)}
+                aria-label={`完整字幕（${parsedLines.length} 句）`}
+                title={`展開完整逐字稿與搜尋（${parsedLines.length} 句）`}
+                className={BAR_BTN}
+              >
+                <Search size={16} aria-hidden="true" className="shrink-0" />
+                <span className={LABEL}>完整字幕</span>
+              </button>
+            </SubtitleToolbar>
           </div>
         )}
 
@@ -480,9 +496,10 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
         {showGroupCard && currentGroupLines.length > 0 && (
           <div
             id="transcript-subtitle-group"
-            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 sm:p-5 shadow-lg flex flex-col gap-2.5"
+            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-4 sm:p-5 pt-3 sm:pt-4 shadow-lg flex flex-col gap-2.5"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400 pb-2 border-b border-zinc-100 dark:border-zinc-800/80">
+            {/* 標題列的 pb 跟卡片的 pt-3 sm:pt-4 同值：上緣離卡片邊 = 下緣離分隔線，字才會落在這一段的正中；要調鬆緊兩處一起改 */}
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400 pb-3 sm:pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
               <span className="flex items-center gap-1.5 font-bold text-zinc-700 dark:text-zinc-200">
                 <span className="w-2 h-2 rounded-full bg-brand-yellow animate-ping"></span>
                 即時字幕群<span className="max-sm:hidden">（{groupSize} 句同步）</span>
@@ -520,7 +537,7 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
                   key={line.index}
                   type="button"
                   onClick={() => seekTo(line.seconds, line.index)}
-                  className="group w-full text-left py-2.5 sm:py-3 px-2 sm:px-3 flex items-start sm:gap-3 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
+                  className="group w-full text-left py-2.5 sm:py-3 px-2 sm:px-3 flex items-start sm:gap-3 rounded-xl cursor-pointer hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-[background-color] duration-200"
                   title="點擊跳轉影片至此秒數"
                 >
                   {/* 時間：桌面是純數字欄，手機只留給螢幕閱讀器（max-sm:sr-only）省下 72px 寬。
@@ -546,57 +563,12 @@ export default function TranscriptMode({ episode }: { episode: EpisodeData }) {
             </div>
           </div>
         )}
-
-        {/* 3. 控制與導航列 */}
-        {/* 放不下一排時整組換到下一行；原本 sm 起硬排成一排，兩組各自折行，按鈕高低對不上 */}
-        <div
-          id="transcript-controls"
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm"
-        >
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-            {/* 播放進度 */}
-            <div className="flex items-baseline gap-2 font-mono text-xs">
-              <span className="text-zinc-500 dark:text-zinc-400">目前進度:</span>
-              <span className={`font-bold text-sm tabular-nums px-2.5 py-1 rounded-lg ${SOFT_ACCENT}`}>
-                {formatSeconds(currentTime)}
-              </span>
-            </div>
-
-            {/* API 連線標籤 */}
-            <div className={`flex items-center gap-1.5 text-[13px] font-medium px-2.5 py-1 rounded-full ${SOFT_ACCENT}`}>
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-yellow animate-pulse"></span>
-              <span>{isPlayerReady ? '雙向同步連動中' : '連線播放器中...'}</span>
-            </div>
-
-            {/* 畫面定位按鈕 */}
-            <button
-              type="button"
-              onClick={scrollToTheaterView}
-              className={`flex items-center gap-1.5 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm hover:scale-105 active:scale-95 ${SOFT_ACCENT} hover:bg-brand-yellow/20`}
-              title="畫面定位：一鍵將畫面視角平滑置中對齊至播放器與字幕"
-            >
-              <Crosshair size={13} />
-              <span>畫面定位</span>
-            </button>
-          </div>
-
-          {/* 手機寬度放不下兩個，換行比讓字斷成「（4 / 句）」好看 */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* 展開抽屜主按鈕（字幕群開關在影片下的字幕工具列） */}
-            <button
-              type="button"
-              onClick={() => setIsDrawerOpen(true)}
-              className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl transition shadow-md hover:scale-105 ${SOLID_ACCENT}`}
-            >
-              <Search size={14} />
-              <span>展開完整逐字稿與搜尋（{parsedLines.length} 句）</span>
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* 4. 常駐畫面右側邊緣的懸浮快捷按鈕群 */}
-      <div className="fixed right-3 sm:right-5 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2.5">
+      {/* 內容欄最寬 max-w-4xl(896px)，兩側餘白放得下這組鈕才顯示（xl 起）；
+          更窄時會壓在影片、字幕工具列上，同樣兩個動作控制列裡都有 */}
+      <div className="fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col gap-2.5">
         {/* 畫面定位按鈕 */}
         <button
           type="button"

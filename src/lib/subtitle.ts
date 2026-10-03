@@ -20,10 +20,14 @@ export interface SubtitleState {
   v: 1;
   on: boolean;
   cur: SubtitleStyle;
-  /** 描邊快捷色：前三個固定（藍、酒紅、深綠，都不是黑），之後是使用者存的，最多 6 個 */
+  /** 描邊快捷色：前四個固定（藍、酒紅、深綠、深紫，都不是黑），之後是使用者存的，最多 6 個 */
   saved: string[];
   /** 整組樣式快捷，三格，空的是 null */
   slots: (SubtitleStyle | null)[];
+  /** 每格快捷的自訂名稱，空字串＝用預設的「快捷 N」 */
+  names: string[];
+  /** 當作「預設」的快捷格序號（「還原」會回到它），null＝用內建樣式 */
+  def: number | null;
   /** 字幕時間補償（毫秒），正值＝字幕提早出現 */
   offset: number;
   /** 是否顯示「目前設定」摘要列 */
@@ -33,7 +37,8 @@ export interface SubtitleState {
 export const SUBTITLE_STORAGE_KEY = 'jurii-transcript-subtitle';
 export const SUBTITLE_SLOT_COUNT = 3;
 export const SUBTITLE_MAX_COLORS = 6;
-export const SUBTITLE_FIXED_COLORS: readonly string[] = ['#14247a', '#7b1226', '#14532d'];
+export const SUBTITLE_NAME_MAX = 12;
+export const SUBTITLE_FIXED_COLORS: readonly string[] = ['#14247a', '#7b1226', '#14532d', '#4a1470'];
 export const SUBTITLE_DEFAULT_STYLE: SubtitleStyle = { c: '#14247a', sb: 13, sf: 4.4, sw: 700, ss: 0.9 };
 
 /** [最小, 最大, 間距]：滑桿與讀回存檔時的夾限共用同一份 */
@@ -51,6 +56,8 @@ export const DEFAULT_SUBTITLE_STATE: SubtitleState = {
   cur: SUBTITLE_DEFAULT_STYLE,
   saved: [...SUBTITLE_FIXED_COLORS],
   slots: [null, null, null],
+  names: ['', '', ''],
+  def: null,
   offset: 0,
   summary: false,
 };
@@ -96,14 +103,22 @@ export function parseSubtitleState(raw: string | null): SubtitleState {
     if (c && !saved.includes(c) && saved.length < SUBTITLE_MAX_COLORS) saved.push(c);
   }
   const slots = Array.isArray(o.slots) ? o.slots : [];
+  const names = Array.isArray(o.names) ? o.names : [];
+
+  const slotList = Array.from({ length: SUBTITLE_SLOT_COUNT }, (_, i) =>
+    slots[i] && typeof slots[i] === 'object' ? sanitizeStyle(slots[i]) : null,
+  );
+  const def = typeof o.def === 'number' && slotList[o.def] ? o.def : null;
 
   return {
     v: 1,
     on: o.on === true,
     cur: sanitizeStyle(o.cur),
     saved,
-    slots: Array.from({ length: SUBTITLE_SLOT_COUNT }, (_, i) =>
-      slots[i] && typeof slots[i] === 'object' ? sanitizeStyle(slots[i]) : null,
+    slots: slotList,
+    def,
+    names: Array.from({ length: SUBTITLE_SLOT_COUNT }, (_, i) =>
+      typeof names[i] === 'string' ? names[i].trim().slice(0, SUBTITLE_NAME_MAX) : '',
     ),
     offset: clamp(o.offset, SUBTITLE_RANGE.offset, 0),
     summary: o.summary === true,

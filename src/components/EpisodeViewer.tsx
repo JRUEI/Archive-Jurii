@@ -32,7 +32,12 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
   // 使用者自己按過分頁就以他按的為準，沒按過才看網址
   const [pickedView, setPickedView] = useState<'summary' | 'lossless' | 'transcript' | null>(null);
   const viewType = pickedView ?? (anchoredSection ? 'lossless' : 'summary');
-  const setViewType = setPickedView;
+  // 逐字稿看過一次就不卸載，切去別的分頁只是藏起來：卸載會連 YouTube 播放器一起銷毀，播到一半的聲音就斷了
+  const [transcriptVisited, setTranscriptVisited] = useState(false);
+  const setViewType = (view: 'summary' | 'lossless' | 'transcript') => {
+    if (view === 'transcript') setTranscriptVisited(true);
+    setPickedView(view);
+  };
   const [isCardMode, setIsCardMode] = useState(false);
 
   useEffect(() => {
@@ -81,7 +86,7 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </div>
-              <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100 whitespace-nowrap">官方 YouTube 收聽</h3>
+              <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100 whitespace-nowrap">YouTube 收聽</h3>
             </div>
             <a 
               href={episode.youtubeUrl} 
@@ -151,13 +156,17 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
 
       {/* Content Area */}
       <div className="w-full flex justify-center">
-        {viewType === 'transcript' ? (
-          <TranscriptMode episode={episode} />
-        ) : isCardMode ? (
-          <CardMode key={viewType} episode={episode} isLossless={viewType === 'lossless'} />
-        ) : (
-          <TextMode episode={episode} isLossless={viewType === 'lossless'} />
+        {transcriptVisited && (
+          <div className={viewType === 'transcript' ? 'w-full' : 'hidden'}>
+            <TranscriptMode episode={episode} />
+          </div>
         )}
+        {viewType !== 'transcript' &&
+          (isCardMode ? (
+            <CardMode key={viewType} episode={episode} isLossless={viewType === 'lossless'} />
+          ) : (
+            <TextMode episode={episode} isLossless={viewType === 'lossless'} />
+          ))}
       </div>
     </div>
   );
