@@ -354,7 +354,7 @@ export default function TranscriptMode({
 
   // 退出鈕平常藏著：點黑邊上看不見的感應區才浮出來（影片 iframe 吃掉點擊，感應區只能放在它外面的黑邊），3 秒後自己收起
   const [exitSide, setExitSide] = useState<'left' | 'right' | null>(null);
-  const swipeFrom = useRef<{ x: number; y: number } | null>(null);
+  const swipeFrom = useRef<{ x: number; y: number; d: number } | null>(null);
   const swiped = useRef(false);
   useEffect(() => {
     if (!exitSide) return;
@@ -541,7 +541,25 @@ export default function TranscriptMode({
                     <button
                       key={side}
                       type="button"
-                      onPointerDown={(e) => (swipeFrom.current = { x: e.clientX, y: e.clientY })}
+                      onPointerDown={(e) => (swipeFrom.current = { x: e.clientX, y: e.clientY, d: 0 })}
+                      // 右緣往左滑會被 Safari 當「下一頁」手勢接走，網頁只收到 pointercancel、等不到 pointerup。
+                      // 所以滑到 40px 就直接退出；被接走時已經滑過 12px 也算滑動（輕點的抖動遠小於這個）
+                      onPointerMove={(e) => {
+                        const from = swipeFrom.current;
+                        if (!from) return;
+                        from.d = Math.hypot(e.clientX - from.x, e.clientY - from.y);
+                        if (from.d < 40) return;
+                        swipeFrom.current = null;
+                        swiped.current = true;
+                        setLandscape(false);
+                      }}
+                      onPointerCancel={() => {
+                        if (swipeFrom.current && swipeFrom.current.d >= 12) {
+                          swiped.current = true;
+                          setLandscape(false);
+                        }
+                        swipeFrom.current = null;
+                      }}
                       onPointerUp={(e) => {
                         const from = swipeFrom.current;
                         swipeFrom.current = null;
