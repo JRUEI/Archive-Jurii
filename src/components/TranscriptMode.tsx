@@ -533,9 +533,12 @@ export default function TranscriptMode({
                       onPointerUp={(e) => {
                         const from = swipeFrom.current;
                         swipeFrom.current = null;
-                        if (from && Math.hypot(e.clientX - from.x, e.clientY - from.y) >= 40) {
+                        const moved = from ? Math.hypot(e.clientX - from.x, e.clientY - from.y) : 0;
+                        if (moved >= 40) {
                           swiped.current = true;
                           setLandscape(false);
+                        } else if (from) {
+                          setExitSide(side); // 輕點不等 click：iOS 對 touch-action:none 的元素補發 click 不穩
                         }
                       }}
                       onClick={() => {
