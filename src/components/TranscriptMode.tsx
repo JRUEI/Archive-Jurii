@@ -17,13 +17,14 @@ import {
   SUBTITLE_STORAGE_KEY,
   type SubtitleState,
 } from '@/lib/subtitle';
-import { Search, Play, X, FileText, Crosshair, LayoutList, Pin, ChevronDown, RectangleHorizontal } from 'lucide-react';
+import { Search, Play, X, Clock, FileText, Crosshair, LayoutList, Pin, ChevronDown, RectangleHorizontal } from 'lucide-react';
 import SubtitleOverlay from './SubtitleOverlay';
 import SubtitleToolbar, { BAR_BTN, LABEL } from './SubtitleToolbar';
 
 const GROUP_SIZE_STORAGE_KEY = 'jurii-transcript-group-size';
 const DEFAULT_GROUP_SIZE = 4;
 const GROUP_CARD_STORAGE_KEY = 'jurii-transcript-group-card';
+const GROUP_TIME_STORAGE_KEY = 'jurii-transcript-group-time';
 
 /** 站上的實心強調色，跟月曆翻頁鈕同一套 */
 const SOLID_ACCENT =
@@ -142,6 +143,16 @@ export default function TranscriptMode({
   const handleGroupCardChange = (on: boolean) => {
     setStoredShowGroupCard(on);
     writeStoredString(GROUP_CARD_STORAGE_KEY, on ? '1' : '0');
+  };
+
+  // 字幕群每列前面的時間欄（桌面才有），預設顯示，記住上次選擇
+  const [storedShowGroupTime, setStoredShowGroupTime] = useState(
+    () => readStoredString(GROUP_TIME_STORAGE_KEY) !== '0',
+  );
+  const showGroupTime = hydrated ? storedShowGroupTime : true;
+  const handleGroupTimeToggle = () => {
+    setStoredShowGroupTime(!showGroupTime);
+    writeStoredString(GROUP_TIME_STORAGE_KEY, showGroupTime ? '0' : '1');
   };
 
   // 影片上的字幕：開關、樣式、快捷、延遲整包存在同一個 key。水合前一律用預設（預設是關）
@@ -331,6 +342,8 @@ export default function TranscriptMode({
 
   // 退出鈕平常藏著：點黑邊上看不見的感應區才浮出來（影片 iframe 吃掉點擊，感應區只能放在它外面的黑邊），3 秒後自己收起
   const [exitSide, setExitSide] = useState<'left' | 'right' | null>(null);
+  const swipeFrom = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
   useEffect(() => {
     if (!exitSide) return;
     const timer = setTimeout(() => setExitSide(null), 3000);
@@ -508,14 +521,29 @@ export default function TranscriptMode({
               )}
               {landscape && (
                 <>
-                  {/* 左右各一條看不見的感應區（螢幕可能轉向，缺口那側不固定）；寬度固定 48px，黑邊比這窄的機型會蓋到影片邊緣一點點 */}
+                  {/* 左右各一條看不見的感應區（螢幕可能轉向，缺口那側不固定）。
+                      直拿轉 90° 時這兩條落在螢幕最上、最下，最外 ~50px 是狀態列／Home 條，點了會被系統吃掉，
+                      所以做到 112px 寬，讓有效的點擊落在 50px 之後；黑邊比這窄會蓋到影片邊緣，那裡通常沒有控制項。
+                      輕點＝浮出退出鈕，往任何方向滑 40px 以上＝直接退出（右緣往左滑沒有系統手勢可靠，只能自己偵測）；touch-none 避免被瀏覽器接走 */}
                   {(['left', 'right'] as const).map((side) => (
                     <button
                       key={side}
                       type="button"
-                      onClick={() => setExitSide(side)}
+                      onPointerDown={(e) => (swipeFrom.current = { x: e.clientX, y: e.clientY })}
+                      onPointerUp={(e) => {
+                        const from = swipeFrom.current;
+                        swipeFrom.current = null;
+                        if (from && Math.hypot(e.clientX - from.x, e.clientY - from.y) >= 40) {
+                          swiped.current = true;
+                          setLandscape(false);
+                        }
+                      }}
+                      onClick={() => {
+                        if (swiped.current) swiped.current = false;
+                        else setExitSide(side);
+                      }}
                       aria-label="顯示退出鈕"
-                      className={`absolute inset-y-0 z-10 w-12 ${side === 'left' ? 'left-0' : 'right-0'}`}
+                      className={`absolute inset-y-0 z-10 w-28 touch-none ${side === 'left' ? 'left-0' : 'right-0'}`}
                     />
                   ))}
                   {exitSide && (
@@ -524,7 +552,7 @@ export default function TranscriptMode({
                       onClick={() => setLandscape(false)}
                       aria-label="退出橫向放大"
                       title="退出橫向放大 (Esc)"
-                      className={`absolute top-1/2 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur ${exitSide === 'left' ? 'left-1.5' : 'right-1.5'}`}
+                      className={`absolute top-1/2 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur ${exitSide === 'left' ? 'left-16' : 'right-16'}`}
                     >
                       <X size={18} aria-hidden="true" />
                     </button>
@@ -564,7 +592,10 @@ export default function TranscriptMode({
               {/* 只給觸控裝置：iPhone 的瀏覽器沒有元素全螢幕（上面那顆全螢幕鈕不會出現），這顆自己鋪滿並轉橫 */}
               <button
                 type="button"
-                onClick={() => setLandscape(true)}
+                onClick={() => {
+                  setLandscape(true);
+                  setExitSide('right'); // 進去先亮 3 秒，讓人知道退出鈕在哪、之後點邊緣會再出現
+                }}
                 aria-label="橫向放大"
                 title="橫向放大：播放器鋪滿畫面並轉成橫的"
                 className={`${BAR_BTN} pointer-fine:hidden`}
@@ -590,6 +621,23 @@ export default function TranscriptMode({
               </span>
               {/* 手機只留標題和按鈕一排；句數按鈕本身就看得出目前幾句 */}
               <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* 時間開關：外框與右邊句數鈕同一款（p-0.5 的灰底框），開著就是實心強調色。手機本來就不顯示時間，所以只在桌面出現 */}
+                <div className="max-sm:hidden inline-flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60 mr-1.5">
+                  <button
+                    type="button"
+                    aria-pressed={showGroupTime}
+                    onClick={handleGroupTimeToggle}
+                    title="顯示／隱藏每句前面的時間"
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold transition-all ${
+                      showGroupTime
+                        ? `${SOLID_ACCENT} shadow-sm`
+                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Clock size={12} aria-hidden="true" className="shrink-0" />
+                    時間
+                  </button>
+                </div>
                 <span className="max-sm:hidden text-[13px] text-zinc-500 dark:text-zinc-400">顯示句數：</span>
                 <div className="inline-flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700/60">
                   {[1, 2, 3, 4, 5].map(num => (
@@ -629,7 +677,7 @@ export default function TranscriptMode({
                       高度 = 內文行高（sm:text-base × leading-relaxed = 26px），時間在裡面置中，
                       對到內文第一行；sm:top-[…] 是字型字面中心的校正值，換字型或字級要重量 */}
                   <span
-                    className="max-sm:sr-only sm:flex sm:h-[26px] sm:w-(--time-w) sm:shrink-0 sm:items-center sm:relative sm:top-[1px] font-mono text-xs tabular-nums text-zinc-400 dark:text-zinc-500 transition-colors group-hover:text-brand-brown dark:group-hover:text-brand-tan"
+                    className={`${showGroupTime ? 'max-sm:sr-only sm:flex sm:h-[26px] sm:w-(--time-w) sm:shrink-0 sm:items-center sm:relative sm:top-[1px]' : 'sr-only'} font-mono text-xs tabular-nums text-zinc-400 dark:text-zinc-500 transition-colors group-hover:text-brand-brown dark:group-hover:text-brand-tan`}
                     style={{ '--time-w': `${timeCh}ch` } as CSSProperties}
                   >
                     {line.time}
