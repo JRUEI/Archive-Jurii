@@ -6,7 +6,7 @@ import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Clock } from 'lucid
 import { formatDuration } from '@/lib/format';
 import type { EpisodeListItem, EpisodeSection } from '@/lib/markdown';
 import { useHomeLayout } from './HomeLayoutProvider';
-import { readStoredString, useHydrated, writeStoredString } from '@/lib/client-state';
+import { readStoredBoolean, readStoredString, useHydrated, writeStoredBoolean, writeStoredString } from '@/lib/client-state';
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
 const NO_SUMMARY = '尚未整理摘要';
@@ -469,6 +469,8 @@ function clockOf(minutes: number | undefined) {
   return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
 }
 
+const DIGEST_OPEN_STORAGE_KEY = 'jurii-digest-open';
+
 /** 月曆底下的該月概況：一回一條，長度就是直播長度 */
 function MonthDigest({
   group,
@@ -483,15 +485,22 @@ function MonthDigest({
 }) {
   const totalMinutes = group.episodes.reduce((sum, episode) => sum + (episode.durationMinutes ?? 0), 0);
   const totalSections = group.episodes.reduce((sum, episode) => sum + episode.sections.length, 0);
-  // 手機預設收起來，免得要多滑一大段才看得到預覽
-  const [open, setOpen] = useState(false);
+  // 手機預設收起來，免得要多滑一大段才看得到預覽；展開過就記住。
+  // SSR 一律當作收起，掛載後才採用儲存值，不然 hydration 對不起來
+  const mounted = useHydrated();
+  const [storedOpen, setStoredOpen] = useState(() => readStoredBoolean(DIGEST_OPEN_STORAGE_KEY, false));
+  const open = mounted && storedOpen;
+  const toggle = () => {
+    setStoredOpen(!open);
+    writeStoredBoolean(DIGEST_OPEN_STORAGE_KEY, !open);
+  };
 
   return (
     <div className="flex-1 min-h-0 flex flex-col mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
       {/* lg 以下卡片不定高，月曆底下再接一整串長條會把預覽推出螢幕，所以這一列當成收折鈕；lg 以上永遠展開 */}
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={toggle}
         aria-expanded={open}
         className={`w-full flex items-center justify-between gap-2 text-left tabular-nums text-xs leading-none text-zinc-500 dark:text-zinc-400 lg:pointer-events-none lg:mb-2.5 ${
           open ? 'mb-2.5' : ''
