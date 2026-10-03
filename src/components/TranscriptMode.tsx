@@ -356,6 +356,13 @@ export default function TranscriptMode({
   const [exitSide, setExitSide] = useState<'left' | 'right' | null>(null);
   const swipeFrom = useRef<{ x: number; y: number } | null>(null);
   const swiped = useRef(false);
+  // 進入橫向時的操作提示，只在剛進去那幾秒出現
+  const [hint, setHint] = useState(false);
+  useEffect(() => {
+    if (!hint) return;
+    const timer = setTimeout(() => setHint(false), 4000);
+    return () => clearTimeout(timer);
+  }, [hint]);
   useEffect(() => {
     if (!exitSide) return;
     const timer = setTimeout(() => setExitSide(null), 3000);
@@ -561,6 +568,11 @@ export default function TranscriptMode({
                       className={`landscape-edge absolute inset-y-0 z-10 touch-none focus:outline-none ${side === 'left' ? 'left-0' : 'right-0'}`}
                     />
                   ))}
+                  {hint && (
+                    <p className="pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-xs text-white backdrop-blur">
+                      輕點兩側黑區顯示退出鈕，或從邊緣往內滑退出
+                    </p>
+                  )}
                   {exitSide && (
                     <button
                       type="button"
@@ -613,6 +625,7 @@ export default function TranscriptMode({
                 onClick={() => {
                   setLandscape(true);
                   setExitSide('right'); // 進去先亮 3 秒，讓人知道退出鈕在哪、之後點邊緣會再出現
+                  setHint(true);
                 }}
                 aria-label="橫向放大"
                 title="橫向放大：播放器鋪滿畫面並轉成橫的"
