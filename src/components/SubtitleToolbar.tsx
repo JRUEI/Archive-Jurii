@@ -52,7 +52,7 @@ const SWITCH_BTN =
   'inline-flex h-8 shrink-0 items-center gap-1 rounded-[10px] px-1 text-[13px] font-bold text-zinc-700 transition hover:bg-brand-yellow/10 dark:text-zinc-200 @min-[780px]:gap-1.5 @min-[780px]:px-2';
 
 /* 軌道 flex + items-center，白球由 flex 垂直置中（不靠 top 手算）；開時右移 = 軌道寬 32 − 左右內距各 2 − 球 14 = 14px（translate-x-3.5） */
-function SwitchTrack({ on }: { on: boolean }) {
+export function SwitchTrack({ on }: { on: boolean }) {
   return (
     <span
       aria-hidden="true"
