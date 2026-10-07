@@ -40,6 +40,16 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
   };
   const [isCardMode, setIsCardMode] = useState(false);
 
+  // 段落紀錄點時間碼 → 切到逐字稿、跳到那一秒開播。n 遞增，同一段連點也會再跳一次
+  const [seekRequest, setSeekRequest] = useState<{ sec: number; n: number } | null>(null);
+  const canJumpToTranscript = !!episode.youtubeUrl && (episode.transcript?.length ?? 0) > 0;
+  const jumpToTranscript = canJumpToTranscript
+    ? (sec: number) => {
+        setViewType('transcript');
+        setSeekRequest(prev => ({ sec, n: (prev?.n ?? 0) + 1 }));
+      }
+    : undefined;
+
   useEffect(() => {
     if (!anchoredSection) return;
     // 直接落點，不用滑的：從首頁點進來本來就等同開新頁，捲個五千像素只是拖時間
@@ -159,13 +169,14 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
             episode={episode}
             active={viewType === 'transcript'}
             onReturn={() => setViewType('transcript')}
+            seekRequest={seekRequest}
           />
         )}
         {viewType !== 'transcript' &&
           (isCardMode ? (
-            <CardMode key={viewType} episode={episode} isLossless={viewType === 'lossless'} />
+            <CardMode key={viewType} episode={episode} isLossless={viewType === 'lossless'} onSeekSection={jumpToTranscript} />
           ) : (
-            <TextMode episode={episode} isLossless={viewType === 'lossless'} />
+            <TextMode episode={episode} isLossless={viewType === 'lossless'} onSeekSection={jumpToTranscript} />
           ))}
       </div>
     </div>

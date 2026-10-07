@@ -6,8 +6,10 @@ import ReactMarkdown from 'react-markdown';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFocusMode } from './FocusModeProvider';
 import { scrollBehavior } from '@/lib/motion';
+import { timeToSeconds } from '@/lib/format';
+import { Play } from 'lucide-react';
 
-function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: number, isFocusMode: boolean }) {
+function SectionBlock({ card, index, isFocusMode, onSeek }: { card: EpisodeCard, index: number, isFocusMode: boolean, onSeek?: (sec: number) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = useState(false);
 
@@ -41,11 +43,24 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
             </span>
           </div>
         )}
-        {card.time && (
+        {card.time && (onSeek ? (
+          <button
+            type="button"
+            onClick={e => {
+              e.stopPropagation();
+              onSeek(timeToSeconds(card.time ?? ''));
+            }}
+            title="跳到逐字稿這一段，從這裡開始播"
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg font-mono text-sm font-bold tabular-nums bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-brand-yellow/15 hover:text-brand-brown dark:hover:text-brand-yellow transition-colors cursor-pointer"
+          >
+            <Play size={12} fill="currentColor" className="shrink-0" />
+            {card.time}
+          </button>
+        ) : (
           <span className="shrink-0 px-3 py-1 rounded-lg font-mono text-sm font-bold tabular-nums bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
             {card.time}
           </span>
-        )}
+        ))}
         <h3 className="col-span-3 min-w-0 text-2xl font-bold text-zinc-900 dark:text-zinc-100 m-0 tracking-tight">
           {card.title}
         </h3>
@@ -101,7 +116,7 @@ function SectionBlock({ card, index, isFocusMode }: { card: EpisodeCard, index: 
   );
 }
 
-export default function TextMode({ episode, isLossless }: { episode: EpisodeData, isLossless: boolean }) {
+export default function TextMode({ episode, isLossless, onSeekSection }: { episode: EpisodeData, isLossless: boolean, onSeekSection?: (sec: number) => void }) {
   // Note: useScroll runs even in summary mode because React hooks cannot be called conditionally
   const { scrollYProgress } = useScroll();
   const { isFocusMode } = useFocusMode();
@@ -132,7 +147,7 @@ export default function TextMode({ episode, isLossless }: { episode: EpisodeData
         
         <div className="space-y-8">
           {episode.cards.map((card, idx) => (
-            <SectionBlock key={idx} card={card} index={idx} isFocusMode={isFocusMode} />
+            <SectionBlock key={idx} card={card} index={idx} isFocusMode={isFocusMode} onSeek={onSeekSection} />
           ))}
         </div>
       </div>

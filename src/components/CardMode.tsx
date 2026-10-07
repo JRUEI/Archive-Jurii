@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { EpisodeData, EpisodeCard } from '@/lib/markdown';
-import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Play } from 'lucide-react';
+import { timeToSeconds } from '@/lib/format';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -16,12 +17,15 @@ interface PaginatedCard {
   displayTitle: string;
   /** 單一條目就超過一張卡時的字級縮放，避免內容被裁掉 */
   scale: number;
+  /** 該段在影片的開始時間碼，一段切成幾張時每張都帶 */
+  time?: string;
 }
 
 interface RenderableCard {
   type: 'cover' | 'content' | 'summary' | 'ending';
   tag?: string;
   title?: string;
+  time?: string;
   content?: string[];
   contentChunk?: string[];
   displayTitle?: string;
@@ -418,7 +422,7 @@ const ExportableCard = ({ card, index, isPreview = false, episode, isDark, total
   );
 };
 
-export default function CardMode({ episode, isLossless }: { episode: EpisodeData, isLossless: boolean }) {
+export default function CardMode({ episode, isLossless, onSeekSection }: { episode: EpisodeData, isLossless: boolean, onSeekSection?: (sec: number) => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { theme } = useTheme();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -738,20 +742,36 @@ export default function CardMode({ episode, isLossless }: { episode: EpisodeData
       <div className="flex flex-col items-center w-full max-w-lg">
 
         {/* Controls */}
-        <div className="w-full flex justify-between items-center mb-4 px-2">
-          <div className="w-16 sm:w-24"></div>
-          <div className="text-zinc-500 dark:text-zinc-400 font-bold bg-zinc-100 dark:bg-zinc-900 px-4 py-1.5 rounded-full text-xs sm:text-sm border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm tracking-wider">
+        <div className="w-full flex items-center mb-4 px-2">
+          {/* 左右兩格 flex-1 等寬，中間的張數徽章才會真的置中；左格放「跳到逐字稿這一段」 */}
+          <div className="flex-1 flex justify-start">
+            {onSeekSection && currentCard?.time && (
+              <button
+                type="button"
+                onClick={() => onSeekSection(timeToSeconds(currentCard.time ?? ''))}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full font-bold font-mono tabular-nums text-xs transition-all shadow-sm border border-zinc-200/50 dark:border-zinc-800/50 hover:scale-105 active:scale-95"
+                aria-label={`跳到逐字稿 ${currentCard.time}，從這一段開始播`}
+                title="跳到逐字稿這一段，從這裡開始播"
+              >
+                <Play size={12} fill="currentColor" className="shrink-0" />
+                <span>{currentCard.time}</span>
+              </button>
+            )}
+          </div>
+          <div className="shrink-0 text-zinc-500 dark:text-zinc-400 font-bold bg-zinc-100 dark:bg-zinc-900 px-4 py-1.5 rounded-full text-xs sm:text-sm border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm tracking-wider">
             {Math.min(currentIndex + 1, cardsToRender.length)} / {cardsToRender.length}
           </div>
-          <button 
-            onClick={() => setIsFullscreen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full font-bold text-xs transition-all shadow-sm border border-zinc-200/50 dark:border-zinc-800/50 hover:scale-105 active:scale-95"
-            aria-label="放大全螢幕"
-            title="放大全螢幕檢視"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-            <span>放大</span>
-          </button>
+          <div className="flex-1 flex justify-end">
+            <button
+              onClick={() => setIsFullscreen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full font-bold text-xs transition-all shadow-sm border border-zinc-200/50 dark:border-zinc-800/50 hover:scale-105 active:scale-95"
+              aria-label="放大全螢幕"
+              title="放大全螢幕檢視"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+              <span>放大</span>
+            </button>
+          </div>
         </div>
 
         {/* The viewport container that scales down the 1080x1920 card */}

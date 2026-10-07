@@ -9,6 +9,7 @@ import {
   writeStoredNumber,
   writeStoredString,
 } from '@/lib/client-state';
+import { timeToSeconds } from '@/lib/format';
 import { scrollBehavior } from '@/lib/motion';
 import {
   buildSubtitleRows,
@@ -70,18 +71,6 @@ declare global {
   }
 }
 
-// 時間字串轉換為秒數 (支援 MM:SS 或 HH:MM:SS)
-function timeToSeconds(timeStr: string): number {
-  if (!timeStr) return 0;
-  const parts = timeStr.split(':').map(Number);
-  if (parts.length === 3) {
-    return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
-  } else if (parts.length === 2) {
-    return (parts[0] || 0) * 60 + (parts[1] || 0);
-  }
-  return 0;
-}
-
 // 從 YouTube URL 提取 videoId
 function extractYouTubeId(url?: string): string | null {
   if (!url) return null;
@@ -95,11 +84,14 @@ export default function TranscriptMode({
   episode,
   active = true,
   onReturn,
+  seekRequest,
 }: {
   episode: EpisodeData;
   /** 不在逐字稿分頁時為 false：整塊藏起來但不卸載（卸載會銷毀播放器、聲音就斷了），並在角落浮出「回逐字稿」鈕 */
   active?: boolean;
   onReturn?: () => void;
+  /** 段落紀錄點時間碼丟過來的跳轉要求；n 每次遞增，同一秒連點也會再觸發 */
+  seekRequest?: { sec: number; n: number } | null;
 }) {
   const videoId = extractYouTubeId(episode.youtubeUrl);
 
@@ -110,7 +102,7 @@ export default function TranscriptMode({
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [landscape, setLandscape] = useState<boolean>(false);
 
-  // 抽屜分頁：逐字稿 ↔ 段落紀錄（段落沒有時間碼，只能對照，不能跳轉）
+  // 抽屜分頁：逐字稿 ↔ 段落紀錄（點段落的時間碼可跳到該段開始的地方）
   const [drawerTab, setDrawerTab] = useState<'lines' | 'sections'>('lines');
   // 釘選中的段落：切回逐字稿分頁時固定在搜尋框下方，一次只釘一段
   const [pinnedCard, setPinnedCard] = useState<number | null>(null);
@@ -179,6 +171,9 @@ export default function TranscriptMode({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const drawerRef = useRef<HTMLElement>(null);
+  // 播放器 onReady 之前 seekTo／playVideo 都沒用：第一次從段落紀錄跳過來時播放器還沒生出來，先記著，ready 了再跳
+  const playerReadyRef = useRef(false);
+  const pendingSeekRef = useRef<number | null>(seekRequest?.sec ?? null);
 
   // 一鍵平滑滾動畫面：底部對齊字幕群底下空白的中間，剛好露出上方影片時間軸
   const scrollToTheaterView = useCallback(() => {
@@ -275,6 +270,17 @@ export default function TranscriptMode({
       setActiveIndex(targetIdx);
     }
   }, []);
+
+  // 段落紀錄點時間碼：定位到播放器，已經在跑就直接跳＋播，還沒 ready 就等 onReady
+  useEffect(() => {
+    if (!seekRequest) return;
+    scrollToTheaterView();
+    if (playerReadyRef.current) {
+      seekTo(seekRequest.sec, findActiveIndex(seekRequest.sec));
+    } else {
+      pendingSeekRef.current = seekRequest.sec;
+    }
+  }, [seekRequest, seekTo, findActiveIndex, scrollToTheaterView]);
 
   // 相對目前進度前後跳（不改播放／暫停狀態）
   const skipBy = useCallback((delta: number) => {
@@ -423,13 +429,24 @@ export default function TranscriptMode({
             enablejsapi: 1,
             cc_load_policy: 0, // 0 是「照觀看者自己的 YouTube 設定」，不是強制關；真正關掉靠 closeNativeCaptions
             iv_load_policy: 3, // 關閉註解
+            // 從段落紀錄第一次跳過來：直接從那一秒開始載入。瀏覽器擋自動播放時，影片就停在這個位置
+            ...(pendingSeekRef.current !== null && { start: Math.floor(pendingSeekRef.current) }),
           },
           events: {
             onReady: () => {
               if (!isMounted) return;
               closeNativeCaptions();
+              playerReadyRef.current = true;
               setIsPlayerReady(true);
               startProgressLoopRef.current();
+              const pending = pendingSeekRef.current;
+              if (pending !== null) {
+                pendingSeekRef.current = null;
+                playerRef.current?.seekTo(pending, true);
+                playerRef.current?.playVideo();
+                const idx = findActiveIndexRef.current(pending);
+                if (idx !== -1) setActiveIndex(idx);
+              }
             },
             onStateChange: event => {
               if (!isMounted) return;
@@ -467,6 +484,7 @@ export default function TranscriptMode({
 
     return () => {
       isMounted = false;
+      playerReadyRef.current = false;
       if (timerRef.current) clearInterval(timerRef.current);
       if (playerRef.current) {
         try {
