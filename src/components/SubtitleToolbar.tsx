@@ -6,6 +6,7 @@ import {
   Captions,
   CaseSensitive,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Circle,
@@ -15,7 +16,6 @@ import {
   MoveVertical,
   Pin,
   RotateCcw,
-  SlidersHorizontal,
   Star,
   Timer,
   X,
@@ -34,22 +34,20 @@ import {
 
 const SKIP_SECONDS = 5;
 
-type Tool = 'style' | 'offset' | 'slots';
+type Tool = 'view' | 'offset' | 'slots';
 type Change = (patch: Partial<SubtitleState>) => void;
 
 const TOOLS: { id: Tool; name: string; Icon: LucideIcon }[] = [
-  { id: 'style', name: '樣式', Icon: SlidersHorizontal },
+  { id: 'view', name: '字幕', Icon: Captions },
   { id: 'offset', name: '延遲', Icon: Timer },
   { id: 'slots', name: '快捷', Icon: Star },
 ];
 
-/* 工具列放得下「圖示＋文字」的最小寬度是 780px（見下面的 @min-[780px]），比這窄就只留圖示，
-   名稱在 aria-label 與 title。Tailwind 只認原始碼裡寫死的 class，所以每處都直接寫 @min-[780px]，不能用變數拼 */
+/* 工具列放得下「圖示＋文字」實量要 679.3px（觸控裝置：橫向放大＋全螢幕同時出現的最寬情況），留 8px 餘裕取 688px（見下面的 @min-[688px]），比這窄就只留圖示，
+   名稱在 aria-label 與 title。Tailwind 只認原始碼裡寫死的 class，所以每處都直接寫 @min-[688px]，不能用變數拼 */
 export const BAR_BTN =
-  'inline-flex h-8 min-w-6 flex-[0_1_36px] items-center justify-center gap-1 rounded-[10px] border border-transparent text-[13px] font-bold text-zinc-500 transition dark:text-zinc-400 enabled:hover:bg-brand-yellow/10 aria-expanded:border-brand-yellow/25 aria-expanded:bg-brand-yellow/10 aria-expanded:text-brand-brown dark:aria-expanded:text-brand-yellow aria-pressed:border-brand-yellow/25 aria-pressed:bg-brand-yellow/10 aria-pressed:text-brand-brown dark:aria-pressed:text-brand-yellow disabled:cursor-not-allowed disabled:opacity-40 @min-[780px]:flex-none @min-[780px]:px-1.5';
-export const LABEL = 'hidden @min-[780px]:inline';
-const SWITCH_BTN =
-  'inline-flex h-8 shrink-0 items-center gap-1 rounded-[10px] px-1 text-[13px] font-bold text-zinc-700 transition hover:bg-brand-yellow/10 dark:text-zinc-200 @min-[780px]:gap-1.5 @min-[780px]:px-2';
+  'inline-flex h-8 min-w-6 flex-[0_1_36px] items-center justify-center gap-1 rounded-[10px] border border-transparent text-[13px] font-bold text-zinc-500 transition dark:text-zinc-400 enabled:hover:bg-brand-yellow/10 aria-expanded:border-brand-yellow/25 aria-expanded:bg-brand-yellow/10 aria-expanded:text-brand-brown dark:aria-expanded:text-brand-yellow aria-pressed:border-brand-yellow/25 aria-pressed:bg-brand-yellow/10 aria-pressed:text-brand-brown dark:aria-pressed:text-brand-yellow disabled:cursor-not-allowed disabled:opacity-40 @min-[688px]:flex-none @min-[688px]:px-1.5';
+export const LABEL = 'hidden @min-[688px]:inline';
 
 /* 軌道 flex + items-center，白球由 flex 垂直置中（不靠 top 手算）；開時右移 = 軌道寬 32 − 左右內距各 2 − 球 14 = 14px（translate-x-3.5） */
 export function SwitchTrack({ on }: { on: boolean }) {
@@ -77,7 +75,7 @@ const describeOffset = (ms: number) => `${ms > 0 ? '提前' : '延後'} ${(Math.
 const formatOffset = (ms: number) => (ms === 0 ? '0 秒' : describeOffset(ms));
 
 /**
- * 影片下面的字幕設定列：字幕開關、字幕群開關、三個設定鈕一排（還原在樣式面板裡）。
+ * 影片下面的工具列：「字幕」選單（影片字幕＋即時字幕群開關，開著字幕時接樣式滑桿與描邊色，還原在裡面）、倒退／快轉、延遲與快捷兩個設定鈕、上層塞進來的按鈕、全螢幕。
  * 設定鈕各開一個小浮層（absolute，不推擠頁面）；一次只開一個。
  * 狀態與存檔都在上層，這裡只負責畫面。
  */
@@ -109,8 +107,8 @@ export default function SubtitleToolbar({
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Partial<Record<Tool, HTMLButtonElement | null>>>({});
-  // 字幕關掉時設定鈕都停用，浮層也一併收起
-  const active = on ? open : null;
+  // 「字幕」選單不受字幕開關影響（關掉字幕要從這裡關，也要能從這裡再開）；字幕關掉時其他設定鈕都停用，浮層也一併收起
+  const active = open === 'view' || on ? open : null;
 
   useEffect(() => {
     if (!active) return;
@@ -159,37 +157,46 @@ export default function SubtitleToolbar({
   const setStyle = (patch: Partial<SubtitleStyle>) => onChange({ cur: { ...cur, ...patch } });
 
   let panel: ReactNode = null;
-  if (active === 'style') {
+  if (active === 'view') {
     panel = (
       <>
-        <Slider
-          label="位置"
-          Icon={MoveVertical}
-          value={cur.sb}
-          range={SUBTITLE_RANGE.sb}
-          format={v => `${v}%`}
-          onChange={sb => setStyle({ sb })}
-        />
-        <Slider
-          label="字號"
-          Icon={CaseSensitive}
-          value={cur.sf}
-          range={SUBTITLE_RANGE.sf}
-          format={v => v.toFixed(1)}
-          onChange={sf => setStyle({ sf })}
-        />
-        <Slider label="粗細" Icon={Bold} value={cur.sw} range={SUBTITLE_RANGE.sw} format={String} onChange={sw => setStyle({ sw })} />
-        <Slider
-          label="描邊"
-          Icon={Circle}
-          iconStrokeWidth={3.4}
-          value={cur.ss}
-          range={SUBTITLE_RANGE.ss}
-          format={v => v.toFixed(2)}
-          onChange={ss => setStyle({ ss })}
-        />
-        <ColorPanel state={state} onChange={onChange} />
-        <SaveSlot state={state} onChange={onChange} />
+        {/* 兩個開關同一列；容器窄到放不下就自己換行 */}
+        <div className="-mx-2 flex flex-wrap gap-x-2">
+          <SwitchRow label="影片上的字幕" Icon={Captions} on={on} onClick={() => onChange({ on: !on })} />
+          <SwitchRow label="即時字幕群" Icon={List} on={groupOn} onClick={() => onGroupChange(!groupOn)} />
+        </div>
+        {on && (
+          <div className="grid gap-2.5 border-t border-zinc-200 pt-2.5 dark:border-zinc-800">
+            <Slider
+              label="位置"
+              Icon={MoveVertical}
+              value={cur.sb}
+              range={SUBTITLE_RANGE.sb}
+              format={v => `${v}%`}
+              onChange={sb => setStyle({ sb })}
+            />
+            <Slider
+              label="字號"
+              Icon={CaseSensitive}
+              value={cur.sf}
+              range={SUBTITLE_RANGE.sf}
+              format={v => v.toFixed(1)}
+              onChange={sf => setStyle({ sf })}
+            />
+            <Slider label="粗細" Icon={Bold} value={cur.sw} range={SUBTITLE_RANGE.sw} format={String} onChange={sw => setStyle({ sw })} />
+            <Slider
+              label="描邊"
+              Icon={Circle}
+              iconStrokeWidth={3.4}
+              value={cur.ss}
+              range={SUBTITLE_RANGE.ss}
+              format={v => v.toFixed(2)}
+              onChange={ss => setStyle({ ss })}
+            />
+            <ColorPanel state={state} onChange={onChange} />
+            <SaveSlot state={state} onChange={onChange} />
+          </div>
+        )}
       </>
     );
   } else if (active === 'offset') {
@@ -220,35 +227,22 @@ export default function SubtitleToolbar({
           手機上那組懸浮鈕會蓋住工具列右端的「目前設定」，按「畫面定位」之後更是剛好對上 */}
       <div ref={rootRef} className="@container relative z-[41]">
         <div className="rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-          <div role="group" aria-label="字幕設定" className="flex h-11 items-center gap-0.5 px-1">
+          <div role="group" aria-label="播放控制" className="flex h-11 items-center gap-0.5 px-1">
             <button
-              type="button"
-              role="switch"
-              aria-checked={on}
-              aria-label="字幕"
-              onClick={() => {
-                setOpen(null);
-                onChange({ on: !on });
+              ref={el => {
+                buttonRefs.current.view = el;
               }}
-              className={SWITCH_BTN}
-            >
-              <Captions size={16} aria-hidden="true" />
-              <span className={LABEL}>字幕</span>
-              <SwitchTrack on={on} />
-            </button>
-            {/* 影片下方卡片的開關，跟「字幕」同一款滑動開關 */}
-            <button
               type="button"
-              role="switch"
-              aria-checked={groupOn}
-              aria-label="即時字幕群"
-              title="顯示／隱藏影片下方的即時字幕群"
-              onClick={() => onGroupChange(!groupOn)}
-              className={SWITCH_BTN}
+              aria-label="字幕"
+              title="字幕、即時字幕群、樣式"
+              aria-expanded={active === 'view'}
+              aria-controls={`${uid}-view`}
+              onClick={() => setOpen(active === 'view' ? null : 'view')}
+              className={`${BAR_BTN} flex-none px-1.5`}
             >
-              <List size={16} aria-hidden="true" />
-              <span className={LABEL}>字幕群</span>
-              <SwitchTrack on={groupOn} />
+              <Captions size={16} aria-hidden="true" className="shrink-0" />
+              <span className={LABEL}>字幕</span>
+              <ChevronDown size={14} aria-hidden="true" className="shrink-0" />
             </button>
 
             <span className="min-w-0 flex-1" />
@@ -267,7 +261,7 @@ export default function SubtitleToolbar({
               </>
             )}
 
-            {TOOLS.map(({ id, name, Icon }) => (
+            {TOOLS.filter(t => t.id !== 'view').map(({ id, name, Icon }) => (
               <button
                 key={id}
                 ref={el => {
@@ -288,7 +282,7 @@ export default function SubtitleToolbar({
             ))}
 
           {children}
-          <span aria-hidden="true" className="mx-1 hidden h-4 w-px shrink-0 bg-zinc-200 @min-[780px]:block dark:bg-zinc-700" />
+          <span aria-hidden="true" className="mx-1 hidden h-4 w-px shrink-0 bg-zinc-200 @min-[688px]:block dark:bg-zinc-700" />
 
             {canFullscreen && (
               <button
@@ -298,7 +292,7 @@ export default function SubtitleToolbar({
                 title={isFullscreen ? '離開全螢幕' : '字幕全螢幕（YouTube 內建全螢幕看不到字幕）'}
                 onClick={toggleFullscreen}
                 /* 手機寬度（工具列窄、觸控）改由旁邊的「橫向放大」取代：兩顆併排會把最右邊擠出工具列。平板與電腦不受影響 */
-                className={`${BAR_BTN} @max-[780px]:pointer-coarse:hidden`}
+                className={`${BAR_BTN} @max-[687px]:pointer-coarse:hidden`}
               >
                 {isFullscreen ? (
                   <Minimize size={16} aria-hidden="true" className="shrink-0" />
@@ -324,6 +318,23 @@ export default function SubtitleToolbar({
         )}
       </div>
     </div>
+  );
+}
+
+/** 「字幕」選單裡的一列：圖示＋名稱＋滑動開關 */
+function SwitchRow({ label, Icon, on, onClick }: { label: string; Icon: LucideIcon; on: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      onClick={onClick}
+      className="flex h-9 min-w-36 flex-1 items-center gap-2 rounded-[10px] px-2 text-[13px] font-bold text-zinc-700 transition hover:bg-brand-yellow/10 dark:text-zinc-200"
+    >
+      <Icon size={16} aria-hidden="true" className="shrink-0" />
+      <span className="flex-1 text-left">{label}</span>
+      <SwitchTrack on={on} />
+    </button>
   );
 }
 
@@ -651,7 +662,7 @@ function SlotsPanel({ state: { cur, slots, names, def }, onChange }: { state: Su
               disabled={!slot}
               aria-pressed={def === i}
               aria-label={`設為預設：快捷 ${i + 1}`}
-              title="設成預設後，樣式面板的「還原」會回到這一組；再按一次取消"
+              title="設成預設後，「字幕」選單裡的「還原」會回到這一組；再按一次取消"
               onClick={() => onChange({ def: def === i ? null : i })}
               className={MINI_BTN}
             >
