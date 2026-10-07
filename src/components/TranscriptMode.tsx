@@ -18,7 +18,8 @@ import {
   SUBTITLE_STORAGE_KEY,
   type SubtitleState,
 } from '@/lib/subtitle';
-import { Search, Play, X, Clock, FileText, Crosshair, LayoutList, Pin, ChevronDown, RectangleHorizontal } from 'lucide-react';
+import { useStageCapture } from '@/lib/stage-capture';
+import { Search, Play, X, Clock, FileText, Crosshair, LayoutList, Pin, ChevronDown, RectangleHorizontal, Camera, Check } from 'lucide-react';
 import SubtitleOverlay from './SubtitleOverlay';
 import SubtitleToolbar, { BAR_BTN, LABEL, SwitchTrack } from './SubtitleToolbar';
 
@@ -171,6 +172,12 @@ export default function TranscriptMode({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const drawerRef = useRef<HTMLElement>(null);
+  // 截圖檔名：標題（去掉不能當檔名的字元）＋按下去那一刻的分秒
+  const shot = useStageCapture(theaterRef, () => {
+    const sec = Math.floor(playerRef.current?.getCurrentTime?.() ?? 0);
+    const title = episode.title.replace(/[\\/:*?"<>|]/g, '-').trim() || 'jurii';
+    return `${title}-${Math.floor(sec / 60)}m${String(sec % 60).padStart(2, '0')}s`;
+  });
   // 播放器 onReady 之前 seekTo／playVideo 都沒用：第一次從段落紀錄跳過來時播放器還沒生出來，先記著，ready 了再跳
   const playerReadyRef = useRef(false);
   const pendingSeekRef = useRef<number | null>(seekRequest?.sec ?? null);
@@ -639,6 +646,24 @@ export default function TranscriptMode({
                 <Search size={16} aria-hidden="true" className="shrink-0" />
                 <span className={LABEL}>完整字幕</span>
               </button>
+              {/* 手機的瀏覽器沒有「分享此分頁」，supported 為 false 就整顆不出現（手機自己截圖，橫向放大時字幕也在） */}
+              {shot.supported && (
+                <button
+                  type="button"
+                  onClick={shot.capture}
+                  disabled={shot.busy}
+                  aria-label="截圖"
+                  title="截圖：存下目前的影片畫面與字幕（第一次要在瀏覽器跳出的視窗按「分享」）"
+                  className={BAR_BTN}
+                >
+                  {shot.result === 'saved' ? (
+                    <Check size={16} strokeWidth={3} aria-hidden="true" className="shrink-0" />
+                  ) : (
+                    <Camera size={16} aria-hidden="true" className="shrink-0" />
+                  )}
+                  <span className={LABEL}>{shot.result === 'saved' ? '已存' : shot.result === 'failed' ? '失敗' : '截圖'}</span>
+                </button>
+              )}
               {/* 只給觸控裝置：iPhone 的瀏覽器沒有元素全螢幕（上面那顆全螢幕鈕不會出現），這顆自己鋪滿並轉橫 */}
               <button
                 type="button"

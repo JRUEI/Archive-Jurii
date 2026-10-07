@@ -43,11 +43,12 @@ const TOOLS: { id: Tool; name: string; Icon: LucideIcon }[] = [
   { id: 'slots', name: '快捷', Icon: Star },
 ];
 
-/* 工具列放得下「圖示＋文字」實量要 679.3px（觸控裝置：橫向放大＋全螢幕同時出現的最寬情況），留 8px 餘裕取 688px（見下面的 @min-[688px]），比這窄就只留圖示，
-   名稱在 aria-label 與 title。Tailwind 只認原始碼裡寫死的 class，所以每處都直接寫 @min-[688px]，不能用變數拼 */
+/* 工具列放得下「圖示＋文字」實量：滑鼠桌面 653.3px；觸控裝置的 Chrome／Edge 同時出現橫向放大＋截圖＋全螢幕是最寬情況，740.6px。
+   留 8px 餘裕取 749px（見下面的 @min-[749px]），比這窄就只留圖示，
+   名稱在 aria-label 與 title。Tailwind 只認原始碼裡寫死的 class，所以每處都直接寫 @min-[749px]，不能用變數拼 */
 export const BAR_BTN =
-  'inline-flex h-8 min-w-6 flex-[0_1_36px] items-center justify-center gap-1 rounded-[10px] border border-transparent text-[13px] font-bold text-zinc-500 transition dark:text-zinc-400 enabled:hover:bg-brand-yellow/10 aria-expanded:border-brand-yellow/25 aria-expanded:bg-brand-yellow/10 aria-expanded:text-brand-brown dark:aria-expanded:text-brand-yellow aria-pressed:border-brand-yellow/25 aria-pressed:bg-brand-yellow/10 aria-pressed:text-brand-brown dark:aria-pressed:text-brand-yellow disabled:cursor-not-allowed disabled:opacity-40 @min-[688px]:flex-none @min-[688px]:px-1.5';
-export const LABEL = 'hidden @min-[688px]:inline';
+  'inline-flex h-8 min-w-6 flex-[0_1_36px] items-center justify-center gap-1 rounded-[10px] border border-transparent text-[13px] font-bold text-zinc-500 transition dark:text-zinc-400 enabled:hover:bg-brand-yellow/10 aria-expanded:border-brand-yellow/25 aria-expanded:bg-brand-yellow/10 aria-expanded:text-brand-brown dark:aria-expanded:text-brand-yellow aria-pressed:border-brand-yellow/25 aria-pressed:bg-brand-yellow/10 aria-pressed:text-brand-brown dark:aria-pressed:text-brand-yellow disabled:cursor-not-allowed disabled:opacity-40 @min-[749px]:flex-none @min-[749px]:px-1.5';
+export const LABEL = 'hidden @min-[749px]:inline';
 
 /* 軌道 flex + items-center，白球由 flex 垂直置中（不靠 top 手算）；開時右移 = 軌道寬 32 − 左右內距各 2 − 球 14 = 14px（translate-x-3.5） */
 export function SwitchTrack({ on }: { on: boolean }) {
@@ -282,7 +283,7 @@ export default function SubtitleToolbar({
             ))}
 
           {children}
-          <span aria-hidden="true" className="mx-1 hidden h-4 w-px shrink-0 bg-zinc-200 @min-[688px]:block dark:bg-zinc-700" />
+          <span aria-hidden="true" className="mx-1 hidden h-4 w-px shrink-0 bg-zinc-200 @min-[749px]:block dark:bg-zinc-700" />
 
             {canFullscreen && (
               <button
@@ -292,7 +293,7 @@ export default function SubtitleToolbar({
                 title={isFullscreen ? '離開全螢幕' : '字幕全螢幕（YouTube 內建全螢幕看不到字幕）'}
                 onClick={toggleFullscreen}
                 /* 手機寬度（工具列窄、觸控）改由旁邊的「橫向放大」取代：兩顆併排會把最右邊擠出工具列。平板與電腦不受影響 */
-                className={`${BAR_BTN} @max-[687px]:pointer-coarse:hidden`}
+                className={`${BAR_BTN} @max-[748px]:pointer-coarse:hidden`}
               >
                 {isFullscreen ? (
                   <Minimize size={16} aria-hidden="true" className="shrink-0" />
