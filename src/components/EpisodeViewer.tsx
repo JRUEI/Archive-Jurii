@@ -26,8 +26,10 @@ export default function EpisodeViewer({ episode }: { episode: EpisodeData }) {
     () => window.location.hash,
     () => '',
   );
-  // 從首頁卡片的簡述點進來時網址會帶 #section-N：預設就開在段落紀錄，捲到那一段
-  const anchoredSection = /^#section-(\d+)$/.exec(hash)?.[1] ?? null;
+  // 從首頁卡片的簡述點進來時網址會帶 #section-N：預設就開在段落紀錄，捲到那一段。
+  // 不能用 ^ 錨定開頭：Next 16 的路由快取會記住第一次進這集時的 #hash，之後再點會接成
+  // `#section-5#section-3`，所以只認結尾那一個
+  const anchoredSection = /#section-(\d+)$/.exec(hash)?.[1] ?? null;
 
   // 使用者自己按過分頁就以他按的為準，沒按過才看網址
   const [pickedView, setPickedView] = useState<'summary' | 'lossless' | 'transcript' | null>(null);
